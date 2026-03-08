@@ -269,6 +269,30 @@ const translations = {
     en: "We'll review your request and respond shortly.",
     ru: "Мы рассмотрим ваш запрос и свяжемся с вами в ближайшее время.",
   },
+
+  // Contact page
+  "contact.title": { en: "Contact Us", ru: "Контакты" },
+  "contact.subtitle": {
+    en: "Get in touch with our team. We're here to help with your electronic component needs.",
+    ru: "Свяжитесь с нашей командой. Мы готовы помочь с подбором электронных компонентов.",
+  },
+  "contact.info_title": { en: "Contact Information", ru: "Контактная информация" },
+  "contact.address": { en: "Address", ru: "Адрес" },
+  "contact.address_value": { en: "Moscow, Russia, Presnenskaya nab. 12", ru: "Москва, Пресненская наб. 12" },
+  "contact.phone": { en: "Phone", ru: "Телефон" },
+  "contact.email": { en: "Email", ru: "Электронная почта" },
+  "contact.hours": { en: "Working Hours", ru: "Режим работы" },
+  "contact.hours_value": { en: "Mon–Fri 9:00–18:00 (MSK)", ru: "Пн–Пт 9:00–18:00 (МСК)" },
+  "contact.form_title": { en: "Send us a message", ru: "Написать нам" },
+  "contact.name": { en: "Name", ru: "Имя" },
+  "contact.message": { en: "Message", ru: "Сообщение" },
+  "contact.subject": { en: "Subject", ru: "Тема" },
+  "contact.send": { en: "Send Message", ru: "Отправить сообщение" },
+  "contact.sent_title": { en: "Message Sent!", ru: "Сообщение отправлено!" },
+  "contact.sent_desc": {
+    en: "We'll get back to you as soon as possible.",
+    ru: "Мы ответим вам в ближайшее время.",
+  },
 } as const;
 
 // Category & subcategory localization map (key = English name)
