@@ -82,6 +82,14 @@ const translations = {
   "catalog.add_to_cart": { en: "Add to Cart", ru: "В корзину" },
   "catalog.upload_bom": { en: "Upload BOM", ru: "Загрузить BOM" },
 
+  // Smart Search
+  "smart_search.products": { en: "products", ru: "товаров" },
+  "smart_search.popular": { en: "Popular searches", ru: "Популярные запросы" },
+  "smart_search.parts": { en: "Parts", ru: "Компоненты" },
+  "smart_search.manufacturers": { en: "Manufacturers", ru: "Производители" },
+  "smart_search.categories": { en: "Categories", ru: "Категории" },
+  "smart_search.search_all": { en: "Search all for", ru: "Искать всё по запросу" },
+
   // Product Detail
   "product.back": { en: "Back to results", ru: "Назад к результатам" },
   "product.tech_specs": { en: "Technical Specifications", ru: "Технические характеристики" },
