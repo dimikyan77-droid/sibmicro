@@ -145,6 +145,45 @@ const translations = {
   // Manufacturers
   "mfg.title": { en: "Authorized Manufacturers", ru: "Авторизованные производители" },
   "mfg.products": { en: "products", ru: "товаров" },
+
+  // Auth
+  "auth.login": { en: "Sign In", ru: "Войти" },
+  "auth.register": { en: "Sign Up", ru: "Регистрация" },
+  "auth.password": { en: "Password", ru: "Пароль" },
+  "auth.full_name": { en: "Full Name", ru: "ФИО" },
+  "auth.company": { en: "Company", ru: "Компания" },
+  "auth.error": { en: "Error", ru: "Ошибка" },
+  "auth.check_email": { en: "Check your email", ru: "Проверьте почту" },
+  "auth.confirm_sent": { en: "Confirmation email sent", ru: "Письмо с подтверждением отправлено" },
+  "auth.reset_sent": { en: "Password reset email sent", ru: "Письмо для сброса пароля отправлено" },
+  "auth.forgot_password": { en: "Forgot password?", ru: "Забыли пароль?" },
+  "auth.reset_password": { en: "Reset Password", ru: "Сброс пароля" },
+  "auth.send_reset": { en: "Send Reset Link", ru: "Отправить ссылку" },
+  "auth.back_login": { en: "Back to login", ru: "Назад к входу" },
+  "auth.google": { en: "Sign in with Google", ru: "Войти через Google" },
+  "auth.new_password": { en: "New Password", ru: "Новый пароль" },
+  "auth.update_password": { en: "Update Password", ru: "Обновить пароль" },
+  "auth.password_updated": { en: "Password updated", ru: "Пароль обновлён" },
+  "auth.invalid_link": { en: "Invalid or expired link", ru: "Недействительная или просроченная ссылка" },
+
+  // Account
+  "account.title": { en: "My Account", ru: "Личный кабинет" },
+  "account.logout": { en: "Sign Out", ru: "Выйти" },
+  "account.profile": { en: "Profile", ru: "Профиль" },
+  "account.orders": { en: "Order History", ru: "История заказов" },
+  "account.phone": { en: "Phone", ru: "Телефон" },
+  "account.inn": { en: "INN (Tax ID)", ru: "ИНН" },
+  "account.save": { en: "Save", ru: "Сохранить" },
+  "account.saved": { en: "Profile saved", ru: "Профиль сохранён" },
+  "account.no_orders": { en: "No orders yet", ru: "Заказов пока нет" },
+  "account.order_number": { en: "Order #", ru: "Заказ №" },
+  "account.date": { en: "Date", ru: "Дата" },
+  "account.status": { en: "Status", ru: "Статус" },
+  "account.total": { en: "Total", ru: "Сумма" },
+
+  // Header auth
+  "header.my_account": { en: "My Account", ru: "Личный кабинет" },
+  "header.login": { en: "Sign In", ru: "Войти" },
 } as const;
 
 type TranslationKey = keyof typeof translations;
