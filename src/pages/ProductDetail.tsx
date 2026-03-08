@@ -169,7 +169,6 @@ const ProductDetail = () => {
               >
                 <GitCompare className="h-3.5 w-3.5" /> {product && isInCompare(product.id) ? "In Compare" : "Compare"}
               </button>
-              </button>
               <button className="flex-1 flex items-center justify-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs hover:bg-muted transition-colors">
                 <Share2 className="h-3.5 w-3.5" /> Share
               </button>
