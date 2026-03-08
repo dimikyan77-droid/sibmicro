@@ -184,6 +184,22 @@ const translations = {
   // Header auth
   "header.my_account": { en: "My Account", ru: "Личный кабинет" },
   "header.login": { en: "Sign In", ru: "Войти" },
+
+  // Cart
+  "cart.title": { en: "Shopping Cart", ru: "Корзина" },
+  "cart.empty": { en: "Cart is empty", ru: "Корзина пуста" },
+  "cart.empty_desc": { en: "Add components from the catalog to get started.", ru: "Добавьте компоненты из каталога, чтобы начать." },
+  "cart.to_catalog": { en: "Go to Catalog", ru: "Перейти в каталог" },
+  "cart.summary": { en: "Order Summary", ru: "Итого" },
+  "cart.items_count": { en: "Items", ru: "Штук" },
+  "cart.positions": { en: "Positions", ru: "Позиций" },
+  "cart.place_order": { en: "Place Order", ru: "Оформить заказ" },
+  "cart.login_to_order": { en: "Sign in to order", ru: "Войдите для заказа" },
+  "cart.login_hint": { en: "You need to sign in to place an order", ru: "Для оформления заказа необходимо войти в аккаунт" },
+  "cart.clear": { en: "Clear Cart", ru: "Очистить корзину" },
+  "cart.continue_shopping": { en: "Continue Shopping", ru: "Продолжить покупки" },
+  "cart.order_placed": { en: "Order placed!", ru: "Заказ оформлен!" },
+  "cart.added": { en: "Added to cart", ru: "Добавлено в корзину" },
 } as const;
 
 type TranslationKey = keyof typeof translations;

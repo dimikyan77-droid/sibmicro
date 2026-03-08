@@ -1,15 +1,21 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FileText, ShoppingCart, Heart, GitCompare, Share2, ArrowLeft } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { products } from "@/data/mockData";
 import { useCompare } from "@/contexts/CompareContext";
 import { useI18n } from "@/contexts/I18nContext";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const { t } = useI18n();
+  const { addToCart } = useCart();
+  const { toast } = useToast();
   const product = products.find((p) => p.id === id);
+  const [qty, setQty] = useState(product?.moq || 1);
 
   if (!product) {
     return (
@@ -140,11 +146,18 @@ const ProductDetail = () => {
               <div className="flex gap-2">
                 <input
                   type="number"
-                  defaultValue={product.moq}
+                  value={qty}
                   min={product.moq}
+                  onChange={(e) => setQty(Math.max(parseInt(e.target.value) || product.moq, product.moq))}
                   className="w-20 rounded-md border border-input bg-background px-3 py-2 text-sm text-center"
                 />
-                <button className="flex-1 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/90 transition-colors flex items-center justify-center gap-2">
+                <button
+                  onClick={() => {
+                    addToCart(product, qty);
+                    toast({ title: t("cart.added"), description: product.partNumber });
+                  }}
+                  className="flex-1 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
+                >
                   <ShoppingCart className="h-4 w-4" /> {t("product.add_to_cart")}
                 </button>
               </div>
