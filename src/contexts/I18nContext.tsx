@@ -293,6 +293,41 @@ const translations = {
     en: "We'll get back to you as soon as possible.",
     ru: "Мы ответим вам в ближайшее время.",
   },
+
+  // Resources page
+  "res.title": { en: "Technical Resources", ru: "Техническая документация" },
+  "res.subtitle": {
+    en: "Datasheets, application notes, design guides and useful tools for electronics engineers.",
+    ru: "Даташиты, аппноуты, руководства по проектированию и полезные инструменты для инженеров-электронщиков.",
+  },
+  "res.datasheets": { en: "Datasheets", ru: "Даташиты" },
+  "res.datasheets_desc": {
+    en: "Access manufacturer datasheets for all components in our catalog. Search by part number to find detailed specifications.",
+    ru: "Доступ к даташитам производителей на все компоненты из нашего каталога. Ищите по номеру детали.",
+  },
+  "res.app_notes": { en: "Application Notes", ru: "Аппноуты" },
+  "res.app_notes_desc": {
+    en: "Practical design examples and implementation guides from leading manufacturers.",
+    ru: "Практические примеры проектирования и руководства по реализации от ведущих производителей.",
+  },
+  "res.design_tools": { en: "Design Tools", ru: "Инструменты проектирования" },
+  "res.design_tools_desc": {
+    en: "Online calculators, simulation tools, and PCB design resources to accelerate your development.",
+    ru: "Онлайн-калькуляторы, инструменты моделирования и ресурсы для проектирования печатных плат.",
+  },
+  "res.standards": { en: "Standards & Compliance", ru: "Стандарты и сертификация" },
+  "res.standards_desc": {
+    en: "Information on RoHS, REACH, ITAR and other regulatory compliance for electronic components.",
+    ru: "Информация о RoHS, REACH, ITAR и других нормативных требованиях к электронным компонентам.",
+  },
+  "res.faq": { en: "FAQ", ru: "Часто задаваемые вопросы" },
+  "res.faq_desc": {
+    en: "Answers to common questions about ordering, shipping, and technical support.",
+    ru: "Ответы на частые вопросы о заказах, доставке и технической поддержке.",
+  },
+  "res.useful_links": { en: "Useful Links", ru: "Полезные ссылки" },
+  "res.search_catalog": { en: "Search Catalog", ru: "Искать в каталоге" },
+  "res.visit": { en: "Visit", ru: "Перейти" },
 } as const;
 
 // Category & subcategory localization map (key = English name)
