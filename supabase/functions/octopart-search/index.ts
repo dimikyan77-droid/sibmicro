@@ -47,37 +47,25 @@ async function getNexarToken(): Promise<string> {
   return cachedToken.access_token;
 }
 
-const SEARCH_QUERY = `
+const SEARCH_QUERY_AUTHORIZED = `
 query SearchParts($q: String!, $limit: Int!) {
   supSearch(q: $q, limit: $limit) {
     hits
     results {
       part {
         mpn
-        manufacturer {
-          name
-        }
+        manufacturer { name }
         shortDescription
         specs {
-          attribute {
-            name
-          }
+          attribute { name }
           displayValue
         }
-        bestDatasheet {
-          url
-        }
+        bestDatasheet { url }
         sellers(authorizedOnly: true) {
-          company {
-            name
-          }
+          company { name }
           offers {
             inventoryLevel
-            prices {
-              quantity
-              price
-              currency
-            }
+            prices { quantity price currency }
             moq
             packaging
           }
@@ -87,6 +75,73 @@ query SearchParts($q: String!, $limit: Int!) {
   }
 }
 `;
+
+const SEARCH_QUERY_ALL_SELLERS = `
+query SearchParts($q: String!, $limit: Int!) {
+  supSearch(q: $q, limit: $limit) {
+    hits
+    results {
+      part {
+        mpn
+        manufacturer { name }
+        shortDescription
+        specs {
+          attribute { name }
+          displayValue
+        }
+        bestDatasheet { url }
+        sellers {
+          company { name }
+          offers {
+            inventoryLevel
+            prices { quantity price currency }
+            moq
+            packaging
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
+const SEARCH_QUERY_BASIC = `
+query SearchParts($q: String!, $limit: Int!) {
+  supSearch(q: $q, limit: $limit) {
+    hits
+    results {
+      part {
+        mpn
+        manufacturer { name }
+        shortDescription
+        specs {
+          attribute { name }
+          displayValue
+        }
+        bestDatasheet { url }
+      }
+    }
+  }
+}
+`;
+
+async function executeSearch(token: string, query: string, variables: { q: string; limit: number }) {
+  const gqlResp = await fetch(NEXAR_GRAPHQL_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  if (!gqlResp.ok) {
+    const text = await gqlResp.text();
+    throw new Error(`Nexar API error [${gqlResp.status}]: ${text}`);
+  }
+
+  return await gqlResp.json();
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -104,31 +159,39 @@ serve(async (req) => {
     }
 
     const token = await getNexarToken();
+    const variables = { q: query, limit: Math.min(limit, 20) };
 
-    const gqlResp = await fetch(NEXAR_GRAPHQL_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: SEARCH_QUERY,
-        variables: { q: query, limit: Math.min(limit, 20) },
-      }),
-    });
+    const attempts = [
+      { name: "authorized_sellers", query: SEARCH_QUERY_AUTHORIZED },
+      { name: "all_sellers", query: SEARCH_QUERY_ALL_SELLERS },
+      { name: "basic", query: SEARCH_QUERY_BASIC },
+    ];
 
-    if (!gqlResp.ok) {
-      const text = await gqlResp.text();
-      throw new Error(`Nexar API error [${gqlResp.status}]: ${text}`);
+    let gqlData: any = null;
+    let source = "none";
+
+    for (const attempt of attempts) {
+      const data = await executeSearch(token, attempt.query, variables);
+      const hits = data?.data?.supSearch?.hits ?? 0;
+      const results = data?.data?.supSearch?.results ?? [];
+
+      if (data?.errors?.length) {
+        console.warn(`Nexar GraphQL errors [${attempt.name}]:`, JSON.stringify(data.errors));
+      }
+
+      gqlData = data;
+      source = attempt.name;
+
+      if (results.length > 0 || hits > 0) {
+        break;
+      }
     }
 
-    const gqlData = await gqlResp.json();
-
     // Transform results into a cleaner format
-    const results = (gqlData.data?.supSearch?.results || []).map((r: any) => {
+    const results = (gqlData?.data?.supSearch?.results || []).map((r: any) => {
       const part = r.part;
-      const sellers = (part.sellers || []).map((s: any) => ({
-        name: s.company.name,
+      const sellers = (part?.sellers || []).map((s: any) => ({
+        name: s.company?.name,
         offers: (s.offers || []).map((o: any) => ({
           stock: o.inventoryLevel,
           moq: o.moq,
@@ -142,12 +205,12 @@ serve(async (req) => {
       }));
 
       return {
-        mpn: part.mpn,
-        manufacturer: part.manufacturer?.name,
-        description: part.shortDescription,
-        datasheetUrl: part.bestDatasheet?.url,
-        specs: (part.specs || []).slice(0, 10).map((s: any) => ({
-          name: s.attribute.name,
+        mpn: part?.mpn,
+        manufacturer: part?.manufacturer?.name,
+        description: part?.shortDescription,
+        datasheetUrl: part?.bestDatasheet?.url,
+        specs: (part?.specs || []).slice(0, 10).map((s: any) => ({
+          name: s.attribute?.name,
           value: s.displayValue,
         })),
         sellers,
@@ -156,8 +219,9 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        hits: gqlData.data?.supSearch?.hits || 0,
+        hits: gqlData?.data?.supSearch?.hits || 0,
         results,
+        source,
       }),
       {
         status: 200,
