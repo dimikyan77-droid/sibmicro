@@ -322,6 +322,10 @@ const ExternalSearchResults = ({
   const [activeTab, setActiveTab] = useState<"all" | "octopart" | "digikey">("all");
   const [extSortKey, setExtSortKey] = useState<ExtSortKey>("price");
   const [extSortDir, setExtSortDir] = useState<"asc" | "desc">("asc");
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+
+  const getQty = (key: string) => quantities[key] ?? 1;
+  const setQty = (key: string, val: number) => setQuantities((prev) => ({ ...prev, [key]: Math.max(1, val) }));
 
   const toggleExtSort = useCallback((key: ExtSortKey) => {
     if (extSortKey === key) setExtSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -333,15 +337,16 @@ const ExternalSearchResults = ({
     return extSortDir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />;
   };
 
-  const handleAdd = useCallback((item: UnifiedItem) => {
+  const handleAdd = useCallback((item: UnifiedItem, qty?: number) => {
+    const quantity = qty ?? getQty(item.key);
     const product = item.source === "octopart"
       ? octopartToProduct(item.raw as OctopartResult)
       : digikeyToProduct(item.raw as DigiKeyResult);
-    addToCart(product);
+    addToCart(product, quantity);
     setAddedKeys((prev) => new Set(prev).add(item.key));
-    toast.success(t("cart.added"), { description: item.mpn });
+    toast.success(t("cart.added"), { description: `${item.mpn} × ${quantity}` });
     setTimeout(() => { setAddedKeys((prev) => { const n = new Set(prev); n.delete(item.key); return n; }); }, 2000);
-  }, [addToCart, t]);
+  }, [addToCart, t, quantities]);
 
   const allItems = useMemo(
     () => buildUnifiedItems(octopart.results, digikey.results),
