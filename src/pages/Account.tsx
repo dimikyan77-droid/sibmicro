@@ -169,7 +169,11 @@ const Account = () => {
                   <TableBody>
                     {orders.map((order) => (
                       <TableRow key={order.id}>
-                        <TableCell className="font-mono font-medium">{order.order_number}</TableCell>
+                        <TableCell>
+                          <Link to={`/order/${order.id}`} className="font-mono font-medium text-primary hover:underline">
+                            {order.order_number}
+                          </Link>
+                        </TableCell>
                         <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
                         <TableCell><span className={statusColor(order.status)}>{order.status}</span></TableCell>
                         <TableCell className="text-right font-medium">
