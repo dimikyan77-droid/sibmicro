@@ -9,20 +9,12 @@ import { useCart } from "@/contexts/CartContext";
 import SmartSearch from "@/components/SmartSearch";
 
 const Header = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { lang, setLang, t, tc } = useI18n();
   const { user } = useAuth();
   const { totalItems } = useCart();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/catalog?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
