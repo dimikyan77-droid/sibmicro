@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Search, ExternalLink, Loader2, Package } from "lucide-react";
+import { Search, ExternalLink, Loader2, Package, ShoppingCart, Check } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/contexts/I18nContext";
+import { useCart } from "@/contexts/CartContext";
+import type { Product } from "@/data/mockData";
+import { toast } from "sonner";
 
 interface OctopartPrice {
   quantity: number;
@@ -38,12 +41,72 @@ interface OctopartResult {
 
 const OctopartSearch = () => {
   const { t } = useI18n();
+  const { addToCart } = useCart();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<OctopartResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalHits, setTotalHits] = useState(0);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [addedMpns, setAddedMpns] = useState<Set<string>>(new Set());
+
+  const octopartToProduct = (r: OctopartResult): Product => {
+    const allPrices: { qty: number; price: number }[] = [];
+    let minMoq = 1;
+    let totalStock = getTotalStock(r.sellers);
+
+    for (const s of r.sellers) {
+      for (const o of s.offers) {
+        if (o.moq && o.moq > 0) minMoq = Math.max(minMoq, 1);
+        for (const p of o.prices) {
+          allPrices.push({ qty: p.quantity, price: p.price });
+        }
+      }
+    }
+
+    // Deduplicate and sort price tiers
+    const tierMap = new Map<number, number>();
+    for (const p of allPrices) {
+      const existing = tierMap.get(p.qty);
+      if (!existing || p.price < existing) tierMap.set(p.qty, p.price);
+    }
+    const priceTiers = Array.from(tierMap.entries())
+      .map(([qty, price]) => ({ qty, price }))
+      .sort((a, b) => a.qty - b.qty);
+
+    if (priceTiers.length === 0) priceTiers.push({ qty: 1, price: 0 });
+
+    return {
+      id: `octopart-${r.mpn}`,
+      partNumber: r.mpn,
+      manufacturer: r.manufacturer || "Unknown",
+      category: "Octopart",
+      subcategory: "",
+      description: r.description || "",
+      package: r.specs.find((s) => s.name.toLowerCase().includes("package"))?.value || "",
+      temperatureRange: r.specs.find((s) => s.name.toLowerCase().includes("temp"))?.value || "",
+      rohs: true,
+      stock: totalStock,
+      leadTime: totalStock > 0 ? "In Stock" : "Contact",
+      priceTiers,
+      moq: minMoq,
+      datasheetUrl: r.datasheetUrl || "",
+    };
+  };
+
+  const handleAddToCart = (r: OctopartResult) => {
+    const product = octopartToProduct(r);
+    addToCart(product);
+    setAddedMpns((prev) => new Set(prev).add(r.mpn));
+    toast.success(t("cart.added"), { description: r.mpn });
+    setTimeout(() => {
+      setAddedMpns((prev) => {
+        const next = new Set(prev);
+        next.delete(r.mpn);
+        return next;
+      });
+    }, 2000);
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,6 +215,7 @@ const OctopartSearch = () => {
                   <th>{t("catalog.stock")}</th>
                   <th className="text-right">{t("catalog.price")}</th>
                   <th className="w-10"></th>
+                  <th className="w-10"></th>
                 </tr>
               </thead>
               <tbody>
@@ -192,6 +256,15 @@ const OctopartSearch = () => {
                         )}
                       </td>
                       <td>
+                        <button
+                          onClick={() => handleAddToCart(r)}
+                          className={`p-1.5 rounded-md transition-colors ${addedMpns.has(r.mpn) ? "text-green-600 bg-green-50" : "text-primary hover:bg-muted"}`}
+                          title={t("product.add_to_cart")}
+                        >
+                          {addedMpns.has(r.mpn) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
+                        </button>
+                      </td>
+                      <td>
                         {r.datasheetUrl && (
                           <a
                             href={r.datasheetUrl}
@@ -220,12 +293,21 @@ const OctopartSearch = () => {
             <div className="mt-4 border border-border rounded-lg p-5 bg-muted/30">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-foreground">{r.mpn}</h2>
-                <button
-                  onClick={() => setExpandedRow(null)}
-                  className="text-xs text-muted-foreground hover:text-foreground"
-                >
-                  ✕ {t("octopart.close")}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleAddToCart(r)}
+                    className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    {t("product.add_to_cart")}
+                  </button>
+                  <button
+                    onClick={() => setExpandedRow(null)}
+                    className="text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    ✕ {t("octopart.close")}
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
