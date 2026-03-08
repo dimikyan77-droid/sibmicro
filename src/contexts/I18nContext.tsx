@@ -292,6 +292,7 @@ interface I18nContextType {
   lang: Lang;
   setLang: (lang: Lang) => void;
   t: (key: TranslationKey) => string;
+  tc: (name: string) => string;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -312,8 +313,13 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     [lang]
   );
 
+  const tc = useCallback(
+    (name: string) => categoryNames[name]?.[lang] ?? name,
+    [lang]
+  );
+
   return (
-    <I18nContext.Provider value={{ lang, setLang: changeLang, t }}>
+    <I18nContext.Provider value={{ lang, setLang: changeLang, t, tc }}>
       {children}
     </I18nContext.Provider>
   );
