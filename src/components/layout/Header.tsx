@@ -151,7 +151,7 @@ const Header = () => {
               className="block py-2 text-sm font-medium text-foreground"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {cat.name}
+              {tc(cat.name)}
             </Link>
           ))}
           <hr className="border-border" />
