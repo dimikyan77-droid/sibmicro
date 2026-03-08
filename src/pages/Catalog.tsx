@@ -630,7 +630,7 @@ const ExternalSearchResults = ({
               )}
               {r.priceTiers.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-2">Ценовые уровни DigiKey</h3>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">{t("ext.digikey_price_tiers")}</h3>
                   <div className="space-y-1">
                     {r.priceTiers.map((tier, i) => (
                       <div key={i} className="flex justify-between text-xs py-1 border-b border-border last:border-0">
