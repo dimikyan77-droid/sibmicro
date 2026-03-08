@@ -256,6 +256,15 @@ const OctopartSearch = () => {
                         )}
                       </td>
                       <td>
+                        <button
+                          onClick={() => handleAddToCart(r)}
+                          className={`p-1.5 rounded-md transition-colors ${addedMpns.has(r.mpn) ? "text-green-600 bg-green-50" : "text-primary hover:bg-muted"}`}
+                          title={t("product.add_to_cart")}
+                        >
+                          {addedMpns.has(r.mpn) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
+                        </button>
+                      </td>
+                      <td>
                         {r.datasheetUrl && (
                           <a
                             href={r.datasheetUrl}
