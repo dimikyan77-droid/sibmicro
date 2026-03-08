@@ -1,0 +1,11 @@
+Part Number,Quantity,Description
+STM32F103C8T6,100,ARM Cortex-M3 MCU 72MHz
+ATmega328P-AU,50,8-bit AVR Microcontroller
+LM7805CT,200,5V Voltage Regulator
+100nF 0805,1000,MLCC Capacitor X7R
+10uF 0805,500,Tantalum Capacitor
+ESP32-WROOM-32,30,WiFi+BT Module
+ADS1115IDGS,25,16-bit ADC I2C
+TPS54331DR,75,Step-Down Converter 3A
+SN74HC595DR,150,8-bit Shift Register
+IRLZ44NPBF,60,N-Channel MOSFET 55V
