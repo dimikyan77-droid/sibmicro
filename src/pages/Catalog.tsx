@@ -164,8 +164,8 @@ const Catalog = () => {
           </div>
         </div>
 
-        {showOctopart ? (
-          <OctopartResults octopart={octopart} />
+        {showExternalSearch ? (
+          <ExternalSearchResults octopart={octopart} digikey={digikey} />
         ) : (
           <div className="flex gap-6">
             {/* Sidebar Filters */}
