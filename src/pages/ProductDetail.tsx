@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { FileText, ShoppingCart, Heart, GitCompare, Share2, ArrowLeft } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { products } from "@/data/mockData";
+import { useCompare } from "@/contexts/CompareContext";
 
 const ProductDetail = () => {
   const { id } = useParams();
