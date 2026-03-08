@@ -240,6 +240,73 @@ const Catalog = () => {
   );
 };
 
+/* ─── Unified item for sorting ─── */
+interface UnifiedItem {
+  key: string;
+  source: "octopart" | "digikey";
+  mpn: string;
+  manufacturer: string;
+  description: string;
+  packageType: string;
+  stock: number;
+  unitPrice: number | null;
+  priceLabel: string;
+  priceSub: string;
+  datasheetUrl: string | null;
+  productUrl: string | null;
+  raw: OctopartResult | DigiKeyResult;
+}
+
+type ExtSortKey = "mpn" | "manufacturer" | "price" | "stock" | "source";
+
+function buildUnifiedItems(
+  octoResults: OctopartResult[],
+  dkResults: DigiKeyResult[]
+): UnifiedItem[] {
+  const items: UnifiedItem[] = [];
+
+  for (const r of octoResults) {
+    const bestPrice = getBestPrice(r.sellers);
+    const totalStock = getTotalStock(r.sellers);
+    items.push({
+      key: `octo-${r.mpn}`,
+      source: "octopart",
+      mpn: r.mpn,
+      manufacturer: r.manufacturer || "",
+      description: r.description || "",
+      packageType: r.specs.find((s) => s.name.toLowerCase().includes("package"))?.value || "",
+      stock: totalStock,
+      unitPrice: bestPrice?.price ?? null,
+      priceLabel: bestPrice ? `$${bestPrice.price.toFixed(bestPrice.price < 1 ? 4 : 2)}` : "—",
+      priceSub: bestPrice ? `qty ${bestPrice.quantity}+` : "",
+      datasheetUrl: r.datasheetUrl || null,
+      productUrl: null,
+      raw: r,
+    });
+  }
+
+  for (const r of dkResults) {
+    const bestPrice = getDigiKeyBestPrice(r.priceTiers);
+    items.push({
+      key: `dk-${r.mpn}-${r.digiKeyPn}`,
+      source: "digikey",
+      mpn: r.mpn,
+      manufacturer: r.manufacturer || "",
+      description: r.description || "",
+      packageType: r.packageType || "",
+      stock: r.stock,
+      unitPrice: bestPrice?.price ?? null,
+      priceLabel: bestPrice ? `$${bestPrice.price.toFixed(bestPrice.price < 1 ? 4 : 2)}` : "—",
+      priceSub: bestPrice ? `qty ${bestPrice.quantity}+` : "",
+      datasheetUrl: r.datasheetUrl || null,
+      productUrl: r.productUrl || null,
+      raw: r,
+    });
+  }
+
+  return items;
+}
+
 /* ─── Combined External Search Results ─── */
 const ExternalSearchResults = ({
   octopart,
@@ -253,24 +320,61 @@ const ExternalSearchResults = ({
   const [addedKeys, setAddedKeys] = useState<Set<string>>(new Set());
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"all" | "octopart" | "digikey">("all");
+  const [extSortKey, setExtSortKey] = useState<ExtSortKey>("price");
+  const [extSortDir, setExtSortDir] = useState<"asc" | "desc">("asc");
 
-  const handleAddOctopart = (r: OctopartResult) => {
-    const product = octopartToProduct(r);
-    addToCart(product);
-    const key = `octo-${r.mpn}`;
-    setAddedKeys((prev) => new Set(prev).add(key));
-    toast.success(t("cart.added"), { description: r.mpn });
-    setTimeout(() => { setAddedKeys((prev) => { const n = new Set(prev); n.delete(key); return n; }); }, 2000);
+  const toggleExtSort = useCallback((key: ExtSortKey) => {
+    if (extSortKey === key) setExtSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setExtSortKey(key); setExtSortDir("asc"); }
+  }, [extSortKey]);
+
+  const ExtSortIcon = ({ col }: { col: ExtSortKey }) => {
+    if (extSortKey !== col) return <ChevronDown className="h-3 w-3 opacity-30" />;
+    return extSortDir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />;
   };
 
-  const handleAddDigiKey = (r: DigiKeyResult) => {
-    const product = digikeyToProduct(r);
+  const handleAdd = useCallback((item: UnifiedItem) => {
+    const product = item.source === "octopart"
+      ? octopartToProduct(item.raw as OctopartResult)
+      : digikeyToProduct(item.raw as DigiKeyResult);
     addToCart(product);
-    const key = `dk-${r.mpn}-${r.digiKeyPn}`;
-    setAddedKeys((prev) => new Set(prev).add(key));
-    toast.success(t("cart.added"), { description: r.mpn });
-    setTimeout(() => { setAddedKeys((prev) => { const n = new Set(prev); n.delete(key); return n; }); }, 2000);
-  };
+    setAddedKeys((prev) => new Set(prev).add(item.key));
+    toast.success(t("cart.added"), { description: item.mpn });
+    setTimeout(() => { setAddedKeys((prev) => { const n = new Set(prev); n.delete(item.key); return n; }); }, 2000);
+  }, [addToCart, t]);
+
+  const allItems = useMemo(
+    () => buildUnifiedItems(octopart.results, digikey.results),
+    [octopart.results, digikey.results]
+  );
+
+  const sortedItems = useMemo(() => {
+    let items = [...allItems];
+
+    // Filter by tab
+    if (activeTab === "octopart") items = items.filter((i) => i.source === "octopart");
+    if (activeTab === "digikey") items = items.filter((i) => i.source === "digikey");
+
+    // Sort
+    items.sort((a, b) => {
+      let cmp = 0;
+      switch (extSortKey) {
+        case "mpn": cmp = a.mpn.localeCompare(b.mpn); break;
+        case "manufacturer": cmp = a.manufacturer.localeCompare(b.manufacturer); break;
+        case "price": {
+          const pa = a.unitPrice ?? Infinity;
+          const pb = b.unitPrice ?? Infinity;
+          cmp = pa - pb;
+          break;
+        }
+        case "stock": cmp = a.stock - b.stock; break;
+        case "source": cmp = a.source.localeCompare(b.source); break;
+      }
+      return extSortDir === "asc" ? cmp : -cmp;
+    });
+
+    return items;
+  }, [allItems, activeTab, extSortKey, extSortDir]);
 
   const bothLoading = octopart.loading && digikey.loading;
   const anyLoading = octopart.loading || digikey.loading;
@@ -303,13 +407,13 @@ const ExternalSearchResults = ({
 
   return (
     <div>
-      {/* Source tabs */}
+      {/* Source tabs + sort info */}
       <div className="mb-3 flex items-center gap-2 flex-wrap">
         <button
           onClick={() => setActiveTab("all")}
           className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"}`}
         >
-          Все источники
+          Все источники ({allItems.length})
         </button>
         {octopart.results.length > 0 && (
           <button
@@ -328,7 +432,10 @@ const ExternalSearchResults = ({
           </button>
         )}
         {anyLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
-        <span className="text-xs text-muted-foreground ml-auto">{t("octopart.fallback_hint")}</span>
+        <span className="text-xs text-muted-foreground ml-auto flex items-center gap-1">
+          <ArrowUpDown className="h-3 w-3" />
+          Сортировка: {extSortKey === "price" ? "цена" : extSortKey === "stock" ? "наличие" : extSortKey === "mpn" ? "артикул" : extSortKey === "manufacturer" ? "производитель" : "источник"} ({extSortDir === "asc" ? "↑" : "↓"})
+        </span>
       </div>
 
       {/* Errors */}
@@ -339,147 +446,92 @@ const ExternalSearchResults = ({
         <div className="mb-3 p-2 rounded-md bg-destructive/10 text-destructive text-xs">DigiKey: {digikey.error}</div>
       )}
 
-      {/* Octopart table */}
-      {(activeTab === "all" || activeTab === "octopart") && octopart.results.length > 0 && (
-        <div className="mb-6">
-          {activeTab === "all" && (
-            <h3 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
-              <span className="bg-primary/10 text-primary rounded px-1.5 py-0.5">Octopart</span>
-              {octopart.totalHits.toLocaleString()} {t("octopart.results")}
-            </h3>
-          )}
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th className="w-10"></th>
-                  <th className="min-w-[140px]">{t("catalog.part_number")}</th>
-                  <th>{t("catalog.manufacturer")}</th>
-                  <th className="min-w-[250px]">{t("catalog.description")}</th>
-                  <th>{t("catalog.stock")}</th>
-                  <th className="text-right">{t("catalog.price")}</th>
-                  <th className="w-10"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {octopart.results.map((r) => {
-                  const bestPrice = getBestPrice(r.sellers);
-                  const totalStock = getTotalStock(r.sellers);
-                  const key = `octo-${r.mpn}`;
-                  return (
-                    <tr key={key}>
-                      <td>
-                        <button onClick={() => handleAddOctopart(r)} className={`p-1.5 rounded-md transition-colors ${addedKeys.has(key) ? "text-green-600 bg-green-50" : "text-primary hover:bg-muted"}`} title={t("product.add_to_cart")}>
-                          {addedKeys.has(key) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
-                        </button>
-                      </td>
-                      <td>
-                        <button onClick={() => setExpandedRow(expandedRow === key ? null : key)} className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline text-left">
-                          {r.mpn}
-                        </button>
-                      </td>
-                      <td className="text-sm">{r.manufacturer}</td>
-                      <td className="text-xs text-muted-foreground">{r.description}</td>
-                      <td>
-                        <span className={`chip ${totalStock > 0 ? "chip-success" : "chip-warning"}`}>
-                          {totalStock > 0 ? totalStock.toLocaleString() : t("catalog.contact")}
-                        </span>
-                      </td>
-                      <td className="text-right">
-                        {bestPrice ? (
-                          <div>
-                            <div className="text-sm font-semibold">${bestPrice.price.toFixed(bestPrice.price < 1 ? 4 : 2)}</div>
-                            <div className="text-[10px] text-muted-foreground">qty {bestPrice.quantity}+</div>
-                          </div>
-                        ) : <span className="text-xs text-muted-foreground">—</span>}
-                      </td>
-                      <td>
-                        {r.datasheetUrl && (
-                          <a href={r.datasheetUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-accent" title={t("product.datasheet")}>
-                            <ExternalLink className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* DigiKey table */}
-      {(activeTab === "all" || activeTab === "digikey") && digikey.results.length > 0 && (
-        <div className="mb-6">
-          {activeTab === "all" && (
-            <h3 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
-              <span className="bg-accent/10 text-accent rounded px-1.5 py-0.5">DigiKey</span>
-              {digikey.totalHits.toLocaleString()} {t("octopart.results")}
-            </h3>
-          )}
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th className="w-10"></th>
-                  <th className="min-w-[140px]">{t("catalog.part_number")}</th>
-                  <th>{t("catalog.manufacturer")}</th>
-                  <th className="min-w-[250px]">{t("catalog.description")}</th>
-                  <th>{t("catalog.package")}</th>
-                  <th>{t("catalog.stock")}</th>
-                  <th className="text-right">{t("catalog.price")}</th>
-                  <th className="w-10"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {digikey.results.map((r) => {
-                  const bestPrice = getDigiKeyBestPrice(r.priceTiers);
-                  const key = `dk-${r.mpn}-${r.digiKeyPn}`;
-                  return (
-                    <tr key={key}>
-                      <td>
-                        <button onClick={() => handleAddDigiKey(r)} className={`p-1.5 rounded-md transition-colors ${addedKeys.has(key) ? "text-green-600 bg-green-50" : "text-primary hover:bg-muted"}`} title={t("product.add_to_cart")}>
-                          {addedKeys.has(key) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
-                        </button>
-                      </td>
-                      <td>
-                        <button onClick={() => setExpandedRow(expandedRow === key ? null : key)} className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline text-left">
-                          {r.mpn}
-                        </button>
-                        {r.digiKeyPn && <div className="text-[10px] text-muted-foreground">{r.digiKeyPn}</div>}
-                      </td>
-                      <td className="text-sm">{r.manufacturer}</td>
-                      <td className="text-xs text-muted-foreground">{r.description}</td>
-                      <td className="text-xs font-mono">{r.packageType}</td>
-                      <td>
-                        <span className={`chip ${r.stock > 0 ? "chip-success" : "chip-warning"}`}>
-                          {r.stock > 0 ? r.stock.toLocaleString() : t("catalog.contact")}
-                        </span>
-                      </td>
-                      <td className="text-right">
-                        {bestPrice ? (
-                          <div>
-                            <div className="text-sm font-semibold">${bestPrice.price.toFixed(bestPrice.price < 1 ? 4 : 2)}</div>
-                            <div className="text-[10px] text-muted-foreground">qty {bestPrice.quantity}+</div>
-                          </div>
-                        ) : <span className="text-xs text-muted-foreground">—</span>}
-                      </td>
-                      <td>
-                        {r.datasheetUrl && (
-                          <a href={r.datasheetUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-accent" title={t("product.datasheet")}>
-                            <ExternalLink className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      {/* Unified table */}
+      <div className="overflow-x-auto">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th className="w-10"></th>
+              <th className="w-16 cursor-pointer" onClick={() => toggleExtSort("source")}>
+                <span className="flex items-center gap-1">Источник <ExtSortIcon col="source" /></span>
+              </th>
+              <th className="min-w-[140px] cursor-pointer" onClick={() => toggleExtSort("mpn")}>
+                <span className="flex items-center gap-1">{t("catalog.part_number")} <ExtSortIcon col="mpn" /></span>
+              </th>
+              <th className="cursor-pointer" onClick={() => toggleExtSort("manufacturer")}>
+                <span className="flex items-center gap-1">{t("catalog.manufacturer")} <ExtSortIcon col="manufacturer" /></span>
+              </th>
+              <th className="min-w-[200px]">{t("catalog.description")}</th>
+              <th>{t("catalog.package")}</th>
+              <th className="cursor-pointer" onClick={() => toggleExtSort("stock")}>
+                <span className="flex items-center gap-1">{t("catalog.stock")} <ExtSortIcon col="stock" /></span>
+              </th>
+              <th className="text-right cursor-pointer" onClick={() => toggleExtSort("price")}>
+                <span className="flex items-center gap-1 justify-end">{t("catalog.price")} <ExtSortIcon col="price" /></span>
+              </th>
+              <th className="w-10"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedItems.map((item) => (
+              <tr key={item.key}>
+                <td>
+                  <button
+                    onClick={() => handleAdd(item)}
+                    className={`p-1.5 rounded-md transition-colors ${addedKeys.has(item.key) ? "text-green-600 bg-green-50" : "text-primary hover:bg-muted"}`}
+                    title={t("product.add_to_cart")}
+                  >
+                    {addedKeys.has(item.key) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
+                  </button>
+                </td>
+                <td>
+                  <span className={`text-[10px] font-semibold rounded px-1.5 py-0.5 ${
+                    item.source === "octopart"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-accent/10 text-accent"
+                  }`}>
+                    {item.source === "octopart" ? "Octopart" : "DigiKey"}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    onClick={() => setExpandedRow(expandedRow === item.key ? null : item.key)}
+                    className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline text-left"
+                  >
+                    {item.mpn}
+                  </button>
+                  {item.source === "digikey" && (item.raw as DigiKeyResult).digiKeyPn && (
+                    <div className="text-[10px] text-muted-foreground">{(item.raw as DigiKeyResult).digiKeyPn}</div>
+                  )}
+                </td>
+                <td className="text-sm">{item.manufacturer}</td>
+                <td className="text-xs text-muted-foreground">{item.description}</td>
+                <td className="text-xs font-mono">{item.packageType}</td>
+                <td>
+                  <span className={`chip ${item.stock > 0 ? "chip-success" : "chip-warning"}`}>
+                    {item.stock > 0 ? item.stock.toLocaleString() : t("catalog.contact")}
+                  </span>
+                </td>
+                <td className="text-right">
+                  {item.unitPrice !== null ? (
+                    <div>
+                      <div className="text-sm font-semibold">{item.priceLabel}</div>
+                      <div className="text-[10px] text-muted-foreground">{item.priceSub}</div>
+                    </div>
+                  ) : <span className="text-xs text-muted-foreground">—</span>}
+                </td>
+                <td>
+                  {item.datasheetUrl && (
+                    <a href={item.datasheetUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-accent" title={t("product.datasheet")}>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Expanded detail for Octopart */}
       {expandedRow?.startsWith("octo-") && (() => {
@@ -491,7 +543,7 @@ const ExternalSearchResults = ({
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-foreground">{r.mpn} <span className="text-xs font-normal text-primary bg-primary/10 rounded px-1.5 py-0.5 ml-2">Octopart</span></h2>
               <div className="flex items-center gap-3">
-                <button onClick={() => handleAddOctopart(r)} className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+                <button onClick={() => handleAdd(allItems.find((i) => i.key === expandedRow)!)} className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
                   <ShoppingCart className="h-4 w-4" /> {t("product.add_to_cart")}
                 </button>
                 <button onClick={() => setExpandedRow(null)} className="text-xs text-muted-foreground hover:text-foreground">✕ {t("octopart.close")}</button>
@@ -556,7 +608,7 @@ const ExternalSearchResults = ({
                     <ExternalLink className="h-3.5 w-3.5" /> DigiKey
                   </a>
                 )}
-                <button onClick={() => handleAddDigiKey(r)} className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+                <button onClick={() => handleAdd(allItems.find((i) => i.key === expandedRow)!)} className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
                   <ShoppingCart className="h-4 w-4" /> {t("product.add_to_cart")}
                 </button>
                 <button onClick={() => setExpandedRow(null)} className="text-xs text-muted-foreground hover:text-foreground">✕ {t("octopart.close")}</button>
@@ -580,10 +632,10 @@ const ExternalSearchResults = ({
                 <div>
                   <h3 className="text-sm font-semibold text-foreground mb-2">Ценовые уровни DigiKey</h3>
                   <div className="space-y-1">
-                    {r.priceTiers.map((t, i) => (
+                    {r.priceTiers.map((tier, i) => (
                       <div key={i} className="flex justify-between text-xs py-1 border-b border-border last:border-0">
-                        <span className="text-muted-foreground">{t.quantity}+</span>
-                        <span className="font-medium text-foreground">${t.price.toFixed(t.price < 1 ? 4 : 2)}</span>
+                        <span className="text-muted-foreground">{tier.quantity}+</span>
+                        <span className="font-medium text-foreground">${tier.price.toFixed(tier.price < 1 ? 4 : 2)}</span>
                       </div>
                     ))}
                   </div>
