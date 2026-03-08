@@ -18,6 +18,7 @@ import Account from "./pages/Account";
 import ResetPassword from "./pages/ResetPassword";
 import Cart from "./pages/Cart";
 import OrderDetail from "./pages/OrderDetail";
+import OctopartSearch from "./pages/OctopartSearch";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
