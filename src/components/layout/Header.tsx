@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, Menu, X, ChevronDown, Globe } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, ChevronDown, Globe, LogIn } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { categories } from "@/data/mockData";
 import { useI18n } from "@/contexts/I18nContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,6 +12,7 @@ const Header = () => {
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { lang, setLang, t } = useI18n();
+  const { user } = useAuth();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,8 +78,8 @@ const Header = () => {
             <ShoppingCart className="h-5 w-5 text-foreground" />
             <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-accent text-[10px] font-bold text-accent-foreground flex items-center justify-center">0</span>
           </Link>
-          <Link to="/account" className="p-2 rounded-md hover:bg-muted transition-colors hidden sm:block">
-            <User className="h-5 w-5 text-foreground" />
+          <Link to={user ? "/account" : "/auth"} className="p-2 rounded-md hover:bg-muted transition-colors hidden sm:flex items-center gap-1" title={user ? t("header.my_account") : t("header.login")}>
+            {user ? <User className="h-5 w-5 text-foreground" /> : <LogIn className="h-5 w-5 text-foreground" />}
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
