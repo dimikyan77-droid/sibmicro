@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Search, ExternalLink, Loader2, Package } from "lucide-react";
+import { Search, ExternalLink, Loader2, Package, ShoppingCart, Check } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/contexts/I18nContext";
+import { useCart } from "@/contexts/CartContext";
+import type { Product } from "@/data/mockData";
+import { toast } from "sonner";
 
 interface OctopartPrice {
   quantity: number;
