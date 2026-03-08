@@ -434,7 +434,7 @@ const ExternalSearchResults = ({
         {anyLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
         <span className="text-xs text-muted-foreground ml-auto flex items-center gap-1">
           <ArrowUpDown className="h-3 w-3" />
-          Сортировка: {extSortKey === "price" ? "цена" : extSortKey === "stock" ? "наличие" : extSortKey === "mpn" ? "артикул" : extSortKey === "manufacturer" ? "производитель" : "источник"} ({extSortDir === "asc" ? "↑" : "↓"})
+          {t("ext.sort_label")}: {extSortKey === "price" ? t("ext.sort_price") : extSortKey === "stock" ? t("ext.sort_stock") : extSortKey === "mpn" ? t("ext.sort_mpn") : extSortKey === "manufacturer" ? t("ext.sort_manufacturer") : t("ext.sort_source")} ({extSortDir === "asc" ? "↑" : "↓"})
         </span>
       </div>
 
