@@ -195,10 +195,7 @@ const Catalog = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredProducts.map((p) => (
-                  <tr key={p.id}>
-                    <td>
+              <CompareRows products={filteredProducts} />
                       <Link to={`/product/${p.id}`} className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline">
                         {p.partNumber}
                       </Link>
