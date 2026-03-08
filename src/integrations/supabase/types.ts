@@ -83,6 +83,42 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_requests: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          name: string
+          part_numbers: string
+          phone: string | null
+          quantities: string | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          part_numbers: string
+          phone?: string | null
+          quantities?: string | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          part_numbers?: string
+          phone?: string | null
+          quantities?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
