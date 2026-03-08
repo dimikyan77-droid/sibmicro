@@ -204,6 +204,52 @@ const Catalog = () => {
   );
 };
 
+const CatalogBody = ({ products: filteredProducts }: { products: Product[] }) => {
+  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
+
+  return (
+    <tbody>
+      {filteredProducts.map((p) => (
+        <tr key={p.id}>
+          <td className="text-center">
+            <input
+              type="checkbox"
+              checked={isInCompare(p.id)}
+              onChange={() => isInCompare(p.id) ? removeFromCompare(p.id) : addToCompare(p)}
+              className="rounded border-border text-accent focus:ring-accent h-3.5 w-3.5"
+              title="Add to compare"
+            />
+          </td>
+          <td>
+            <Link to={`/product/${p.id}`} className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline">
+              {p.partNumber}
+            </Link>
+          </td>
+          <td className="text-sm">{p.manufacturer}</td>
+          <td className="text-xs text-muted-foreground">{p.description}</td>
+          <td className="text-xs font-mono">{p.package}</td>
+          <td>
+            <span className={`chip ${p.stock > 0 ? "chip-success" : "chip-warning"}`}>
+              {p.stock > 0 ? p.stock.toLocaleString() : "Contact"}
+            </span>
+          </td>
+          <td className="text-right">
+            <div className="text-sm font-semibold">${p.priceTiers[0].price.toFixed(p.priceTiers[0].price < 1 ? 4 : 2)}</div>
+            <div className="text-[10px] text-muted-foreground">qty {p.priceTiers[0].qty}+</div>
+          </td>
+        </tr>
+      ))}
+      {filteredProducts.length === 0 && (
+        <tr>
+          <td colSpan={7} className="text-center py-12 text-muted-foreground">
+            No products found. Try adjusting your search or filters.
+          </td>
+        </tr>
+      )}
+    </tbody>
+  );
+};
+
 const FilterGroup = ({
   title,
   options,
