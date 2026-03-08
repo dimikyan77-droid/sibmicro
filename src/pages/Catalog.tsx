@@ -116,7 +116,9 @@ const Catalog = () => {
 
   const activeFilterCount = Object.values(filters).flat().length;
 
-  const showOctopart = query && filteredProducts.length === 0;
+  const showExternalSearch = query && filteredProducts.length === 0;
+  const externalLoading = octopart.loading || digikey.loading;
+  const externalHasResults = octopart.results.length > 0 || digikey.results.length > 0;
 
   return (
     <Layout>
