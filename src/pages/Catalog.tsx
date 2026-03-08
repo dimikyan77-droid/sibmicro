@@ -30,6 +30,9 @@ const Catalog = () => {
   const [inStockOnly, setInStockOnly] = useState(false);
   const [authorizedOnly, setAuthorizedOnly] = useState(false);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ category: true, manufacturer: true, availability: true });
+  const [authorizedOnly, setAuthorizedOnly] = useState(false);
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
   const octopart = useOctopartSearch();
   const digikey = useDigiKeySearch();
