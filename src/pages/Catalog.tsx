@@ -101,12 +101,14 @@ const Catalog = () => {
     return result;
   }, [query, categorySlug, subSlug, filters, sortKey, sortDir]);
 
-  // Auto-search Octopart when local results are empty and there's a query
+  // Auto-search external sources when local results are empty and there's a query
   useEffect(() => {
     if (query && filteredProducts.length === 0) {
       octopart.search(query);
+      digikey.search(query);
     } else {
       octopart.clear();
+      digikey.clear();
     }
   }, [query, filteredProducts.length]);
 
