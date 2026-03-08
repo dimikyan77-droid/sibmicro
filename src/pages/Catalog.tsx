@@ -176,6 +176,9 @@ const Catalog = () => {
             <table className="data-table">
               <thead>
                 <tr>
+                  <th className="w-10">
+                    <GitCompare className="h-3.5 w-3.5 mx-auto text-muted-foreground" />
+                  </th>
                   <th onClick={() => toggleSort("partNumber")} className="min-w-[160px]">
                     <span className="flex items-center gap-1">Part Number <SortIcon col="partNumber" /></span>
                   </th>
