@@ -3,18 +3,20 @@ import { FileText, ShoppingCart, Heart, GitCompare, Share2, ArrowLeft } from "lu
 import Layout from "@/components/layout/Layout";
 import { products } from "@/data/mockData";
 import { useCompare } from "@/contexts/CompareContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
+  const { t } = useI18n();
   const product = products.find((p) => p.id === id);
 
   if (!product) {
     return (
       <Layout>
         <div className="container py-20 text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Product Not Found</h1>
-          <Link to="/catalog" className="text-accent hover:underline text-sm">← Back to Catalog</Link>
+          <h1 className="text-2xl font-bold text-foreground mb-2">{t("product.not_found")}</h1>
+          <Link to="/catalog" className="text-accent hover:underline text-sm">{t("product.back_catalog")}</Link>
         </div>
       </Layout>
     );
@@ -23,19 +25,19 @@ const ProductDetail = () => {
   const relatedProducts = products.filter((p) => p.id !== product.id && p.subcategory === product.subcategory).slice(0, 4);
 
   const specs: [string, string | undefined][] = [
-    ["Part Number", product.partNumber],
-    ["Manufacturer", product.manufacturer],
-    ["Category", `${product.category} / ${product.subcategory}`],
-    ["Frequency Range", product.frequency],
-    ["Gain", product.gain],
-    ["Noise Figure", product.noiseFigure],
-    ["Output Power", product.powerOutput],
-    ["Supply Voltage", product.supplyVoltage],
-    ["Package", product.package],
-    ["Temperature Range", product.temperatureRange],
-    ["RoHS Compliant", product.rohs ? "Yes" : "No"],
-    ["MOQ", String(product.moq)],
-    ["Lead Time", product.leadTime],
+    [t("spec.part_number"), product.partNumber],
+    [t("spec.manufacturer"), product.manufacturer],
+    [t("spec.category"), `${product.category} / ${product.subcategory}`],
+    [t("spec.frequency"), product.frequency],
+    [t("spec.gain"), product.gain],
+    [t("spec.noise_figure"), product.noiseFigure],
+    [t("spec.output_power"), product.powerOutput],
+    [t("spec.supply_voltage"), product.supplyVoltage],
+    [t("spec.package"), product.package],
+    [t("spec.temp_range"), product.temperatureRange],
+    [t("spec.rohs"), product.rohs ? t("spec.yes") : t("spec.no")],
+    [t("spec.moq"), String(product.moq)],
+    [t("spec.lead_time"), product.leadTime],
   ];
 
   return (
@@ -43,9 +45,9 @@ const ProductDetail = () => {
       {/* Breadcrumb */}
       <div className="bg-muted border-b border-border">
         <div className="container py-3 text-xs text-muted-foreground flex items-center gap-1.5">
-          <Link to="/" className="hover:text-foreground">Home</Link>
+          <Link to="/" className="hover:text-foreground">{t("catalog.home")}</Link>
           <span>/</span>
-          <Link to="/catalog" className="hover:text-foreground">Catalog</Link>
+          <Link to="/catalog" className="hover:text-foreground">{t("catalog.title")}</Link>
           <span>/</span>
           <span className="text-foreground font-medium">{product.partNumber}</span>
         </div>
@@ -53,7 +55,7 @@ const ProductDetail = () => {
 
       <div className="container py-8">
         <Link to="/catalog" className="inline-flex items-center gap-1 text-xs text-accent hover:underline mb-6">
-          <ArrowLeft className="h-3 w-3" /> Back to results
+          <ArrowLeft className="h-3 w-3" /> {t("product.back")}
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -68,7 +70,7 @@ const ProductDetail = () => {
             {/* Specs Table */}
             <div className="rounded-lg border border-border overflow-hidden">
               <div className="bg-muted px-4 py-2.5">
-                <h2 className="text-sm font-semibold text-foreground">Technical Specifications</h2>
+                <h2 className="text-sm font-semibold text-foreground">{t("product.tech_specs")}</h2>
               </div>
               <table className="w-full text-sm">
                 <tbody>
@@ -85,7 +87,7 @@ const ProductDetail = () => {
             {/* Cross References */}
             {product.crossReferences && product.crossReferences.length > 0 && (
               <div>
-                <h2 className="text-sm font-semibold text-foreground mb-2">Cross References</h2>
+                <h2 className="text-sm font-semibold text-foreground mb-2">{t("product.cross_refs")}</h2>
                 <div className="flex flex-wrap gap-2">
                   {product.crossReferences.map((ref) => {
                     const linked = products.find((p) => p.partNumber === ref);
@@ -107,19 +109,19 @@ const ProductDetail = () => {
             {/* Stock & Pricing */}
             <div className="rounded-lg border border-border p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">Availability</span>
+                <span className="text-sm font-medium text-foreground">{t("product.availability")}</span>
                 <span className={`chip ${product.stock > 0 ? "chip-success" : "chip-warning"}`}>
-                  {product.stock > 0 ? `${product.stock.toLocaleString()} in stock` : product.leadTime}
+                  {product.stock > 0 ? `${product.stock.toLocaleString()} ${t("catalog.in_stock")}` : product.leadTime}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-xs font-semibold text-muted-foreground mb-2">PRICE TIERS</h3>
+                <h3 className="text-xs font-semibold text-muted-foreground mb-2">{t("product.price_tiers")}</h3>
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-xs text-muted-foreground">
-                      <th className="text-left pb-1">Qty</th>
-                      <th className="text-right pb-1">Unit Price</th>
+                      <th className="text-left pb-1">{t("product.qty")}</th>
+                      <th className="text-right pb-1">{t("product.unit_price")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -143,21 +145,21 @@ const ProductDetail = () => {
                   className="w-20 rounded-md border border-input bg-background px-3 py-2 text-sm text-center"
                 />
                 <button className="flex-1 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/90 transition-colors flex items-center justify-center gap-2">
-                  <ShoppingCart className="h-4 w-4" /> Add to Cart
+                  <ShoppingCart className="h-4 w-4" /> {t("product.add_to_cart")}
                 </button>
               </div>
               <button className="w-full rounded-md border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
-                Request Quote
+                {t("product.request_quote")}
               </button>
             </div>
 
             {/* Actions */}
             <div className="flex gap-2">
               <button className="flex-1 flex items-center justify-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs hover:bg-muted transition-colors">
-                <FileText className="h-3.5 w-3.5" /> Datasheet
+                <FileText className="h-3.5 w-3.5" /> {t("product.datasheet")}
               </button>
               <button className="flex-1 flex items-center justify-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs hover:bg-muted transition-colors">
-                <Heart className="h-3.5 w-3.5" /> Save
+                <Heart className="h-3.5 w-3.5" /> {t("product.save")}
               </button>
               <button
                 onClick={() => product && (isInCompare(product.id) ? removeFromCompare(product.id) : addToCompare(product))}
@@ -167,10 +169,10 @@ const ProductDetail = () => {
                     : "border-border hover:bg-muted"
                 }`}
               >
-                <GitCompare className="h-3.5 w-3.5" /> {product && isInCompare(product.id) ? "In Compare" : "Compare"}
+                <GitCompare className="h-3.5 w-3.5" /> {product && isInCompare(product.id) ? t("product.in_compare") : t("product.compare")}
               </button>
               <button className="flex-1 flex items-center justify-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs hover:bg-muted transition-colors">
-                <Share2 className="h-3.5 w-3.5" /> Share
+                <Share2 className="h-3.5 w-3.5" /> {t("product.share")}
               </button>
             </div>
           </div>
@@ -179,7 +181,7 @@ const ProductDetail = () => {
         {/* Related */}
         {relatedProducts.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-lg font-bold text-foreground mb-4">Related Products</h2>
+            <h2 className="text-lg font-bold text-foreground mb-4">{t("product.related")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {relatedProducts.map((p) => (
                 <Link
