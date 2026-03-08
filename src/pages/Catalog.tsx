@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ChevronDown, ChevronUp, Filter, X, Download } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, X, Download, GitCompare } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { products, categories, Product } from "@/data/mockData";
+import { useCompare } from "@/contexts/CompareContext";
 
 type SortKey = "partNumber" | "manufacturer" | "price" | "stock";
 
