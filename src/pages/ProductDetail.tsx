@@ -40,6 +40,13 @@ const ProductDetail = () => {
   const [copied, setCopied] = useState(false);
   const [imgZoom, setImgZoom] = useState(false);
 
+  const relatedProducts = useMemo(() => product ? products.filter((p) => p.id !== product.id && p.subcategory === product.subcategory).slice(0, 4) : [], [product]);
+  const analogProducts = useMemo(() => product ? products.filter((p) => p.id !== product.id && p.category === product.category && p.manufacturer !== product.manufacturer).slice(0, 6) : [], [product]);
+  const priceHistory = useMemo(() => product ? generatePriceHistory(product.priceTiers[0].price) : [], [product]);
+  const maxPrice = Math.max(...priceHistory.map((d) => d.price), 0);
+  const minPrice = Math.min(...priceHistory.map((d) => d.price), 0);
+  const priceRange = maxPrice - minPrice || 1;
+
   if (!product) {
     return (
       <Layout>
@@ -50,13 +57,6 @@ const ProductDetail = () => {
       </Layout>
     );
   }
-
-  const relatedProducts = products.filter((p) => p.id !== product.id && p.subcategory === product.subcategory).slice(0, 4);
-  const analogProducts = products.filter((p) => p.id !== product.id && p.category === product.category && p.manufacturer !== product.manufacturer).slice(0, 6);
-  const priceHistory = useMemo(() => generatePriceHistory(product.priceTiers[0].price), [product.priceTiers]);
-  const maxPrice = Math.max(...priceHistory.map((d) => d.price));
-  const minPrice = Math.min(...priceHistory.map((d) => d.price));
-  const priceRange = maxPrice - minPrice || 1;
 
   const currentTierPrice = product.priceTiers.reduce((best, tier) => (qty >= tier.qty ? tier : best), product.priceTiers[0]);
   const extPrice = (currentTierPrice.price * qty);
