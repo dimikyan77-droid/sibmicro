@@ -328,6 +328,28 @@ const translations = {
   "res.useful_links": { en: "Useful Links", ru: "Полезные ссылки" },
   "res.search_catalog": { en: "Search Catalog", ru: "Искать в каталоге" },
   "res.visit": { en: "Visit", ru: "Перейти" },
+
+  // BOM page
+  "bom.title": { en: "BOM Upload", ru: "Загрузка BOM" },
+  "bom.subtitle": {
+    en: "Upload your Bill of Materials (CSV or Excel) to quickly search availability and pricing.",
+    ru: "Загрузите спецификацию материалов (CSV или Excel) для быстрого поиска наличия и цен.",
+  },
+  "bom.drop_zone": { en: "Drag & drop your BOM file here, or click to browse", ru: "Перетащите BOM-файл сюда или нажмите для выбора" },
+  "bom.supported": { en: "Supported formats: CSV, XLS, XLSX", ru: "Поддерживаемые форматы: CSV, XLS, XLSX" },
+  "bom.col_part": { en: "Part Number column", ru: "Столбец номера детали" },
+  "bom.col_qty": { en: "Quantity column", ru: "Столбец количества" },
+  "bom.col_desc": { en: "Description column (optional)", ru: "Столбец описания (необязательно)" },
+  "bom.preview": { en: "Preview", ru: "Предпросмотр" },
+  "bom.part_number": { en: "Part Number", ru: "Номер детали" },
+  "bom.quantity": { en: "Qty", ru: "Кол-во" },
+  "bom.description": { en: "Description", ru: "Описание" },
+  "bom.search_all": { en: "Search All Parts", ru: "Искать все детали" },
+  "bom.clear": { en: "Clear", ru: "Очистить" },
+  "bom.rows_loaded": { en: "rows loaded", ru: "строк загружено" },
+  "bom.no_file": { en: "No file loaded", ru: "Файл не загружен" },
+  "bom.error_parse": { en: "Failed to parse file", ru: "Ошибка парсинга файла" },
+  "bom.request_quote": { en: "Request Quote for All", ru: "Запросить цену на всё" },
 } as const;
 
 // Category & subcategory localization map (key = English name)
