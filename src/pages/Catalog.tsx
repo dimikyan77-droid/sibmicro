@@ -195,7 +195,7 @@ const Catalog = () => {
                   </th>
                 </tr>
               </thead>
-              <CompareRows products={filteredProducts} />
+              <CatalogBody products={filteredProducts} />
             </table>
           </div>
         </div>
