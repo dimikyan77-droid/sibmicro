@@ -246,100 +246,117 @@ const Catalog = () => {
         ) : (
           <div className="flex gap-6">
             {/* Sidebar Filters */}
-            <aside className="w-60 shrink-0 hidden lg:block space-y-6">
-              <div className="rounded-lg border border-border bg-card p-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <Filter className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-foreground text-sm">{t("catalog.filters")}</span>
+            <aside className="w-64 shrink-0 hidden lg:block">
+              <div className="rounded-xl border border-border bg-card overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+                  <SlidersHorizontal className="h-4.5 w-4.5 text-primary" />
+                  <span className="font-bold text-foreground text-base">{t("catalog.filters")}</span>
+                  {activeFilterCount > 0 && (
+                    <button
+                      onClick={() => setFilters({})}
+                      className="ml-auto text-xs text-destructive hover:underline"
+                    >
+                      {t("catalog.clear_filters")}
+                    </button>
+                  )}
                 </div>
 
                 {/* Category filter */}
-                <div className="mb-5">
-                  <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center justify-between">
+                <div className="border-b border-border">
+                  <button
+                    onClick={() => setOpenSections(s => ({ ...s, category: !s.category }))}
+                    className="flex items-center justify-between w-full px-5 py-3.5 text-sm font-bold text-foreground hover:bg-muted/50 transition-colors"
+                  >
                     {t("catalog.category")}
-                    <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
-                  </h3>
-                  <div className="space-y-1.5">
-                    {categories.map((cat) => (
-                      <label key={cat.slug} className="flex items-center gap-2 text-xs cursor-pointer group">
-                        <input
-                          type="checkbox"
-                          checked={categorySlug === cat.slug}
-                          onChange={() => {
-                            if (categorySlug === cat.slug) navigate("/catalog");
-                            else navigate(`/catalog?category=${cat.slug}`);
-                          }}
-                          className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
-                        />
-                        <span className="text-muted-foreground group-hover:text-foreground truncate flex-1">{tc(cat.name)}</span>
-                        <span className="text-muted-foreground/60 text-[10px]">({categoryProductCounts[cat.name] || 0})</span>
-                      </label>
-                    ))}
-                  </div>
+                    {openSections.category ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                  </button>
+                  {openSections.category && (
+                    <div className="px-5 pb-4 space-y-3">
+                      {categories.map((cat) => (
+                        <label key={cat.slug} className="flex items-center gap-3 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={categorySlug === cat.slug}
+                            onChange={() => {
+                              if (categorySlug === cat.slug) navigate("/catalog");
+                              else navigate(`/catalog?category=${cat.slug}`);
+                            }}
+                            className="rounded border-border text-primary focus:ring-primary h-4 w-4 shrink-0"
+                          />
+                          <span className="text-sm text-muted-foreground group-hover:text-foreground truncate flex-1">{tc(cat.name)}</span>
+                          <span className="text-xs text-muted-foreground/60">({categoryProductCounts[cat.name] || 0})</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Manufacturer filter */}
-                <div className="mb-5">
-                  <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center justify-between">
+                <div className="border-b border-border">
+                  <button
+                    onClick={() => setOpenSections(s => ({ ...s, manufacturer: !s.manufacturer }))}
+                    className="flex items-center justify-between w-full px-5 py-3.5 text-sm font-bold text-foreground hover:bg-muted/50 transition-colors"
+                  >
                     {t("catalog.manufacturer")}
-                    <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
-                  </h3>
-                  <input
-                    type="text"
-                    placeholder={t("catalog.search_manufacturer")}
-                    value={mfgSearch}
-                    onChange={(e) => setMfgSearch(e.target.value)}
-                    className="w-full rounded border border-border bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary mb-2"
-                  />
-                  <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                    {uniqueManufacturers.map(([name, count]) => (
-                      <label key={name} className="flex items-center gap-2 text-xs cursor-pointer group">
-                        <input
-                          type="checkbox"
-                          checked={(filters.manufacturer || []).includes(name)}
-                          onChange={() => toggleFilter("manufacturer", name)}
-                          className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
-                        />
-                        <span className="text-muted-foreground group-hover:text-foreground truncate flex-1">{name}</span>
-                        <span className="text-muted-foreground/60 text-[10px]">({count})</span>
-                      </label>
-                    ))}
-                  </div>
+                    {openSections.manufacturer ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                  </button>
+                  {openSections.manufacturer && (
+                    <div className="px-5 pb-4">
+                      <input
+                        type="text"
+                        placeholder={t("catalog.search_manufacturer")}
+                        value={mfgSearch}
+                        onChange={(e) => setMfgSearch(e.target.value)}
+                        className="w-full rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary mb-3"
+                      />
+                      <div className="space-y-3 max-h-56 overflow-y-auto pr-1 scrollbar-thin">
+                        {uniqueManufacturers.map(([name, count]) => (
+                          <label key={name} className="flex items-center gap-3 cursor-pointer group">
+                            <input
+                              type="checkbox"
+                              checked={(filters.manufacturer || []).includes(name)}
+                              onChange={() => toggleFilter("manufacturer", name)}
+                              className="rounded border-border text-primary focus:ring-primary h-4 w-4 shrink-0"
+                            />
+                            <span className="text-sm text-muted-foreground group-hover:text-foreground truncate flex-1">{name}</span>
+                            <span className="text-xs text-muted-foreground/60">({count})</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Availability filter */}
-                <div className="mb-4">
-                  <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center justify-between">
-                    {t("catalog.availability")}
-                    <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
-                  </h3>
-                  <div className="space-y-1.5">
-                    <label className="flex items-center gap-2 text-xs cursor-pointer group">
-                      <input type="checkbox" checked={(filters.stock || []).includes("In Stock")} onChange={() => toggleFilter("stock", "In Stock")} className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5" />
-                      <span className="text-muted-foreground group-hover:text-foreground flex-1">{t("catalog.in_stock")}</span>
-                      <span className="text-muted-foreground/60 text-[10px]">({stockCounts.inStock})</span>
-                    </label>
-                    <label className="flex items-center gap-2 text-xs cursor-pointer group">
-                      <input type="checkbox" checked={(filters.stock || []).includes("On Order")} onChange={() => toggleFilter("stock", "On Order")} className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5" />
-                      <span className="text-muted-foreground group-hover:text-foreground flex-1">{t("catalog.on_order")}</span>
-                      <span className="text-muted-foreground/60 text-[10px]">({stockCounts.onOrder})</span>
-                    </label>
-                    <label className="flex items-center gap-2 text-xs cursor-pointer group">
-                      <input type="checkbox" checked={(filters.stock || []).includes("Preorder")} onChange={() => toggleFilter("stock", "Preorder")} className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5" />
-                      <span className="text-muted-foreground group-hover:text-foreground flex-1">{t("catalog.preorder")}</span>
-                      <span className="text-muted-foreground/60 text-[10px]">({stockCounts.preorder})</span>
-                    </label>
-                  </div>
-                </div>
-
-                {activeFilterCount > 0 && (
+                <div>
                   <button
-                    onClick={() => setFilters({})}
-                    className="flex items-center gap-1 text-xs text-destructive hover:underline"
+                    onClick={() => setOpenSections(s => ({ ...s, availability: !s.availability }))}
+                    className="flex items-center justify-between w-full px-5 py-3.5 text-sm font-bold text-foreground hover:bg-muted/50 transition-colors"
                   >
-                    <X className="h-3 w-3" /> {t("catalog.clear_filters")}
+                    {t("catalog.availability")}
+                    {openSections.availability ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
                   </button>
-                )}
+                  {openSections.availability && (
+                    <div className="px-5 pb-4 space-y-3">
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" checked={(filters.stock || []).includes("In Stock")} onChange={() => toggleFilter("stock", "In Stock")} className="rounded border-border text-primary focus:ring-primary h-4 w-4 shrink-0" />
+                        <span className="text-sm text-muted-foreground group-hover:text-foreground flex-1">{t("catalog.in_stock")}</span>
+                        <span className="text-xs text-muted-foreground/60">({stockCounts.inStock})</span>
+                      </label>
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" checked={(filters.stock || []).includes("On Order")} onChange={() => toggleFilter("stock", "On Order")} className="rounded border-border text-primary focus:ring-primary h-4 w-4 shrink-0" />
+                        <span className="text-sm text-muted-foreground group-hover:text-foreground flex-1">{t("catalog.on_order")}</span>
+                        <span className="text-xs text-muted-foreground/60">({stockCounts.onOrder})</span>
+                      </label>
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" checked={(filters.stock || []).includes("Preorder")} onChange={() => toggleFilter("stock", "Preorder")} className="rounded border-border text-primary focus:ring-primary h-4 w-4 shrink-0" />
+                        <span className="text-sm text-muted-foreground group-hover:text-foreground flex-1">{t("catalog.preorder")}</span>
+                        <span className="text-xs text-muted-foreground/60">({stockCounts.preorder})</span>
+                      </label>
+                    </div>
+                  )}
+                </div>
               </div>
             </aside>
 
