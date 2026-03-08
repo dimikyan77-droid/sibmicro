@@ -18,7 +18,7 @@ const iconMap: Record<string, React.ReactNode> = {
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { t, tc } = useI18n();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
