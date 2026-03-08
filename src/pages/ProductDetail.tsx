@@ -33,7 +33,7 @@ const ProductDetail = () => {
   const specs: [string, string | undefined][] = [
     [t("spec.part_number"), product.partNumber],
     [t("spec.manufacturer"), product.manufacturer],
-    [t("spec.category"), `${product.category} / ${product.subcategory}`],
+    [t("spec.category"), `${tc(product.category)} / ${tc(product.subcategory)}`],
     [t("spec.frequency"), product.frequency],
     [t("spec.gain"), product.gain],
     [t("spec.noise_figure"), product.noiseFigure],

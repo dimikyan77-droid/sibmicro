@@ -6,12 +6,12 @@ import { useI18n } from "@/contexts/I18nContext";
 
 const Compare = () => {
   const { compareItems, removeFromCompare, clearCompare } = useCompare();
-  const { t } = useI18n();
+  const { t, tc } = useI18n();
 
   const specRows = [
     { label: t("spec.part_number"), getter: (p: any) => p.partNumber },
     { label: t("spec.manufacturer"), getter: (p: any) => p.manufacturer },
-    { label: t("spec.category"), getter: (p: any) => `${p.category} / ${p.subcategory}` },
+    { label: t("spec.category"), getter: (p: any) => `${tc(p.category)} / ${tc(p.subcategory)}` },
     { label: t("spec.description"), getter: (p: any) => p.description },
     { label: t("spec.frequency"), getter: (p: any) => p.frequency || "—" },
     { label: t("spec.gain"), getter: (p: any) => p.gain || "—" },
