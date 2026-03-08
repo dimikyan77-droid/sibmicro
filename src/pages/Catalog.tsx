@@ -453,7 +453,7 @@ const ExternalSearchResults = ({
             <tr>
               <th className="w-10"></th>
               <th className="w-16 cursor-pointer" onClick={() => toggleExtSort("source")}>
-                <span className="flex items-center gap-1">Источник <ExtSortIcon col="source" /></span>
+                <span className="flex items-center gap-1">{t("ext.source")} <ExtSortIcon col="source" /></span>
               </th>
               <th className="min-w-[140px] cursor-pointer" onClick={() => toggleExtSort("mpn")}>
                 <span className="flex items-center gap-1">{t("catalog.part_number")} <ExtSortIcon col="mpn" /></span>
