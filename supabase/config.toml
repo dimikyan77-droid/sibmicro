@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.digikey-search]
 verify_jwt = false
+
+[functions.send-quote-email]
+verify_jwt = false

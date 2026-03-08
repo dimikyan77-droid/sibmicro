@@ -47,6 +47,7 @@ const App = () => (
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/order/:id" element={<OrderDetail />} />
                   <Route path="/octopart" element={<OctopartSearch />} />
+                  <Route path="/quote" element={<Quote />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CompareBar />

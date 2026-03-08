@@ -248,6 +248,27 @@ const translations = {
   // 404
   "notfound.text": { en: "Oops! Page not found", ru: "Страница не найдена" },
   "notfound.back": { en: "Return to Home", ru: "На главную" },
+
+  // Quote
+  "quote.title": { en: "Request a Quote", ru: "Запрос цены" },
+  "quote.subtitle": {
+    en: "Fill in the form and we'll get back to you with pricing and availability.",
+    ru: "Заполните форму, и мы свяжемся с вами по вопросам цены и наличия.",
+  },
+  "quote.name": { en: "Name", ru: "Имя" },
+  "quote.phone": { en: "Phone", ru: "Телефон" },
+  "quote.company": { en: "Company", ru: "Компания" },
+  "quote.part_numbers": { en: "Part Numbers", ru: "Номера деталей" },
+  "quote.part_numbers_hint": { en: "One per line, e.g. STM32F103C8T6", ru: "По одному на строку, напр. STM32F103C8T6" },
+  "quote.quantities": { en: "Quantities", ru: "Количество" },
+  "quote.quantities_hint": { en: "e.g. 100, 500, 1000", ru: "напр. 100, 500, 1000" },
+  "quote.message": { en: "Message", ru: "Сообщение" },
+  "quote.submit": { en: "Submit Request", ru: "Отправить запрос" },
+  "quote.success_title": { en: "Request Sent!", ru: "Запрос отправлен!" },
+  "quote.success_desc": {
+    en: "We'll review your request and respond shortly.",
+    ru: "Мы рассмотрим ваш запрос и свяжемся с вами в ближайшее время.",
+  },
 } as const;
 
 // Category & subcategory localization map (key = English name)
