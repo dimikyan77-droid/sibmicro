@@ -6,6 +6,7 @@ import { useCompare } from "@/contexts/CompareContext";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const product = products.find((p) => p.id === id);
 
   if (!product) {
