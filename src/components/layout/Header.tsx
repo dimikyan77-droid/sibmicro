@@ -12,6 +12,7 @@ const Header = () => {
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { lang, setLang, t } = useI18n();
+  const { user } = useAuth();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
