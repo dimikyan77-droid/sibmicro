@@ -25,6 +25,7 @@ const Catalog = () => {
   const [showFilters, setShowFilters] = useState(true);
 
   const octopart = useOctopartSearch();
+  const digikey = useDigiKeySearch();
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
