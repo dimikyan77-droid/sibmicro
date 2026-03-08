@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/contexts/I18nContext";
@@ -169,7 +169,11 @@ const Account = () => {
                   <TableBody>
                     {orders.map((order) => (
                       <TableRow key={order.id}>
-                        <TableCell className="font-mono font-medium">{order.order_number}</TableCell>
+                        <TableCell>
+                          <Link to={`/order/${order.id}`} className="font-mono font-medium text-primary hover:underline">
+                            {order.order_number}
+                          </Link>
+                        </TableCell>
                         <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
                         <TableCell><span className={statusColor(order.status)}>{order.status}</span></TableCell>
                         <TableCell className="text-right font-medium">
