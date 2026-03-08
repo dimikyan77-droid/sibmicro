@@ -14,10 +14,10 @@ const Footer = () => {
         <div>
           <h4 className="font-semibold mb-3 text-sm">{t("footer.products")}</h4>
           <ul className="space-y-1.5 text-sm opacity-80">
-            <li><Link to="/catalog?category=semiconductors" className="hover:opacity-100">Semiconductors</Link></li>
-            <li><Link to="/catalog?category=passive-components" className="hover:opacity-100">Passive Components</Link></li>
-            <li><Link to="/catalog?category=rf-microwave" className="hover:opacity-100">RF & Microwave</Link></li>
-            <li><Link to="/catalog?category=connectors" className="hover:opacity-100">Connectors</Link></li>
+            <li><Link to="/catalog?category=semiconductors" className="hover:opacity-100">{t("footer.semiconductors")}</Link></li>
+            <li><Link to="/catalog?category=passive-components" className="hover:opacity-100">{t("footer.passive")}</Link></li>
+            <li><Link to="/catalog?category=rf-microwave" className="hover:opacity-100">{t("footer.rf")}</Link></li>
+            <li><Link to="/catalog?category=connectors" className="hover:opacity-100">{t("footer.connectors")}</Link></li>
           </ul>
         </div>
         <div>

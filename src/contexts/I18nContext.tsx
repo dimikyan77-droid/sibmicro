@@ -226,6 +226,28 @@ const translations = {
     en: "No local results found — showing results from Octopart",
     ru: "Локальных результатов нет — показаны результаты из Octopart",
   },
+
+  // External search / unified table
+  "ext.all_sources": { en: "All sources", ru: "Все источники" },
+  "ext.source": { en: "Source", ru: "Источник" },
+  "ext.sort_label": { en: "Sort", ru: "Сортировка" },
+  "ext.sort_price": { en: "price", ru: "цена" },
+  "ext.sort_stock": { en: "stock", ru: "наличие" },
+  "ext.sort_mpn": { en: "part number", ru: "артикул" },
+  "ext.sort_manufacturer": { en: "manufacturer", ru: "производитель" },
+  "ext.sort_source": { en: "source", ru: "источник" },
+  "ext.digikey_price_tiers": { en: "DigiKey Price Tiers", ru: "Ценовые уровни DigiKey" },
+  "ext.searching_all": { en: "Searching all sources...", ru: "Поиск по всем источникам..." },
+
+  // Footer product links
+  "footer.semiconductors": { en: "Semiconductors", ru: "Полупроводники" },
+  "footer.passive": { en: "Passive Components", ru: "Пассивные компоненты" },
+  "footer.rf": { en: "RF & Microwave", ru: "ВЧ и СВЧ" },
+  "footer.connectors": { en: "Connectors", ru: "Разъёмы" },
+
+  // 404
+  "notfound.text": { en: "Oops! Page not found", ru: "Страница не найдена" },
+  "notfound.back": { en: "Return to Home", ru: "На главную" },
 } as const;
 
 type TranslationKey = keyof typeof translations;

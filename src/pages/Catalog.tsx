@@ -142,7 +142,7 @@ const Catalog = () => {
             <p className="text-sm text-muted-foreground mt-0.5">
               {showExternalSearch
                 ? externalLoading
-                  ? t("octopart.searching")
+                  ? t("ext.searching_all")
                   : `${(octopart.totalHits + digikey.totalHits).toLocaleString()} ${t("octopart.results")} (Octopart + DigiKey)`
                 : `${filteredProducts.length} ${t("catalog.products_found")}`}
             </p>
@@ -413,7 +413,7 @@ const ExternalSearchResults = ({
           onClick={() => setActiveTab("all")}
           className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"}`}
         >
-          Все источники ({allItems.length})
+          {t("ext.all_sources")} ({allItems.length})
         </button>
         {octopart.results.length > 0 && (
           <button
@@ -434,7 +434,7 @@ const ExternalSearchResults = ({
         {anyLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
         <span className="text-xs text-muted-foreground ml-auto flex items-center gap-1">
           <ArrowUpDown className="h-3 w-3" />
-          Сортировка: {extSortKey === "price" ? "цена" : extSortKey === "stock" ? "наличие" : extSortKey === "mpn" ? "артикул" : extSortKey === "manufacturer" ? "производитель" : "источник"} ({extSortDir === "asc" ? "↑" : "↓"})
+          {t("ext.sort_label")}: {extSortKey === "price" ? t("ext.sort_price") : extSortKey === "stock" ? t("ext.sort_stock") : extSortKey === "mpn" ? t("ext.sort_mpn") : extSortKey === "manufacturer" ? t("ext.sort_manufacturer") : t("ext.sort_source")} ({extSortDir === "asc" ? "↑" : "↓"})
         </span>
       </div>
 
@@ -453,7 +453,7 @@ const ExternalSearchResults = ({
             <tr>
               <th className="w-10"></th>
               <th className="w-16 cursor-pointer" onClick={() => toggleExtSort("source")}>
-                <span className="flex items-center gap-1">Источник <ExtSortIcon col="source" /></span>
+                <span className="flex items-center gap-1">{t("ext.source")} <ExtSortIcon col="source" /></span>
               </th>
               <th className="min-w-[140px] cursor-pointer" onClick={() => toggleExtSort("mpn")}>
                 <span className="flex items-center gap-1">{t("catalog.part_number")} <ExtSortIcon col="mpn" /></span>
@@ -630,7 +630,7 @@ const ExternalSearchResults = ({
               )}
               {r.priceTiers.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-2">Ценовые уровни DigiKey</h3>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">{t("ext.digikey_price_tiers")}</h3>
                   <div className="space-y-1">
                     {r.priceTiers.map((tier, i) => (
                       <div key={i} className="flex justify-between text-xs py-1 border-b border-border last:border-0">
