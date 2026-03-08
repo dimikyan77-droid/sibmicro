@@ -111,12 +111,12 @@
     @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors;
   }
   .chip-success {
-    @apply bg-green-50 text-green-700 border-green-200;
+    @apply bg-emerald-50 text-emerald-700 border-emerald-200;
   }
   .chip-warning {
     @apply bg-amber-50 text-amber-700 border-amber-200;
   }
   .chip-info {
-    @apply bg-sky-50 text-sky-700 border-sky-200;
+    @apply bg-lime-50 text-lime-700 border-lime-200;
   }
 }
