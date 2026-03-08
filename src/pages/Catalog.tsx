@@ -128,7 +128,7 @@ const Catalog = () => {
           <Link to="/" className="hover:text-foreground">{t("catalog.home")}</Link>
           <span>/</span>
           <span className="text-foreground font-medium">
-            {query ? `${t("catalog.results_for")}: "${query}"` : categorySlug ? categories.find((c) => c.slug === categorySlug)?.name || t("catalog.title") : t("catalog.title")}
+            {query ? `${t("catalog.results_for")}: "${query}"` : categorySlug ? tc(categories.find((c) => c.slug === categorySlug)?.name || "") || t("catalog.title") : t("catalog.title")}
           </span>
         </div>
       </div>
