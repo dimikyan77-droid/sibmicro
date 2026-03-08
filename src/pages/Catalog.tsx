@@ -322,6 +322,10 @@ const ExternalSearchResults = ({
   const [activeTab, setActiveTab] = useState<"all" | "octopart" | "digikey">("all");
   const [extSortKey, setExtSortKey] = useState<ExtSortKey>("price");
   const [extSortDir, setExtSortDir] = useState<"asc" | "desc">("asc");
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+
+  const getQty = (key: string) => quantities[key] ?? 1;
+  const setQty = (key: string, val: number) => setQuantities((prev) => ({ ...prev, [key]: Math.max(1, val) }));
 
   const toggleExtSort = useCallback((key: ExtSortKey) => {
     if (extSortKey === key) setExtSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -333,15 +337,16 @@ const ExternalSearchResults = ({
     return extSortDir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />;
   };
 
-  const handleAdd = useCallback((item: UnifiedItem) => {
+  const handleAdd = useCallback((item: UnifiedItem, qty?: number) => {
+    const quantity = qty ?? getQty(item.key);
     const product = item.source === "octopart"
       ? octopartToProduct(item.raw as OctopartResult)
       : digikeyToProduct(item.raw as DigiKeyResult);
-    addToCart(product);
+    addToCart(product, quantity);
     setAddedKeys((prev) => new Set(prev).add(item.key));
-    toast.success(t("cart.added"), { description: item.mpn });
+    toast.success(t("cart.added"), { description: `${item.mpn} × ${quantity}` });
     setTimeout(() => { setAddedKeys((prev) => { const n = new Set(prev); n.delete(item.key); return n; }); }, 2000);
-  }, [addToCart, t]);
+  }, [addToCart, t, quantities]);
 
   const allItems = useMemo(
     () => buildUnifiedItems(octopart.results, digikey.results),
@@ -469,6 +474,7 @@ const ExternalSearchResults = ({
               <th className="text-right cursor-pointer" onClick={() => toggleExtSort("price")}>
                 <span className="flex items-center gap-1 justify-end">{t("catalog.price")} <ExtSortIcon col="price" /></span>
               </th>
+              <th className="w-[130px]">{t("product.qty")}</th>
               <th className="w-10"></th>
             </tr>
           </thead>
@@ -519,6 +525,25 @@ const ExternalSearchResults = ({
                       <div className="text-[10px] text-muted-foreground">{item.priceSub}</div>
                     </div>
                   ) : <span className="text-xs text-muted-foreground">—</span>}
+                </td>
+                <td>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setQty(item.key, getQty(item.key) - 1)}
+                      className="w-6 h-6 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center"
+                    >−</button>
+                    <input
+                      type="number"
+                      min={1}
+                      value={getQty(item.key)}
+                      onChange={(e) => setQty(item.key, parseInt(e.target.value) || 1)}
+                      className="w-12 h-6 text-center text-xs border border-border rounded bg-background focus:outline-none focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <button
+                      onClick={() => setQty(item.key, getQty(item.key) + 1)}
+                      className="w-6 h-6 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center"
+                    >+</button>
+                  </div>
                 </td>
                 <td>
                   {item.datasheetUrl && (
