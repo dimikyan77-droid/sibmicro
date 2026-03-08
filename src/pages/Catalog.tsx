@@ -240,24 +240,43 @@ const Catalog = () => {
   );
 };
 
-/* ─── Octopart Results Section ─── */
-const OctopartResults = ({ octopart }: { octopart: ReturnType<typeof useOctopartSearch> }) => {
+/* ─── Combined External Search Results ─── */
+const ExternalSearchResults = ({
+  octopart,
+  digikey,
+}: {
+  octopart: ReturnType<typeof useOctopartSearch>;
+  digikey: ReturnType<typeof useDigiKeySearch>;
+}) => {
   const { t } = useI18n();
   const { addToCart } = useCart();
-  const [addedMpns, setAddedMpns] = useState<Set<string>>(new Set());
+  const [addedKeys, setAddedKeys] = useState<Set<string>>(new Set());
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"all" | "octopart" | "digikey">("all");
 
-  const handleAddToCart = (r: OctopartResult) => {
+  const handleAddOctopart = (r: OctopartResult) => {
     const product = octopartToProduct(r);
     addToCart(product);
-    setAddedMpns((prev) => new Set(prev).add(r.mpn));
+    const key = `octo-${r.mpn}`;
+    setAddedKeys((prev) => new Set(prev).add(key));
     toast.success(t("cart.added"), { description: r.mpn });
-    setTimeout(() => {
-      setAddedMpns((prev) => { const n = new Set(prev); n.delete(r.mpn); return n; });
-    }, 2000);
+    setTimeout(() => { setAddedKeys((prev) => { const n = new Set(prev); n.delete(key); return n; }); }, 2000);
   };
 
-  if (octopart.loading) {
+  const handleAddDigiKey = (r: DigiKeyResult) => {
+    const product = digikeyToProduct(r);
+    addToCart(product);
+    const key = `dk-${r.mpn}-${r.digiKeyPn}`;
+    setAddedKeys((prev) => new Set(prev).add(key));
+    toast.success(t("cart.added"), { description: r.mpn });
+    setTimeout(() => { setAddedKeys((prev) => { const n = new Set(prev); n.delete(key); return n; }); }, 2000);
+  };
+
+  const bothLoading = octopart.loading && digikey.loading;
+  const anyLoading = octopart.loading || digikey.loading;
+  const noResults = !anyLoading && octopart.results.length === 0 && digikey.results.length === 0;
+
+  if (bothLoading) {
     return (
       <div className="flex items-center justify-center py-16 gap-3 text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin" />
@@ -266,160 +285,314 @@ const OctopartResults = ({ octopart }: { octopart: ReturnType<typeof useOctopart
     );
   }
 
-  if (octopart.error) {
+  if (noResults) {
+    const errors = [octopart.error, digikey.error].filter(Boolean);
     return (
-      <div className="max-w-3xl mx-auto mb-6 p-3 rounded-md bg-destructive/10 text-destructive text-sm">
-        {octopart.error}
+      <div>
+        {errors.length > 0 && (
+          <div className="max-w-3xl mx-auto mb-4 space-y-2">
+            {errors.map((e, i) => (
+              <div key={i} className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">{e}</div>
+            ))}
+          </div>
+        )}
+        <div className="text-center py-12 text-muted-foreground">{t("catalog.no_products")}</div>
       </div>
     );
   }
-
-  if (octopart.results.length === 0) {
-    return (
-      <div className="text-center py-12 text-muted-foreground">
-        {t("catalog.no_products")}
-      </div>
-    );
-  }
-
-  const expandedResult = expandedRow ? octopart.results.find((r) => r.mpn === expandedRow) : null;
 
   return (
     <div>
-      <div className="mb-3 flex items-center gap-2">
-        <span className="text-xs font-medium text-primary bg-primary/10 rounded px-2 py-0.5">Octopart</span>
-        <span className="text-xs text-muted-foreground">{t("octopart.fallback_hint")}</span>
+      {/* Source tabs */}
+      <div className="mb-3 flex items-center gap-2 flex-wrap">
+        <button
+          onClick={() => setActiveTab("all")}
+          className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"}`}
+        >
+          Все источники
+        </button>
+        {octopart.results.length > 0 && (
+          <button
+            onClick={() => setActiveTab("octopart")}
+            className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "octopart" ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary hover:bg-primary/20"}`}
+          >
+            Octopart ({octopart.results.length})
+          </button>
+        )}
+        {digikey.results.length > 0 && (
+          <button
+            onClick={() => setActiveTab("digikey")}
+            className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "digikey" ? "bg-primary text-primary-foreground" : "bg-accent/10 text-accent hover:bg-accent/20"}`}
+          >
+            DigiKey ({digikey.results.length})
+          </button>
+        )}
+        {anyLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+        <span className="text-xs text-muted-foreground ml-auto">{t("octopart.fallback_hint")}</span>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th className="w-10"></th>
-              <th className="min-w-[140px]">{t("catalog.part_number")}</th>
-              <th>{t("catalog.manufacturer")}</th>
-              <th className="min-w-[250px]">{t("catalog.description")}</th>
-              <th>{t("catalog.stock")}</th>
-              <th className="text-right">{t("catalog.price")}</th>
-              <th className="w-10"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {octopart.results.map((r) => {
-              const bestPrice = getBestPrice(r.sellers);
-              const totalStock = getTotalStock(r.sellers);
+      {/* Errors */}
+      {octopart.error && activeTab !== "digikey" && (
+        <div className="mb-3 p-2 rounded-md bg-destructive/10 text-destructive text-xs">Octopart: {octopart.error}</div>
+      )}
+      {digikey.error && activeTab !== "octopart" && (
+        <div className="mb-3 p-2 rounded-md bg-destructive/10 text-destructive text-xs">DigiKey: {digikey.error}</div>
+      )}
 
-              return (
-                <tr key={r.mpn}>
-                  <td>
-                    <button
-                      onClick={() => handleAddToCart(r)}
-                      className={`p-1.5 rounded-md transition-colors ${addedMpns.has(r.mpn) ? "text-green-600 bg-green-50" : "text-primary hover:bg-muted"}`}
-                      title={t("product.add_to_cart")}
-                    >
-                      {addedMpns.has(r.mpn) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => setExpandedRow(expandedRow === r.mpn ? null : r.mpn)}
-                      className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline text-left"
-                    >
-                      {r.mpn}
-                    </button>
-                  </td>
-                  <td className="text-sm">{r.manufacturer}</td>
-                  <td className="text-xs text-muted-foreground">{r.description}</td>
-                  <td>
-                    <span className={`chip ${totalStock > 0 ? "chip-success" : "chip-warning"}`}>
-                      {totalStock > 0 ? totalStock.toLocaleString() : t("catalog.contact")}
-                    </span>
-                  </td>
-                  <td className="text-right">
-                    {bestPrice ? (
-                      <div>
-                        <div className="text-sm font-semibold">
-                          ${bestPrice.price.toFixed(bestPrice.price < 1 ? 4 : 2)}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground">qty {bestPrice.quantity}+</div>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
-                    )}
-                  </td>
-                  <td>
-                    {r.datasheetUrl && (
-                      <a href={r.datasheetUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-accent" title={t("product.datasheet")}>
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    )}
-                  </td>
+      {/* Octopart table */}
+      {(activeTab === "all" || activeTab === "octopart") && octopart.results.length > 0 && (
+        <div className="mb-6">
+          {activeTab === "all" && (
+            <h3 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
+              <span className="bg-primary/10 text-primary rounded px-1.5 py-0.5">Octopart</span>
+              {octopart.totalHits.toLocaleString()} {t("octopart.results")}
+            </h3>
+          )}
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th className="w-10"></th>
+                  <th className="min-w-[140px]">{t("catalog.part_number")}</th>
+                  <th>{t("catalog.manufacturer")}</th>
+                  <th className="min-w-[250px]">{t("catalog.description")}</th>
+                  <th>{t("catalog.stock")}</th>
+                  <th className="text-right">{t("catalog.price")}</th>
+                  <th className="w-10"></th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Expanded detail */}
-      {expandedResult && (
-        <div className="mt-4 border border-border rounded-lg p-5 bg-muted/30">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-foreground">{expandedResult.mpn}</h2>
-            <div className="flex items-center gap-3">
-              <button onClick={() => handleAddToCart(expandedResult)} className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
-                <ShoppingCart className="h-4 w-4" />
-                {t("product.add_to_cart")}
-              </button>
-              <button onClick={() => setExpandedRow(null)} className="text-xs text-muted-foreground hover:text-foreground">
-                ✕ {t("octopart.close")}
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {expandedResult.specs.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-2">{t("product.tech_specs")}</h3>
-                <div className="space-y-1">
-                  {expandedResult.specs.map((s) => (
-                    <div key={s.name} className="flex justify-between text-xs py-1 border-b border-border last:border-0">
-                      <span className="text-muted-foreground">{s.name}</span>
-                      <span className="font-medium text-foreground">{s.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {expandedResult.sellers.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-2">{t("octopart.sellers")}</h3>
-                <div className="space-y-3">
-                  {expandedResult.sellers.slice(0, 5).map((s) => (
-                    <div key={s.name} className="border border-border rounded-md p-3 bg-background">
-                      <div className="font-medium text-sm text-foreground mb-1">{s.name}</div>
-                      {s.offers.map((o, i) => (
-                        <div key={i} className="text-xs text-muted-foreground">
-                          <span>{t("catalog.stock")}: {typeof o.stock === "number" ? o.stock.toLocaleString() : "—"}</span>
-                          {o.moq && <span className="ml-3">MOQ: {o.moq}</span>}
-                          {o.prices.length > 0 && (
-                            <div className="mt-1 flex gap-3 flex-wrap">
-                              {o.prices.slice(0, 4).map((p, j) => (
-                                <span key={j} className="text-foreground font-medium">
-                                  {p.quantity}+: ${p.price.toFixed(p.price < 1 ? 4 : 2)}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              </thead>
+              <tbody>
+                {octopart.results.map((r) => {
+                  const bestPrice = getBestPrice(r.sellers);
+                  const totalStock = getTotalStock(r.sellers);
+                  const key = `octo-${r.mpn}`;
+                  return (
+                    <tr key={key}>
+                      <td>
+                        <button onClick={() => handleAddOctopart(r)} className={`p-1.5 rounded-md transition-colors ${addedKeys.has(key) ? "text-green-600 bg-green-50" : "text-primary hover:bg-muted"}`} title={t("product.add_to_cart")}>
+                          {addedKeys.has(key) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
+                        </button>
+                      </td>
+                      <td>
+                        <button onClick={() => setExpandedRow(expandedRow === key ? null : key)} className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline text-left">
+                          {r.mpn}
+                        </button>
+                      </td>
+                      <td className="text-sm">{r.manufacturer}</td>
+                      <td className="text-xs text-muted-foreground">{r.description}</td>
+                      <td>
+                        <span className={`chip ${totalStock > 0 ? "chip-success" : "chip-warning"}`}>
+                          {totalStock > 0 ? totalStock.toLocaleString() : t("catalog.contact")}
+                        </span>
+                      </td>
+                      <td className="text-right">
+                        {bestPrice ? (
+                          <div>
+                            <div className="text-sm font-semibold">${bestPrice.price.toFixed(bestPrice.price < 1 ? 4 : 2)}</div>
+                            <div className="text-[10px] text-muted-foreground">qty {bestPrice.quantity}+</div>
+                          </div>
+                        ) : <span className="text-xs text-muted-foreground">—</span>}
+                      </td>
+                      <td>
+                        {r.datasheetUrl && (
+                          <a href={r.datasheetUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-accent" title={t("product.datasheet")}>
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
+
+      {/* DigiKey table */}
+      {(activeTab === "all" || activeTab === "digikey") && digikey.results.length > 0 && (
+        <div className="mb-6">
+          {activeTab === "all" && (
+            <h3 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
+              <span className="bg-accent/10 text-accent rounded px-1.5 py-0.5">DigiKey</span>
+              {digikey.totalHits.toLocaleString()} {t("octopart.results")}
+            </h3>
+          )}
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th className="w-10"></th>
+                  <th className="min-w-[140px]">{t("catalog.part_number")}</th>
+                  <th>{t("catalog.manufacturer")}</th>
+                  <th className="min-w-[250px]">{t("catalog.description")}</th>
+                  <th>{t("catalog.package")}</th>
+                  <th>{t("catalog.stock")}</th>
+                  <th className="text-right">{t("catalog.price")}</th>
+                  <th className="w-10"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {digikey.results.map((r) => {
+                  const bestPrice = getDigiKeyBestPrice(r.priceTiers);
+                  const key = `dk-${r.mpn}-${r.digiKeyPn}`;
+                  return (
+                    <tr key={key}>
+                      <td>
+                        <button onClick={() => handleAddDigiKey(r)} className={`p-1.5 rounded-md transition-colors ${addedKeys.has(key) ? "text-green-600 bg-green-50" : "text-primary hover:bg-muted"}`} title={t("product.add_to_cart")}>
+                          {addedKeys.has(key) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
+                        </button>
+                      </td>
+                      <td>
+                        <button onClick={() => setExpandedRow(expandedRow === key ? null : key)} className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline text-left">
+                          {r.mpn}
+                        </button>
+                        {r.digiKeyPn && <div className="text-[10px] text-muted-foreground">{r.digiKeyPn}</div>}
+                      </td>
+                      <td className="text-sm">{r.manufacturer}</td>
+                      <td className="text-xs text-muted-foreground">{r.description}</td>
+                      <td className="text-xs font-mono">{r.packageType}</td>
+                      <td>
+                        <span className={`chip ${r.stock > 0 ? "chip-success" : "chip-warning"}`}>
+                          {r.stock > 0 ? r.stock.toLocaleString() : t("catalog.contact")}
+                        </span>
+                      </td>
+                      <td className="text-right">
+                        {bestPrice ? (
+                          <div>
+                            <div className="text-sm font-semibold">${bestPrice.price.toFixed(bestPrice.price < 1 ? 4 : 2)}</div>
+                            <div className="text-[10px] text-muted-foreground">qty {bestPrice.quantity}+</div>
+                          </div>
+                        ) : <span className="text-xs text-muted-foreground">—</span>}
+                      </td>
+                      <td>
+                        {r.datasheetUrl && (
+                          <a href={r.datasheetUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-accent" title={t("product.datasheet")}>
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Expanded detail for Octopart */}
+      {expandedRow?.startsWith("octo-") && (() => {
+        const mpn = expandedRow.replace("octo-", "");
+        const r = octopart.results.find((x) => x.mpn === mpn);
+        if (!r) return null;
+        return (
+          <div className="mt-4 border border-border rounded-lg p-5 bg-muted/30">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-foreground">{r.mpn} <span className="text-xs font-normal text-primary bg-primary/10 rounded px-1.5 py-0.5 ml-2">Octopart</span></h2>
+              <div className="flex items-center gap-3">
+                <button onClick={() => handleAddOctopart(r)} className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+                  <ShoppingCart className="h-4 w-4" /> {t("product.add_to_cart")}
+                </button>
+                <button onClick={() => setExpandedRow(null)} className="text-xs text-muted-foreground hover:text-foreground">✕ {t("octopart.close")}</button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {r.specs.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">{t("product.tech_specs")}</h3>
+                  <div className="space-y-1">
+                    {r.specs.map((s) => (
+                      <div key={s.name} className="flex justify-between text-xs py-1 border-b border-border last:border-0">
+                        <span className="text-muted-foreground">{s.name}</span>
+                        <span className="font-medium text-foreground">{s.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {r.sellers.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">{t("octopart.sellers")}</h3>
+                  <div className="space-y-3">
+                    {r.sellers.slice(0, 5).map((s) => (
+                      <div key={s.name} className="border border-border rounded-md p-3 bg-background">
+                        <div className="font-medium text-sm text-foreground mb-1">{s.name}</div>
+                        {s.offers.map((o, i) => (
+                          <div key={i} className="text-xs text-muted-foreground">
+                            <span>{t("catalog.stock")}: {typeof o.stock === "number" ? o.stock.toLocaleString() : "—"}</span>
+                            {o.moq && <span className="ml-3">MOQ: {o.moq}</span>}
+                            {o.prices.length > 0 && (
+                              <div className="mt-1 flex gap-3 flex-wrap">
+                                {o.prices.slice(0, 4).map((p, j) => (
+                                  <span key={j} className="text-foreground font-medium">{p.quantity}+: ${p.price.toFixed(p.price < 1 ? 4 : 2)}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Expanded detail for DigiKey */}
+      {expandedRow?.startsWith("dk-") && (() => {
+        const rest = expandedRow.replace("dk-", "");
+        const r = digikey.results.find((x) => `${x.mpn}-${x.digiKeyPn}` === rest);
+        if (!r) return null;
+        return (
+          <div className="mt-4 border border-border rounded-lg p-5 bg-muted/30">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-foreground">{r.mpn} <span className="text-xs font-normal text-accent bg-accent/10 rounded px-1.5 py-0.5 ml-2">DigiKey</span></h2>
+              <div className="flex items-center gap-3">
+                {r.productUrl && (
+                  <a href={r.productUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-muted transition-colors">
+                    <ExternalLink className="h-3.5 w-3.5" /> DigiKey
+                  </a>
+                )}
+                <button onClick={() => handleAddDigiKey(r)} className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+                  <ShoppingCart className="h-4 w-4" /> {t("product.add_to_cart")}
+                </button>
+                <button onClick={() => setExpandedRow(null)} className="text-xs text-muted-foreground hover:text-foreground">✕ {t("octopart.close")}</button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {r.specs.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">{t("product.tech_specs")}</h3>
+                  <div className="space-y-1">
+                    {r.specs.map((s) => (
+                      <div key={s.name} className="flex justify-between text-xs py-1 border-b border-border last:border-0">
+                        <span className="text-muted-foreground">{s.name}</span>
+                        <span className="font-medium text-foreground">{s.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {r.priceTiers.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">Ценовые уровни DigiKey</h3>
+                  <div className="space-y-1">
+                    {r.priceTiers.map((t, i) => (
+                      <div key={i} className="flex justify-between text-xs py-1 border-b border-border last:border-0">
+                        <span className="text-muted-foreground">{t.quantity}+</span>
+                        <span className="font-medium text-foreground">${t.price.toFixed(t.price < 1 ? 4 : 2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
