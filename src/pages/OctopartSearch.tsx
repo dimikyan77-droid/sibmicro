@@ -41,12 +41,72 @@ interface OctopartResult {
 
 const OctopartSearch = () => {
   const { t } = useI18n();
+  const { addToCart } = useCart();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<OctopartResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalHits, setTotalHits] = useState(0);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [addedMpns, setAddedMpns] = useState<Set<string>>(new Set());
+
+  const octopartToProduct = (r: OctopartResult): Product => {
+    const allPrices: { qty: number; price: number }[] = [];
+    let minMoq = 1;
+    let totalStock = getTotalStock(r.sellers);
+
+    for (const s of r.sellers) {
+      for (const o of s.offers) {
+        if (o.moq && o.moq > 0) minMoq = Math.max(minMoq, 1);
+        for (const p of o.prices) {
+          allPrices.push({ qty: p.quantity, price: p.price });
+        }
+      }
+    }
+
+    // Deduplicate and sort price tiers
+    const tierMap = new Map<number, number>();
+    for (const p of allPrices) {
+      const existing = tierMap.get(p.qty);
+      if (!existing || p.price < existing) tierMap.set(p.qty, p.price);
+    }
+    const priceTiers = Array.from(tierMap.entries())
+      .map(([qty, price]) => ({ qty, price }))
+      .sort((a, b) => a.qty - b.qty);
+
+    if (priceTiers.length === 0) priceTiers.push({ qty: 1, price: 0 });
+
+    return {
+      id: `octopart-${r.mpn}`,
+      partNumber: r.mpn,
+      manufacturer: r.manufacturer || "Unknown",
+      category: "Octopart",
+      subcategory: "",
+      description: r.description || "",
+      package: r.specs.find((s) => s.name.toLowerCase().includes("package"))?.value || "",
+      temperatureRange: r.specs.find((s) => s.name.toLowerCase().includes("temp"))?.value || "",
+      rohs: true,
+      stock: totalStock,
+      leadTime: totalStock > 0 ? "In Stock" : "Contact",
+      priceTiers,
+      moq: minMoq,
+      datasheetUrl: r.datasheetUrl || "",
+    };
+  };
+
+  const handleAddToCart = (r: OctopartResult) => {
+    const product = octopartToProduct(r);
+    addToCart(product);
+    setAddedMpns((prev) => new Set(prev).add(r.mpn));
+    toast.success(t("cart.added"), { description: r.mpn });
+    setTimeout(() => {
+      setAddedMpns((prev) => {
+        const next = new Set(prev);
+        next.delete(r.mpn);
+        return next;
+      });
+    }, 2000);
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
