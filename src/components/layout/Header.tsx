@@ -113,7 +113,7 @@ const Header = () => {
                       to={`/catalog?category=${cat.slug}`}
                       className="font-semibold text-sm text-primary hover:underline"
                     >
-                      {cat.name}
+                      {tc(cat.name)}
                     </Link>
                     <ul className="mt-1 space-y-0.5">
                       {cat.subcategories.map((sub) => (
