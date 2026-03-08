@@ -176,7 +176,22 @@ serve(async (req) => {
       const results = data?.data?.supSearch?.results ?? [];
 
       if (data?.errors?.length) {
-        console.warn(`Nexar GraphQL errors [${attempt.name}]:`, JSON.stringify(data.errors));
+        const errorText = JSON.stringify(data.errors);
+        console.warn(`Nexar GraphQL errors [${attempt.name}]:`, errorText);
+
+        if (errorText.toLowerCase().includes("exceeded your part limit")) {
+          return new Response(
+            JSON.stringify({
+              error:
+                "Octopart API limit exceeded for this account. Please upgrade your Nexar plan or wait for reset.",
+              code: "OCTOPART_LIMIT_EXCEEDED",
+            }),
+            {
+              status: 402,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
       }
 
       gqlData = data;
