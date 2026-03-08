@@ -196,32 +196,6 @@ const Catalog = () => {
                 </tr>
               </thead>
               <CompareRows products={filteredProducts} />
-                      <Link to={`/product/${p.id}`} className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline">
-                        {p.partNumber}
-                      </Link>
-                    </td>
-                    <td className="text-sm">{p.manufacturer}</td>
-                    <td className="text-xs text-muted-foreground">{p.description}</td>
-                    <td className="text-xs font-mono">{p.package}</td>
-                    <td>
-                      <span className={`chip ${p.stock > 0 ? "chip-success" : "chip-warning"}`}>
-                        {p.stock > 0 ? p.stock.toLocaleString() : "Contact"}
-                      </span>
-                    </td>
-                    <td className="text-right">
-                      <div className="text-sm font-semibold">${p.priceTiers[0].price.toFixed(p.priceTiers[0].price < 1 ? 4 : 2)}</div>
-                      <div className="text-[10px] text-muted-foreground">qty {p.priceTiers[0].qty}+</div>
-                    </td>
-                  </tr>
-                ))}
-                {filteredProducts.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="text-center py-12 text-muted-foreground">
-                      No products found. Try adjusting your search or filters.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
             </table>
           </div>
         </div>
