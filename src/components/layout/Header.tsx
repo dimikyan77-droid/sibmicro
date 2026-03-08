@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, Menu, X, ChevronDown, Globe } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, ChevronDown, Globe, LogIn } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { categories } from "@/data/mockData";
 import { useI18n } from "@/contexts/I18nContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
