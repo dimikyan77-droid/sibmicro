@@ -72,7 +72,21 @@ export function useOctopartSearch() {
         body: { query: query.trim(), limit },
       });
 
-      if (fnError) throw new Error(fnError.message);
+      if (fnError) {
+        let detailedMessage = fnError.message;
+
+        const maybeContext = (fnError as any)?.context;
+        if (maybeContext && typeof maybeContext.json === "function") {
+          try {
+            const payload = await maybeContext.json();
+            if (payload?.error) detailedMessage = payload.error;
+          } catch {
+            // ignore parsing issues, fallback to default message
+          }
+        }
+
+        throw new Error(detailedMessage);
+      }
       if (data?.error) throw new Error(data.error);
 
       setResults(data.results || []);
