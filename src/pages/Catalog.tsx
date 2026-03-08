@@ -7,6 +7,7 @@ import { useCompare } from "@/contexts/CompareContext";
 import { useI18n } from "@/contexts/I18nContext";
 import { useCart } from "@/contexts/CartContext";
 import { useOctopartSearch, getBestPrice, getTotalStock, type OctopartResult } from "@/hooks/useOctopartSearch";
+import { useDigiKeySearch, getDigiKeyBestPrice, type DigiKeyResult } from "@/hooks/useDigiKeySearch";
 import { toast } from "sonner";
 
 type SortKey = "partNumber" | "manufacturer" | "price" | "stock";
