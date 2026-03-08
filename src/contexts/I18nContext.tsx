@@ -200,6 +200,14 @@ const translations = {
   "cart.continue_shopping": { en: "Continue Shopping", ru: "Продолжить покупки" },
   "cart.order_placed": { en: "Order placed!", ru: "Заказ оформлен!" },
   "cart.added": { en: "Added to cart", ru: "Добавлено в корзину" },
+
+  // Order detail
+  "order.not_found": { en: "Order not found", ru: "Заказ не найден" },
+  "order.back_to_orders": { en: "Back to orders", ru: "Назад к заказам" },
+  "order.part_number": { en: "Part Number", ru: "Артикул" },
+  "order.manufacturer": { en: "Manufacturer", ru: "Производитель" },
+  "order.quantity": { en: "Qty", ru: "Кол-во" },
+  "order.unit_price": { en: "Unit Price", ru: "Цена за шт." },
 } as const;
 
 type TranslationKey = keyof typeof translations;
