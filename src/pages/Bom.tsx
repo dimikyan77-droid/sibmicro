@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
 import {
   Upload, FileSpreadsheet, Search, Trash2, ShoppingCart, Download,
-  CheckCircle2, XCircle, AlertTriangle, ChevronDown, ChevronUp, Package, DollarSign, TrendingUp
+  CheckCircle2, XCircle, AlertTriangle, ChevronDown, ChevronUp, Package, DollarSign, TrendingUp, ChevronRight
 } from "lucide-react";
 import { products, Product } from "@/data/mockData";
 import { useCart } from "@/contexts/CartContext";
