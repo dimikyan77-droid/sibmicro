@@ -148,7 +148,7 @@ const Catalog = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            {!showOctopart && (
+            {!showExternalSearch && (
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
