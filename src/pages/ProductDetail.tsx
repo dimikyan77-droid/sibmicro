@@ -12,7 +12,10 @@ const ProductDetail = () => {
   const { id } = useParams();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const { t } = useI18n();
-  const product = products.find((p) => p.id === id);
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+  const [qty, setQty] = useState(product?.moq || 1);
+  const product2 = products.find((p) => p.id === id);
 
   if (!product) {
     return (
