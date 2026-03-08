@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FileText, ShoppingCart, Heart, GitCompare, Share2, ArrowLeft } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { products } from "@/data/mockData";
 import { useCompare } from "@/contexts/CompareContext";
 import { useI18n } from "@/contexts/I18nContext";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductDetail = () => {
   const { id } = useParams();
