@@ -142,7 +142,7 @@ const Catalog = () => {
             <p className="text-sm text-muted-foreground mt-0.5">
               {showExternalSearch
                 ? externalLoading
-                  ? t("octopart.searching")
+                  ? t("ext.searching_all")
                   : `${(octopart.totalHits + digikey.totalHits).toLocaleString()} ${t("octopart.results")} (Octopart + DigiKey)`
                 : `${filteredProducts.length} ${t("catalog.products_found")}`}
             </p>
