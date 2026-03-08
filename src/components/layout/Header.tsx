@@ -1,27 +1,20 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, Menu, X, ChevronDown, Globe, LogIn } from "lucide-react";
+import { ShoppingCart, User, Menu, X, ChevronDown, Globe, LogIn } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { categories } from "@/data/mockData";
 import { useI18n } from "@/contexts/I18nContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import SmartSearch from "@/components/SmartSearch";
 
 const Header = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { lang, setLang, t, tc } = useI18n();
   const { user } = useAuth();
   const { totalItems } = useCart();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/catalog?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -55,24 +48,7 @@ const Header = () => {
         </Link>
 
         {/* Search */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder={t("header.search_placeholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input pl-10 pr-20"
-            />
-            <button
-              type="submit"
-              className="absolute right-1 top-1/2 -translate-y-1/2 rounded bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              {t("header.search")}
-            </button>
-          </div>
-        </form>
+        <SmartSearch />
 
         {/* Actions */}
         <div className="flex items-center gap-3 shrink-0">
