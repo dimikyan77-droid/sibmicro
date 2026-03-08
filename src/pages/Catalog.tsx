@@ -639,6 +639,28 @@ function octopartToProduct(r: OctopartResult): Product {
   };
 }
 
+function digikeyToProduct(r: DigiKeyResult): Product {
+  const priceTiers = r.priceTiers.map((t) => ({ qty: t.quantity, price: t.price }));
+  if (priceTiers.length === 0) priceTiers.push({ qty: 1, price: 0 });
+
+  return {
+    id: `digikey-${r.digiKeyPn || r.mpn}`,
+    partNumber: r.mpn,
+    manufacturer: r.manufacturer || "Unknown",
+    category: "DigiKey",
+    subcategory: "",
+    description: r.description || "",
+    package: r.packageType || "",
+    temperatureRange: r.specs.find((s) => s.name.toLowerCase().includes("temp"))?.value || "",
+    rohs: r.rohs?.toLowerCase().includes("compliant") ?? false,
+    stock: r.stock,
+    leadTime: r.stock > 0 ? "In Stock" : "Contact",
+    priceTiers,
+    moq: 1,
+    datasheetUrl: r.datasheetUrl || "",
+  };
+}
+
 const CatalogBody = ({ products: filteredProducts }: { products: Product[] }) => {
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const { t } = useI18n();
