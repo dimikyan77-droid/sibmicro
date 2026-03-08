@@ -12,7 +12,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { lang, setLang, t } = useI18n();
+  const { lang, setLang, t, tc } = useI18n();
   const { user } = useAuth();
   const { totalItems } = useCart();
 
