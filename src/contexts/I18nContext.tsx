@@ -250,12 +250,49 @@ const translations = {
   "notfound.back": { en: "Return to Home", ru: "На главную" },
 } as const;
 
+// Category & subcategory localization map (key = English name)
+const categoryNames: Record<string, { en: string; ru: string }> = {
+  // Categories
+  "Semiconductors": { en: "Semiconductors", ru: "Полупроводники" },
+  "Passive Components": { en: "Passive Components", ru: "Пассивные компоненты" },
+  "RF & Microwave": { en: "RF & Microwave", ru: "ВЧ и СВЧ" },
+  "Connectors": { en: "Connectors", ru: "Разъёмы" },
+  "Test & Measurement": { en: "Test & Measurement", ru: "Контрольно-измерительное оборудование" },
+  "Optoelectronics": { en: "Optoelectronics", ru: "Оптоэлектроника" },
+  // Subcategories
+  "RF Amplifiers": { en: "RF Amplifiers", ru: "ВЧ усилители" },
+  "RF Mixers": { en: "RF Mixers", ru: "ВЧ смесители" },
+  "RF Switches": { en: "RF Switches", ru: "ВЧ переключатели" },
+  "ADC / DAC": { en: "ADC / DAC", ru: "АЦП / ЦАП" },
+  "Microcontrollers": { en: "Microcontrollers", ru: "Микроконтроллеры" },
+  "Power Management ICs": { en: "Power Management ICs", ru: "Микросхемы управления питанием" },
+  "Capacitors": { en: "Capacitors", ru: "Конденсаторы" },
+  "Resistors": { en: "Resistors", ru: "Резисторы" },
+  "Inductors": { en: "Inductors", ru: "Катушки индуктивности" },
+  "Ferrite Beads": { en: "Ferrite Beads", ru: "Ферритовые бусины" },
+  "Power Amplifiers": { en: "Power Amplifiers", ru: "Усилители мощности" },
+  "LNAs": { en: "LNAs", ru: "МШУ (LNA)" },
+  "Attenuators": { en: "Attenuators", ru: "Аттенюаторы" },
+  "RF Modules": { en: "RF Modules", ru: "ВЧ модули" },
+  "Filters": { en: "Filters", ru: "Фильтры" },
+  "RF Connectors": { en: "RF Connectors", ru: "ВЧ разъёмы" },
+  "Board-to-Board": { en: "Board-to-Board", ru: "Плата-плата" },
+  "Wire-to-Board": { en: "Wire-to-Board", ru: "Провод-плата" },
+  "Oscilloscope Probes": { en: "Oscilloscope Probes", ru: "Пробники осциллографов" },
+  "Signal Generators": { en: "Signal Generators", ru: "Генераторы сигналов" },
+  "Spectrum Analyzers": { en: "Spectrum Analyzers", ru: "Анализаторы спектра" },
+  "LEDs": { en: "LEDs", ru: "Светодиоды" },
+  "Photodiodes": { en: "Photodiodes", ru: "Фотодиоды" },
+  "Laser Diodes": { en: "Laser Diodes", ru: "Лазерные диоды" },
+};
+
 type TranslationKey = keyof typeof translations;
 
 interface I18nContextType {
   lang: Lang;
   setLang: (lang: Lang) => void;
   t: (key: TranslationKey) => string;
+  tc: (name: string) => string;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -276,8 +313,13 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     [lang]
   );
 
+  const tc = useCallback(
+    (name: string) => categoryNames[name]?.[lang] ?? name,
+    [lang]
+  );
+
   return (
-    <I18nContext.Provider value={{ lang, setLang: changeLang, t }}>
+    <I18nContext.Provider value={{ lang, setLang: changeLang, t, tc }}>
       {children}
     </I18nContext.Provider>
   );

@@ -17,7 +17,7 @@ const Catalog = () => {
   const query = searchParams.get("q") || "";
   const categorySlug = searchParams.get("category") || "";
   const subSlug = searchParams.get("sub") || "";
-  const { t } = useI18n();
+  const { t, tc } = useI18n();
 
   const [sortKey, setSortKey] = useState<SortKey>("partNumber");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
@@ -128,7 +128,7 @@ const Catalog = () => {
           <Link to="/" className="hover:text-foreground">{t("catalog.home")}</Link>
           <span>/</span>
           <span className="text-foreground font-medium">
-            {query ? `${t("catalog.results_for")}: "${query}"` : categorySlug ? categories.find((c) => c.slug === categorySlug)?.name || t("catalog.title") : t("catalog.title")}
+            {query ? `${t("catalog.results_for")}: "${query}"` : categorySlug ? tc(categories.find((c) => c.slug === categorySlug)?.name || "") || t("catalog.title") : t("catalog.title")}
           </span>
         </div>
       </div>

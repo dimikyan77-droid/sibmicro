@@ -12,7 +12,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { lang, setLang, t } = useI18n();
+  const { lang, setLang, t, tc } = useI18n();
   const { user } = useAuth();
   const { totalItems } = useCart();
 
@@ -113,7 +113,7 @@ const Header = () => {
                       to={`/catalog?category=${cat.slug}`}
                       className="font-semibold text-sm text-primary hover:underline"
                     >
-                      {cat.name}
+                      {tc(cat.name)}
                     </Link>
                     <ul className="mt-1 space-y-0.5">
                       {cat.subcategories.map((sub) => (
@@ -122,7 +122,7 @@ const Header = () => {
                             to={`/catalog?category=${cat.slug}&sub=${sub.slug}`}
                             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                           >
-                            {sub.name} ({sub.count.toLocaleString()})
+                            {tc(sub.name)} ({sub.count.toLocaleString()})
                           </Link>
                         </li>
                       ))}
@@ -151,7 +151,7 @@ const Header = () => {
               className="block py-2 text-sm font-medium text-foreground"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {cat.name}
+              {tc(cat.name)}
             </Link>
           ))}
           <hr className="border-border" />

@@ -18,7 +18,7 @@ const iconMap: Record<string, React.ReactNode> = {
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { t, tc } = useI18n();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,7 +109,7 @@ const Index = () => {
                 {iconMap[cat.icon]}
               </div>
               <div className="text-center">
-                <div className="text-sm font-semibold text-card-foreground">{cat.name}</div>
+                <div className="text-sm font-semibold text-card-foreground">{tc(cat.name)}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">
                   {cat.subcategories.reduce((acc, s) => acc + s.count, 0).toLocaleString()} {t("index.parts")}
                 </div>

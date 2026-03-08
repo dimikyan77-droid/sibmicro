@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
-  const { t } = useI18n();
+  const { t, tc } = useI18n();
   const { addToCart } = useCart();
   const { toast } = useToast();
   const product = products.find((p) => p.id === id);
@@ -33,7 +33,7 @@ const ProductDetail = () => {
   const specs: [string, string | undefined][] = [
     [t("spec.part_number"), product.partNumber],
     [t("spec.manufacturer"), product.manufacturer],
-    [t("spec.category"), `${product.category} / ${product.subcategory}`],
+    [t("spec.category"), `${tc(product.category)} / ${tc(product.subcategory)}`],
     [t("spec.frequency"), product.frequency],
     [t("spec.gain"), product.gain],
     [t("spec.noise_figure"), product.noiseFigure],
