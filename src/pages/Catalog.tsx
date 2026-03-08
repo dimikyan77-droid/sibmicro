@@ -140,10 +140,10 @@ const Catalog = () => {
               {query ? `${t("catalog.results_for")} "${query}"` : t("catalog.title")}
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              {showOctopart
-                ? octopart.loading
+              {showExternalSearch
+                ? externalLoading
                   ? t("octopart.searching")
-                  : `${octopart.totalHits.toLocaleString()} ${t("octopart.results")} (Octopart)`
+                  : `${(octopart.totalHits + digikey.totalHits).toLocaleString()} ${t("octopart.results")} (Octopart + DigiKey)`
                 : `${filteredProducts.length} ${t("catalog.products_found")}`}
             </p>
           </div>
