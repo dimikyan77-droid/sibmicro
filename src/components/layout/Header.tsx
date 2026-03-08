@@ -14,6 +14,7 @@ const Header = () => {
   const navigate = useNavigate();
   const { lang, setLang, t } = useI18n();
   const { user } = useAuth();
+  const { totalItems } = useCart();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
