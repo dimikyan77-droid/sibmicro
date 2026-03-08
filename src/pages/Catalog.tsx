@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { ChevronDown, ChevronUp, Filter, X, Download, GitCompare, Loader2, ShoppingCart, Check, ExternalLink, ArrowUpDown } from "lucide-react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { ChevronDown, ChevronUp, Filter, X, Download, GitCompare, Loader2, ShoppingCart, Check, ExternalLink, ArrowUpDown, ArrowLeft, Search, Upload, LayoutGrid, List, ChevronRight } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { products, categories, Product } from "@/data/mockData";
 import { useCompare } from "@/contexts/CompareContext";
@@ -14,15 +14,22 @@ type SortKey = "partNumber" | "manufacturer" | "price" | "stock";
 
 const Catalog = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const query = searchParams.get("q") || "";
   const categorySlug = searchParams.get("category") || "";
   const subSlug = searchParams.get("sub") || "";
   const { t, tc } = useI18n();
+  const { addToCart } = useCart();
 
   const [sortKey, setSortKey] = useState<SortKey>("partNumber");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [filters, setFilters] = useState<Record<string, string[]>>({});
-  const [showFilters, setShowFilters] = useState(true);
+  const [localSearch, setLocalSearch] = useState("");
+  const [mfgSearch, setMfgSearch] = useState("");
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [authorizedOnly, setAuthorizedOnly] = useState(false);
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
   const octopart = useOctopartSearch();
   const digikey = useDigiKeySearch();
@@ -33,7 +40,7 @@ const Catalog = () => {
   };
 
   const SortIcon = ({ col }: { col: SortKey }) => {
-    if (sortKey !== col) return <ChevronDown className="h-3 w-3 opacity-30" />;
+    if (sortKey !== col) return <ArrowUpDown className="h-3 w-3 opacity-30" />;
     return sortDir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />;
   };
 
@@ -45,9 +52,17 @@ const Catalog = () => {
     });
   };
 
+  const handleAddToCart = useCallback((p: Product) => {
+    addToCart(p, 1);
+    setAddedIds((prev) => new Set(prev).add(p.id));
+    toast.success(t("cart.added"), { description: p.partNumber });
+    setTimeout(() => { setAddedIds((prev) => { const n = new Set(prev); n.delete(p.id); return n; }); }, 2000);
+  }, [addToCart, t]);
+
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
+    // Global query from URL
     if (query) {
       const q = query.toLowerCase();
       result = result.filter(
@@ -57,6 +72,17 @@ const Catalog = () => {
           p.description.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q) ||
           p.subcategory.toLowerCase().includes(q)
+      );
+    }
+
+    // Local search within catalog
+    if (localSearch) {
+      const q = localSearch.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.partNumber.toLowerCase().includes(q) ||
+          p.manufacturer.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q)
       );
     }
 
@@ -76,16 +102,16 @@ const Catalog = () => {
     if (filters.manufacturer?.length) {
       result = result.filter((p) => filters.manufacturer.includes(p.manufacturer));
     }
-    if (filters.package?.length) {
-      result = result.filter((p) => filters.package.includes(p.package));
-    }
-    if (filters.rohs?.length) {
-      const rohsFilter = filters.rohs.includes("Yes");
-      result = result.filter((p) => p.rohs === rohsFilter);
-    }
     if (filters.stock?.length) {
-      if (filters.stock.includes("In Stock")) result = result.filter((p) => p.stock > 0);
+      result = result.filter((p) => {
+        if (filters.stock.includes("In Stock") && p.stock > 0) return true;
+        if (filters.stock.includes("On Order") && p.stock === 0 && p.leadTime !== "Contact") return true;
+        if (filters.stock.includes("Preorder") && p.leadTime === "Contact") return true;
+        return false;
+      });
     }
+
+    if (inStockOnly) result = result.filter((p) => p.stock > 0);
 
     result.sort((a, b) => {
       let cmp = 0;
@@ -99,7 +125,7 @@ const Catalog = () => {
     });
 
     return result;
-  }, [query, categorySlug, subSlug, filters, sortKey, sortDir]);
+  }, [query, localSearch, categorySlug, subSlug, filters, sortKey, sortDir, inStockOnly]);
 
   // Auto-search external sources when local results are empty and there's a query
   useEffect(() => {
@@ -112,126 +138,323 @@ const Catalog = () => {
     }
   }, [query, filteredProducts.length]);
 
-  const uniqueValues = (key: keyof Product) => [...new Set(products.map((p) => String(p[key])))].sort();
+  const uniqueManufacturers = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const p of products) {
+      counts[p.manufacturer] = (counts[p.manufacturer] || 0) + 1;
+    }
+    return Object.entries(counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
+  }, [mfgSearch]);
+
+  const categoryProductCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const p of products) {
+      const cat = p.category;
+      counts[cat] = (counts[cat] || 0) + 1;
+    }
+    return counts;
+  }, []);
+
+  const stockCounts = useMemo(() => {
+    const inStock = products.filter((p) => p.stock > 0).length;
+    const onOrder = products.filter((p) => p.stock === 0 && p.leadTime !== "Contact").length;
+    const preorder = products.filter((p) => p.leadTime === "Contact").length;
+    return { inStock, onOrder, preorder };
+  }, []);
 
   const activeFilterCount = Object.values(filters).flat().length;
-
   const showExternalSearch = query && filteredProducts.length === 0;
   const externalLoading = octopart.loading || digikey.loading;
-  const externalHasResults = octopart.results.length > 0 || digikey.results.length > 0;
+
+  const getAvailabilityBadge = (p: Product) => {
+    if (p.stock > 0) return { label: t("catalog.in_stock"), cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
+    if (p.leadTime === "Contact") return { label: t("catalog.preorder"), cls: "bg-violet-500/15 text-violet-400 border-violet-500/30" };
+    return { label: t("catalog.on_order"), cls: "bg-amber-500/15 text-amber-400 border-amber-500/30" };
+  };
 
   return (
     <Layout>
-      {/* Breadcrumb */}
-      <div className="bg-muted border-b border-border">
-        <div className="container py-3 text-xs text-muted-foreground flex items-center gap-1.5">
-          <Link to="/" className="hover:text-foreground">{t("catalog.home")}</Link>
-          <span>/</span>
-          <span className="text-foreground font-medium">
-            {query ? `${t("catalog.results_for")}: "${query}"` : categorySlug ? tc(categories.find((c) => c.slug === categorySlug)?.name || "") || t("catalog.title") : t("catalog.title")}
-          </span>
+      {/* Top bar with back, search, BOM */}
+      <div className="border-b border-border bg-card">
+        <div className="container py-4">
+          <div className="flex items-center gap-4">
+            <button onClick={() => navigate(-1)} className="p-1.5 rounded-md hover:bg-muted transition-colors shrink-0">
+              <ArrowLeft className="h-5 w-5 text-foreground" />
+            </button>
+            <h1 className="text-lg font-bold text-foreground shrink-0">
+              {query ? `${t("catalog.results_for")} "${query}"` : t("catalog.title")}
+            </h1>
+            <div className="flex-1 max-w-lg ml-auto">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder={t("catalog.search_placeholder")}
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
+                  className="w-full rounded-md border border-border bg-background pl-10 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+            <Link
+              to="/bom"
+              className="flex items-center gap-2 rounded-md border border-primary text-primary px-4 py-2 text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors shrink-0"
+            >
+              <Upload className="h-4 w-4" />
+              {t("catalog.upload_bom")}
+            </Link>
+          </div>
+
+          {/* Filter chips + view toggle */}
+          <div className="flex items-center gap-3 mt-3">
+            <button
+              onClick={() => setInStockOnly(!inStockOnly)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${inStockOnly ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-border hover:bg-muted"}`}
+            >
+              {t("catalog.in_stock_only")}
+            </button>
+            <button
+              onClick={() => setAuthorizedOnly(!authorizedOnly)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${authorizedOnly ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-border hover:bg-muted"}`}
+            >
+              {t("catalog.authorized")}
+            </button>
+            <div className="ml-auto flex items-center gap-1">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                <List className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="container py-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
-              {query ? `${t("catalog.results_for")} "${query}"` : t("catalog.title")}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {showExternalSearch
-                ? externalLoading
-                  ? t("ext.searching_all")
-                  : `${(octopart.totalHits + digikey.totalHits).toLocaleString()} ${t("octopart.results")} (Octopart + DigiKey)`
-                : `${filteredProducts.length} ${t("catalog.products_found")}`}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            {!showExternalSearch && (
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
-              >
-                <Filter className="h-3.5 w-3.5" />
-                {t("catalog.filters")} {activeFilterCount > 0 && `(${activeFilterCount})`}
-              </button>
-            )}
-            <button className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors">
-              <Download className="h-3.5 w-3.5" />
-              {t("catalog.export")}
-            </button>
-          </div>
-        </div>
-
         {showExternalSearch ? (
           <ExternalSearchResults octopart={octopart} digikey={digikey} />
         ) : (
           <div className="flex gap-6">
             {/* Sidebar Filters */}
-            {showFilters && (
-              <aside className="w-56 shrink-0 hidden lg:block space-y-5">
-                <FilterGroup
-                  title={t("catalog.manufacturer")}
-                  options={uniqueValues("manufacturer")}
-                  selected={filters.manufacturer || []}
-                  onToggle={(v) => toggleFilter("manufacturer", v)}
-                />
-                <FilterGroup
-                  title={t("catalog.package")}
-                  options={uniqueValues("package")}
-                  selected={filters.package || []}
-                  onToggle={(v) => toggleFilter("package", v)}
-                />
-                <FilterGroup
-                  title={t("catalog.rohs")}
-                  options={["Yes", "No"]}
-                  selected={filters.rohs || []}
-                  onToggle={(v) => toggleFilter("rohs", v)}
-                />
-                <FilterGroup
-                  title={t("catalog.availability")}
-                  options={["In Stock"]}
-                  selected={filters.stock || []}
-                  onToggle={(v) => toggleFilter("stock", v)}
-                />
+            <aside className="w-60 shrink-0 hidden lg:block space-y-6">
+              <div className="rounded-lg border border-border bg-card p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Filter className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-foreground text-sm">{t("catalog.filters")}</span>
+                </div>
+
+                {/* Category filter */}
+                <div className="mb-5">
+                  <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center justify-between">
+                    {t("catalog.category")}
+                    <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+                  </h3>
+                  <div className="space-y-1.5">
+                    {categories.map((cat) => (
+                      <label key={cat.slug} className="flex items-center gap-2 text-xs cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={categorySlug === cat.slug}
+                          onChange={() => {
+                            if (categorySlug === cat.slug) navigate("/catalog");
+                            else navigate(`/catalog?category=${cat.slug}`);
+                          }}
+                          className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
+                        />
+                        <span className="text-muted-foreground group-hover:text-foreground truncate flex-1">{tc(cat.name)}</span>
+                        <span className="text-muted-foreground/60 text-[10px]">({categoryProductCounts[cat.name] || 0})</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Manufacturer filter */}
+                <div className="mb-5">
+                  <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center justify-between">
+                    {t("catalog.manufacturer")}
+                    <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+                  </h3>
+                  <input
+                    type="text"
+                    placeholder={t("catalog.search_manufacturer")}
+                    value={mfgSearch}
+                    onChange={(e) => setMfgSearch(e.target.value)}
+                    className="w-full rounded border border-border bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary mb-2"
+                  />
+                  <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                    {uniqueManufacturers.map(([name, count]) => (
+                      <label key={name} className="flex items-center gap-2 text-xs cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={(filters.manufacturer || []).includes(name)}
+                          onChange={() => toggleFilter("manufacturer", name)}
+                          className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
+                        />
+                        <span className="text-muted-foreground group-hover:text-foreground truncate flex-1">{name}</span>
+                        <span className="text-muted-foreground/60 text-[10px]">({count})</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Availability filter */}
+                <div className="mb-4">
+                  <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center justify-between">
+                    {t("catalog.availability")}
+                    <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+                  </h3>
+                  <div className="space-y-1.5">
+                    <label className="flex items-center gap-2 text-xs cursor-pointer group">
+                      <input type="checkbox" checked={(filters.stock || []).includes("In Stock")} onChange={() => toggleFilter("stock", "In Stock")} className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5" />
+                      <span className="text-muted-foreground group-hover:text-foreground flex-1">{t("catalog.in_stock")}</span>
+                      <span className="text-muted-foreground/60 text-[10px]">({stockCounts.inStock})</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-xs cursor-pointer group">
+                      <input type="checkbox" checked={(filters.stock || []).includes("On Order")} onChange={() => toggleFilter("stock", "On Order")} className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5" />
+                      <span className="text-muted-foreground group-hover:text-foreground flex-1">{t("catalog.on_order")}</span>
+                      <span className="text-muted-foreground/60 text-[10px]">({stockCounts.onOrder})</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-xs cursor-pointer group">
+                      <input type="checkbox" checked={(filters.stock || []).includes("Preorder")} onChange={() => toggleFilter("stock", "Preorder")} className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5" />
+                      <span className="text-muted-foreground group-hover:text-foreground flex-1">{t("catalog.preorder")}</span>
+                      <span className="text-muted-foreground/60 text-[10px]">({stockCounts.preorder})</span>
+                    </label>
+                  </div>
+                </div>
+
                 {activeFilterCount > 0 && (
                   <button
                     onClick={() => setFilters({})}
-                    className="flex items-center gap-1 text-xs text-accent hover:underline"
+                    className="flex items-center gap-1 text-xs text-destructive hover:underline"
                   >
                     <X className="h-3 w-3" /> {t("catalog.clear_filters")}
                   </button>
                 )}
-              </aside>
-            )}
+              </div>
+            </aside>
 
-            {/* Results Table */}
-            <div className="flex-1 overflow-x-auto">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th className="w-10">
-                      <GitCompare className="h-3.5 w-3.5 mx-auto text-muted-foreground" />
-                    </th>
-                    <th onClick={() => toggleSort("partNumber")} className="min-w-[160px]">
-                      <span className="flex items-center gap-1">{t("catalog.part_number")} <SortIcon col="partNumber" /></span>
-                    </th>
-                    <th onClick={() => toggleSort("manufacturer")}>
-                      <span className="flex items-center gap-1">{t("catalog.manufacturer")} <SortIcon col="manufacturer" /></span>
-                    </th>
-                    <th className="min-w-[250px]">{t("catalog.description")}</th>
-                    <th>{t("catalog.package")}</th>
-                    <th onClick={() => toggleSort("stock")}>
-                      <span className="flex items-center gap-1">{t("catalog.stock")} <SortIcon col="stock" /></span>
-                    </th>
-                    <th onClick={() => toggleSort("price")} className="text-right">
-                      <span className="flex items-center gap-1 justify-end">{t("catalog.price")} <SortIcon col="price" /></span>
-                    </th>
-                  </tr>
-                </thead>
-                <CatalogBody products={filteredProducts} />
-              </table>
+            {/* Main content */}
+            <div className="flex-1 min-w-0">
+              {/* Count */}
+              <div className="text-sm text-muted-foreground mb-4">
+                {t("catalog.shown_of")} <span className="font-bold text-foreground">{filteredProducts.length}</span> {t("catalog.of")} {products.length} {t("catalog.products")}
+              </div>
+
+              {viewMode === "list" ? (
+                /* List / Table view */
+                <div className="overflow-x-auto rounded-lg border border-border bg-card">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="px-4 py-3 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wider cursor-pointer hover:text-foreground" onClick={() => toggleSort("partNumber")}>
+                          <span className="flex items-center gap-1">{t("catalog.part_number")} <SortIcon col="partNumber" /></span>
+                        </th>
+                        <th className="px-4 py-3 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wider cursor-pointer hover:text-foreground" onClick={() => toggleSort("manufacturer")}>
+                          <span className="flex items-center gap-1">{t("catalog.manufacturer")} <SortIcon col="manufacturer" /></span>
+                        </th>
+                        <th className="px-4 py-3 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wider min-w-[200px]">{t("catalog.description")}</th>
+                        <th className="px-4 py-3 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wider cursor-pointer hover:text-foreground" onClick={() => toggleSort("stock")}>
+                          <span className="flex items-center gap-1">{t("catalog.stock")} <SortIcon col="stock" /></span>
+                        </th>
+                        <th className="px-4 py-3 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wider cursor-pointer hover:text-foreground" onClick={() => toggleSort("price")}>
+                          <span className="flex items-center gap-1">{t("catalog.price")} <SortIcon col="price" /></span>
+                        </th>
+                        <th className="px-4 py-3 w-[120px]"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredProducts.map((p) => {
+                        const badge = getAvailabilityBadge(p);
+                        const added = addedIds.has(p.id);
+                        return (
+                          <tr key={p.id} className="border-b border-border last:border-0 hover:bg-muted/40 transition-colors">
+                            <td className="px-4 py-3">
+                              <Link to={`/product/${p.id}`} className="font-semibold text-foreground hover:text-primary transition-colors">
+                                {p.description.split(",")[0] || p.partNumber}
+                              </Link>
+                              <div className="text-xs text-primary font-mono mt-0.5">{p.partNumber}</div>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-foreground">{p.manufacturer}</td>
+                            <td className="px-4 py-3 text-xs text-muted-foreground">{p.description}</td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${badge.cls}`}>
+                                {badge.label}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="font-semibold text-foreground">${p.priceTiers[0].price.toFixed(2)}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <button
+                                onClick={() => handleAddToCart(p)}
+                                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                                  added
+                                    ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/30"
+                                    : "border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                                }`}
+                              >
+                                {added ? <Check className="h-3.5 w-3.5" /> : <ShoppingCart className="h-3.5 w-3.5" />}
+                                {t("catalog.add_to_cart")}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {filteredProducts.length === 0 && (
+                        <tr>
+                          <td colSpan={6} className="text-center py-12 text-muted-foreground">
+                            {t("catalog.no_products")}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                /* Grid view */
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {filteredProducts.map((p) => {
+                    const badge = getAvailabilityBadge(p);
+                    const added = addedIds.has(p.id);
+                    return (
+                      <div key={p.id} className="rounded-lg border border-border bg-card p-4 hover:shadow-md transition-shadow">
+                        <Link to={`/product/${p.id}`} className="font-semibold text-foreground hover:text-primary text-sm transition-colors">
+                          {p.description.split(",")[0] || p.partNumber}
+                        </Link>
+                        <div className="text-xs text-primary font-mono mt-0.5">{p.partNumber}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{p.manufacturer}</div>
+                        <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{p.description}</div>
+                        <div className="flex items-center justify-between mt-3">
+                          <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${badge.cls}`}>
+                            {badge.label}
+                          </span>
+                          <span className="font-bold text-foreground">${p.priceTiers[0].price.toFixed(2)}</span>
+                        </div>
+                        <button
+                          onClick={() => handleAddToCart(p)}
+                          className={`w-full mt-3 flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition-colors ${
+                            added
+                              ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/30"
+                              : "border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                          }`}
+                        >
+                          {added ? <Check className="h-3.5 w-3.5" /> : <ShoppingCart className="h-3.5 w-3.5" />}
+                          {t("catalog.add_to_cart")}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -355,12 +578,9 @@ const ExternalSearchResults = ({
 
   const sortedItems = useMemo(() => {
     let items = [...allItems];
-
-    // Filter by tab
     if (activeTab === "octopart") items = items.filter((i) => i.source === "octopart");
     if (activeTab === "digikey") items = items.filter((i) => i.source === "digikey");
 
-    // Sort
     items.sort((a, b) => {
       let cmp = 0;
       switch (extSortKey) {
@@ -412,27 +632,18 @@ const ExternalSearchResults = ({
 
   return (
     <div>
-      {/* Source tabs + sort info */}
+      {/* Source tabs */}
       <div className="mb-3 flex items-center gap-2 flex-wrap">
-        <button
-          onClick={() => setActiveTab("all")}
-          className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"}`}
-        >
+        <button onClick={() => setActiveTab("all")} className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"}`}>
           {t("ext.all_sources")} ({allItems.length})
         </button>
         {octopart.results.length > 0 && (
-          <button
-            onClick={() => setActiveTab("octopart")}
-            className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "octopart" ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary hover:bg-primary/20"}`}
-          >
+          <button onClick={() => setActiveTab("octopart")} className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "octopart" ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary hover:bg-primary/20"}`}>
             Octopart ({octopart.results.length})
           </button>
         )}
         {digikey.results.length > 0 && (
-          <button
-            onClick={() => setActiveTab("digikey")}
-            className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "digikey" ? "bg-primary text-primary-foreground" : "bg-accent/10 text-accent hover:bg-accent/20"}`}
-          >
+          <button onClick={() => setActiveTab("digikey")} className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "digikey" ? "bg-primary text-primary-foreground" : "bg-accent/10 text-accent hover:bg-accent/20"}`}>
             DigiKey ({digikey.results.length})
           </button>
         )}
@@ -443,7 +654,6 @@ const ExternalSearchResults = ({
         </span>
       </div>
 
-      {/* Errors */}
       {octopart.error && activeTab !== "digikey" && (
         <div className="mb-3 p-2 rounded-md bg-destructive/10 text-destructive text-xs">Octopart: {octopart.error}</div>
       )}
@@ -451,55 +661,51 @@ const ExternalSearchResults = ({
         <div className="mb-3 p-2 rounded-md bg-destructive/10 text-destructive text-xs">DigiKey: {digikey.error}</div>
       )}
 
-      {/* Unified table */}
-      <div className="overflow-x-auto">
-        <table className="data-table">
+      <div className="overflow-x-auto rounded-lg border border-border bg-card">
+        <table className="w-full text-sm">
           <thead>
-            <tr>
-              <th className="w-10"></th>
-              <th className="w-16 cursor-pointer" onClick={() => toggleExtSort("source")}>
+            <tr className="border-b border-border">
+              <th className="px-3 py-2.5 w-10"></th>
+              <th className="px-3 py-2.5 w-16 cursor-pointer text-left text-xs font-semibold text-muted-foreground uppercase" onClick={() => toggleExtSort("source")}>
                 <span className="flex items-center gap-1">{t("ext.source")} <ExtSortIcon col="source" /></span>
               </th>
-              <th className="min-w-[140px] cursor-pointer" onClick={() => toggleExtSort("mpn")}>
+              <th className="px-3 py-2.5 min-w-[140px] cursor-pointer text-left text-xs font-semibold text-muted-foreground uppercase" onClick={() => toggleExtSort("mpn")}>
                 <span className="flex items-center gap-1">{t("catalog.part_number")} <ExtSortIcon col="mpn" /></span>
               </th>
-              <th className="cursor-pointer" onClick={() => toggleExtSort("manufacturer")}>
+              <th className="px-3 py-2.5 cursor-pointer text-left text-xs font-semibold text-muted-foreground uppercase" onClick={() => toggleExtSort("manufacturer")}>
                 <span className="flex items-center gap-1">{t("catalog.manufacturer")} <ExtSortIcon col="manufacturer" /></span>
               </th>
-              <th className="min-w-[200px]">{t("catalog.description")}</th>
-              <th>{t("catalog.package")}</th>
-              <th className="cursor-pointer" onClick={() => toggleExtSort("stock")}>
+              <th className="px-3 py-2.5 min-w-[200px] text-left text-xs font-semibold text-muted-foreground uppercase">{t("catalog.description")}</th>
+              <th className="px-3 py-2.5 cursor-pointer text-left text-xs font-semibold text-muted-foreground uppercase" onClick={() => toggleExtSort("stock")}>
                 <span className="flex items-center gap-1">{t("catalog.stock")} <ExtSortIcon col="stock" /></span>
               </th>
-              <th className="text-right cursor-pointer" onClick={() => toggleExtSort("price")}>
+              <th className="px-3 py-2.5 text-right cursor-pointer text-xs font-semibold text-muted-foreground uppercase" onClick={() => toggleExtSort("price")}>
                 <span className="flex items-center gap-1 justify-end">{t("catalog.price")} <ExtSortIcon col="price" /></span>
               </th>
-              <th className="w-[130px]">{t("product.qty")}</th>
-              <th className="w-10"></th>
+              <th className="px-3 py-2.5 w-[130px] text-xs font-semibold text-muted-foreground uppercase">{t("product.qty")}</th>
+              <th className="px-3 py-2.5 w-10"></th>
             </tr>
           </thead>
           <tbody>
             {sortedItems.map((item) => (
-              <tr key={item.key}>
-                <td>
+              <tr key={item.key} className="border-b border-border last:border-0 hover:bg-muted/40 transition-colors">
+                <td className="px-3 py-2">
                   <button
                     onClick={() => handleAdd(item)}
-                    className={`p-1.5 rounded-md transition-colors ${addedKeys.has(item.key) ? "text-green-600 bg-green-50" : "text-primary hover:bg-muted"}`}
+                    className={`p-1.5 rounded-md transition-colors ${addedKeys.has(item.key) ? "text-emerald-600 bg-emerald-50" : "text-primary hover:bg-muted"}`}
                     title={t("product.add_to_cart")}
                   >
                     {addedKeys.has(item.key) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
                   </button>
                 </td>
-                <td>
+                <td className="px-3 py-2">
                   <span className={`text-[10px] font-semibold rounded px-1.5 py-0.5 ${
-                    item.source === "octopart"
-                      ? "bg-primary/10 text-primary"
-                      : "bg-accent/10 text-accent"
+                    item.source === "octopart" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"
                   }`}>
                     {item.source === "octopart" ? "Octopart" : "DigiKey"}
                   </span>
                 </td>
-                <td>
+                <td className="px-3 py-2">
                   <button
                     onClick={() => setExpandedRow(expandedRow === item.key ? null : item.key)}
                     className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline text-left"
@@ -510,15 +716,14 @@ const ExternalSearchResults = ({
                     <div className="text-[10px] text-muted-foreground">{(item.raw as DigiKeyResult).digiKeyPn}</div>
                   )}
                 </td>
-                <td className="text-sm">{item.manufacturer}</td>
-                <td className="text-xs text-muted-foreground">{item.description}</td>
-                <td className="text-xs font-mono">{item.packageType}</td>
-                <td>
-                  <span className={`chip ${item.stock > 0 ? "chip-success" : "chip-warning"}`}>
+                <td className="px-3 py-2 text-sm">{item.manufacturer}</td>
+                <td className="px-3 py-2 text-xs text-muted-foreground">{item.description}</td>
+                <td className="px-3 py-2">
+                  <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${item.stock > 0 ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" : "bg-amber-500/15 text-amber-600 border-amber-500/30"}`}>
                     {item.stock > 0 ? item.stock.toLocaleString() : t("catalog.contact")}
                   </span>
                 </td>
-                <td className="text-right">
+                <td className="px-3 py-2 text-right">
                   {item.unitPrice !== null ? (
                     <div>
                       <div className="text-sm font-semibold">{item.priceLabel}</div>
@@ -526,12 +731,9 @@ const ExternalSearchResults = ({
                     </div>
                   ) : <span className="text-xs text-muted-foreground">—</span>}
                 </td>
-                <td>
+                <td className="px-3 py-2">
                   <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setQty(item.key, getQty(item.key) - 1)}
-                      className="w-6 h-6 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center"
-                    >−</button>
+                    <button onClick={() => setQty(item.key, getQty(item.key) - 1)} className="w-6 h-6 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center">−</button>
                     <input
                       type="number"
                       min={1}
@@ -539,13 +741,10 @@ const ExternalSearchResults = ({
                       onChange={(e) => setQty(item.key, parseInt(e.target.value) || 1)}
                       className="w-12 h-6 text-center text-xs border border-border rounded bg-background focus:outline-none focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
-                    <button
-                      onClick={() => setQty(item.key, getQty(item.key) + 1)}
-                      className="w-6 h-6 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center"
-                    >+</button>
+                    <button onClick={() => setQty(item.key, getQty(item.key) + 1)} className="w-6 h-6 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center">+</button>
                   </div>
                 </td>
-                <td>
+                <td className="px-3 py-2">
                   {item.datasheetUrl && (
                     <a href={item.datasheetUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-accent" title={t("product.datasheet")}>
                       <ExternalLink className="h-3.5 w-3.5" />
@@ -558,13 +757,13 @@ const ExternalSearchResults = ({
         </table>
       </div>
 
-      {/* Expanded detail for Octopart */}
+      {/* Expanded detail rows (kept from original) */}
       {expandedRow?.startsWith("octo-") && (() => {
         const mpn = expandedRow.replace("octo-", "");
         const r = octopart.results.find((x) => x.mpn === mpn);
         if (!r) return null;
         return (
-          <div className="mt-4 border border-border rounded-lg p-5 bg-muted/30">
+          <div className="mt-4 border border-border rounded-lg p-5 bg-card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-foreground">{r.mpn} <span className="text-xs font-normal text-primary bg-primary/10 rounded px-1.5 py-0.5 ml-2">Octopart</span></h2>
               <div className="flex items-center gap-3">
@@ -618,13 +817,12 @@ const ExternalSearchResults = ({
         );
       })()}
 
-      {/* Expanded detail for DigiKey */}
       {expandedRow?.startsWith("dk-") && (() => {
         const rest = expandedRow.replace("dk-", "");
         const r = digikey.results.find((x) => `${x.mpn}-${x.digiKeyPn}` === rest);
         if (!r) return null;
         return (
-          <div className="mt-4 border border-border rounded-lg p-5 bg-muted/30">
+          <div className="mt-4 border border-border rounded-lg p-5 bg-card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-foreground">{r.mpn} <span className="text-xs font-normal text-accent bg-accent/10 rounded px-1.5 py-0.5 ml-2">DigiKey</span></h2>
               <div className="flex items-center gap-3">
@@ -737,81 +935,5 @@ function digikeyToProduct(r: DigiKeyResult): Product {
     datasheetUrl: r.datasheetUrl || "",
   };
 }
-
-const CatalogBody = ({ products: filteredProducts }: { products: Product[] }) => {
-  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
-  const { t } = useI18n();
-
-  return (
-    <tbody>
-      {filteredProducts.map((p) => (
-        <tr key={p.id}>
-          <td className="text-center">
-            <input
-              type="checkbox"
-              checked={isInCompare(p.id)}
-              onChange={() => isInCompare(p.id) ? removeFromCompare(p.id) : addToCompare(p)}
-              className="rounded border-border text-accent focus:ring-accent h-3.5 w-3.5"
-              title={t("product.compare")}
-            />
-          </td>
-          <td>
-            <Link to={`/product/${p.id}`} className="font-mono text-sm font-medium text-primary hover:text-accent hover:underline">
-              {p.partNumber}
-            </Link>
-          </td>
-          <td className="text-sm">{p.manufacturer}</td>
-          <td className="text-xs text-muted-foreground">{p.description}</td>
-          <td className="text-xs font-mono">{p.package}</td>
-          <td>
-            <span className={`chip ${p.stock > 0 ? "chip-success" : "chip-warning"}`}>
-              {p.stock > 0 ? p.stock.toLocaleString() : t("catalog.contact")}
-            </span>
-          </td>
-          <td className="text-right">
-            <div className="text-sm font-semibold">${p.priceTiers[0].price.toFixed(p.priceTiers[0].price < 1 ? 4 : 2)}</div>
-            <div className="text-[10px] text-muted-foreground">qty {p.priceTiers[0].qty}+</div>
-          </td>
-        </tr>
-      ))}
-      {filteredProducts.length === 0 && (
-        <tr>
-          <td colSpan={7} className="text-center py-12 text-muted-foreground">
-            {t("catalog.no_products")}
-          </td>
-        </tr>
-      )}
-    </tbody>
-  );
-};
-
-const FilterGroup = ({
-  title,
-  options,
-  selected,
-  onToggle,
-}: {
-  title: string;
-  options: string[];
-  selected: string[];
-  onToggle: (v: string) => void;
-}) => (
-  <div>
-    <h3 className="text-xs font-semibold text-foreground mb-2">{title}</h3>
-    <div className="space-y-1">
-      {options.map((opt) => (
-        <label key={opt} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer">
-          <input
-            type="checkbox"
-            checked={selected.includes(opt)}
-            onChange={() => onToggle(opt)}
-            className="rounded border-border text-accent focus:ring-accent h-3.5 w-3.5"
-          />
-          <span className="truncate">{opt}</span>
-        </label>
-      ))}
-    </div>
-  </div>
-);
 
 export default Catalog;
