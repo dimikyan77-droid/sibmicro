@@ -146,11 +146,18 @@ const ProductDetail = () => {
               <div className="flex gap-2">
                 <input
                   type="number"
-                  defaultValue={product.moq}
+                  value={qty}
                   min={product.moq}
+                  onChange={(e) => setQty(Math.max(parseInt(e.target.value) || product.moq, product.moq))}
                   className="w-20 rounded-md border border-input bg-background px-3 py-2 text-sm text-center"
                 />
-                <button className="flex-1 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/90 transition-colors flex items-center justify-center gap-2">
+                <button
+                  onClick={() => {
+                    addToCart(product, qty);
+                    toast({ title: t("cart.added"), description: product.partNumber });
+                  }}
+                  className="flex-1 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
+                >
                   <ShoppingCart className="h-4 w-4" /> {t("product.add_to_cart")}
                 </button>
               </div>
