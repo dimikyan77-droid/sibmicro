@@ -33,7 +33,7 @@ const Footer = () => {
           <h4 className="font-semibold mb-3 text-sm">{t("footer.contact")}</h4>
           <ul className="space-y-1.5 text-sm opacity-80">
             <li>📞 +7 (495) 123-45-67</li>
-            <li>✉ sales@sibmicro.com</li>
+            <li>✉ sales@sibmicro.ru</li>
             <li>🏢 Moscow, Russia</li>
           </ul>
         </div>

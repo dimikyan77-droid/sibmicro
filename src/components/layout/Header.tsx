@@ -30,7 +30,7 @@ const Header = () => {
         <div className="container flex h-8 items-center justify-between text-xs text-primary-foreground">
           <div className="flex gap-4">
             <span>📞 +7 (495) 123-45-67</span>
-            <span className="hidden sm:inline">✉ sales@sibmicro.com</span>
+            <span className="hidden sm:inline">✉ sales@sibmicro.ru</span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/quote" className="hover:underline">{t("header.request_quote")}</Link>

@@ -19,6 +19,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Cart from "./pages/Cart";
 import OrderDetail from "./pages/OrderDetail";
 import OctopartSearch from "./pages/OctopartSearch";
+import Quote from "./pages/Quote";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/order/:id" element={<OrderDetail />} />
                   <Route path="/octopart" element={<OctopartSearch />} />
+                  <Route path="/quote" element={<Quote />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CompareBar />
