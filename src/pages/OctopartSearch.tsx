@@ -215,6 +215,7 @@ const OctopartSearch = () => {
                   <th>{t("catalog.stock")}</th>
                   <th className="text-right">{t("catalog.price")}</th>
                   <th className="w-10"></th>
+                  <th className="w-10"></th>
                 </tr>
               </thead>
               <tbody>
