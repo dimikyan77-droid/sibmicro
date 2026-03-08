@@ -2,43 +2,44 @@ import { Link } from "react-router-dom";
 import { X, ArrowLeft, GitCompare } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { useCompare } from "@/contexts/CompareContext";
-
-const specRows: { label: string; key: string; getter: (p: any) => string }[] = [
-  { label: "Part Number", key: "partNumber", getter: (p) => p.partNumber },
-  { label: "Manufacturer", key: "manufacturer", getter: (p) => p.manufacturer },
-  { label: "Category", key: "category", getter: (p) => `${p.category} / ${p.subcategory}` },
-  { label: "Description", key: "description", getter: (p) => p.description },
-  { label: "Frequency Range", key: "frequency", getter: (p) => p.frequency || "—" },
-  { label: "Gain", key: "gain", getter: (p) => p.gain || "—" },
-  { label: "Noise Figure", key: "noiseFigure", getter: (p) => p.noiseFigure || "—" },
-  { label: "Output Power", key: "powerOutput", getter: (p) => p.powerOutput || "—" },
-  { label: "Supply Voltage", key: "supplyVoltage", getter: (p) => p.supplyVoltage || "—" },
-  { label: "Package", key: "package", getter: (p) => p.package },
-  { label: "Temperature Range", key: "temperatureRange", getter: (p) => p.temperatureRange },
-  { label: "RoHS", key: "rohs", getter: (p) => p.rohs ? "Yes ✓" : "No" },
-  { label: "Stock", key: "stock", getter: (p) => p.stock > 0 ? p.stock.toLocaleString() : "Contact" },
-  { label: "Lead Time", key: "leadTime", getter: (p) => p.leadTime },
-  { label: "MOQ", key: "moq", getter: (p) => String(p.moq) },
-  {
-    label: "Price (qty 1)",
-    key: "price",
-    getter: (p) => {
-      const t = p.priceTiers[0];
-      return `$${t.price.toFixed(t.price < 1 ? 4 : 2)}`;
-    },
-  },
-];
+import { useI18n } from "@/contexts/I18nContext";
 
 const Compare = () => {
   const { compareItems, removeFromCompare, clearCompare } = useCompare();
+  const { t } = useI18n();
+
+  const specRows = [
+    { label: t("spec.part_number"), getter: (p: any) => p.partNumber },
+    { label: t("spec.manufacturer"), getter: (p: any) => p.manufacturer },
+    { label: t("spec.category"), getter: (p: any) => `${p.category} / ${p.subcategory}` },
+    { label: t("spec.description"), getter: (p: any) => p.description },
+    { label: t("spec.frequency"), getter: (p: any) => p.frequency || "—" },
+    { label: t("spec.gain"), getter: (p: any) => p.gain || "—" },
+    { label: t("spec.noise_figure"), getter: (p: any) => p.noiseFigure || "—" },
+    { label: t("spec.output_power"), getter: (p: any) => p.powerOutput || "—" },
+    { label: t("spec.supply_voltage"), getter: (p: any) => p.supplyVoltage || "—" },
+    { label: t("spec.package"), getter: (p: any) => p.package },
+    { label: t("spec.temp_range"), getter: (p: any) => p.temperatureRange },
+    { label: t("spec.rohs"), getter: (p: any) => p.rohs ? `${t("spec.yes")} ✓` : t("spec.no") },
+    { label: t("spec.stock"), getter: (p: any) => p.stock > 0 ? p.stock.toLocaleString() : t("catalog.contact") },
+    { label: t("spec.lead_time"), getter: (p: any) => p.leadTime },
+    { label: t("spec.moq"), getter: (p: any) => String(p.moq) },
+    {
+      label: t("spec.price_qty1"),
+      getter: (p: any) => {
+        const tier = p.priceTiers[0];
+        return `$${tier.price.toFixed(tier.price < 1 ? 4 : 2)}`;
+      },
+    },
+  ];
 
   return (
     <Layout>
       <div className="bg-muted border-b border-border">
         <div className="container py-3 text-xs text-muted-foreground flex items-center gap-1.5">
-          <Link to="/" className="hover:text-foreground">Home</Link>
+          <Link to="/" className="hover:text-foreground">{t("catalog.home")}</Link>
           <span>/</span>
-          <span className="text-foreground font-medium">Compare Components</span>
+          <span className="text-foreground font-medium">{t("compare.breadcrumb")}</span>
         </div>
       </div>
 
@@ -46,11 +47,11 @@ const Compare = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Link to="/catalog" className="inline-flex items-center gap-1 text-xs text-accent hover:underline">
-              <ArrowLeft className="h-3 w-3" /> Back to catalog
+              <ArrowLeft className="h-3 w-3" /> {t("compare.back_catalog")}
             </Link>
             <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
               <GitCompare className="h-5 w-5 text-accent" />
-              Component Comparison
+              {t("compare.title")}
             </h1>
           </div>
           {compareItems.length > 0 && (
@@ -58,7 +59,7 @@ const Compare = () => {
               onClick={clearCompare}
               className="text-xs text-muted-foreground hover:text-destructive transition-colors"
             >
-              Clear all
+              {t("compare.clear")}
             </button>
           )}
         </div>
@@ -66,11 +67,9 @@ const Compare = () => {
         {compareItems.length === 0 ? (
           <div className="text-center py-20 space-y-3">
             <GitCompare className="h-12 w-12 text-muted-foreground mx-auto" />
-            <h2 className="text-lg font-semibold text-foreground">No components to compare</h2>
+            <h2 className="text-lg font-semibold text-foreground">{t("compare.empty_title")}</h2>
             <p className="text-sm text-muted-foreground">
-              Add components from the{" "}
-              <Link to="/catalog" className="text-accent hover:underline">catalog</Link>{" "}
-              using the compare checkbox.
+              {t("compare.empty_text")}
             </p>
           </div>
         ) : (
@@ -79,7 +78,7 @@ const Compare = () => {
               <thead>
                 <tr className="border-b border-border">
                   <th className="bg-muted px-4 py-3 text-left text-xs font-semibold text-muted-foreground w-44 sticky left-0 z-10">
-                    Specification
+                    {t("compare.specification")}
                   </th>
                   {compareItems.map((p) => (
                     <th key={p.id} className="bg-muted px-4 py-3 min-w-[200px]">
@@ -100,7 +99,7 @@ const Compare = () => {
               </thead>
               <tbody>
                 {specRows.map((row, i) => (
-                  <tr key={row.key} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+                  <tr key={row.label} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
                     <td className="px-4 py-2.5 font-medium text-muted-foreground text-xs sticky left-0 z-10 bg-inherit">
                       {row.label}
                     </td>
@@ -108,7 +107,7 @@ const Compare = () => {
                       const val = row.getter(p);
                       return (
                         <td key={p.id} className="px-4 py-2.5 font-mono text-xs text-foreground">
-                          {row.key === "rohs" && val.includes("✓") ? (
+                          {val.includes("✓") ? (
                             <span className="text-emerald-600 font-semibold">{val}</span>
                           ) : val === "—" ? (
                             <span className="text-muted-foreground">{val}</span>

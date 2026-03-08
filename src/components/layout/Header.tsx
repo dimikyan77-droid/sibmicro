@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, Menu, X, ChevronDown } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, ChevronDown, Globe } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { categories } from "@/data/mockData";
+import { useI18n } from "@/contexts/I18nContext";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { lang, setLang, t } = useI18n();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,9 +28,17 @@ const Header = () => {
             <span>📞 +7 (495) 123-45-67</span>
             <span className="hidden sm:inline">✉ sales@sibmicro.com</span>
           </div>
-          <div className="flex gap-4">
-            <Link to="/quote" className="hover:underline">Request Quote</Link>
-            <Link to="/bom" className="hover:underline">BOM Upload</Link>
+          <div className="flex items-center gap-4">
+            <Link to="/quote" className="hover:underline">{t("header.request_quote")}</Link>
+            <Link to="/bom" className="hover:underline">{t("header.bom_upload")}</Link>
+            <button
+              onClick={() => setLang(lang === "en" ? "ru" : "en")}
+              className="flex items-center gap-1 hover:underline font-medium"
+              title={lang === "en" ? "Переключить на русский" : "Switch to English"}
+            >
+              <Globe className="h-3.5 w-3.5" />
+              {lang === "en" ? "RU" : "EN"}
+            </button>
           </div>
         </div>
       </div>
@@ -46,7 +56,7 @@ const Header = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search by part number, keyword, or manufacturer..."
+              placeholder={t("header.search_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input pl-10 pr-20"
@@ -55,7 +65,7 @@ const Header = () => {
               type="submit"
               className="absolute right-1 top-1/2 -translate-y-1/2 rounded bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Search
+              {t("header.search")}
             </button>
           </div>
         </form>
@@ -87,7 +97,7 @@ const Header = () => {
             onMouseLeave={() => setCategoryMenuOpen(false)}
           >
             <button className="flex items-center gap-1 px-4 py-2.5 font-medium text-primary hover:bg-muted transition-colors">
-              Products <ChevronDown className="h-3.5 w-3.5" />
+              {t("header.products")} <ChevronDown className="h-3.5 w-3.5" />
             </button>
             {categoryMenuOpen && (
               <div className="absolute top-full left-0 w-[600px] bg-background border border-border rounded-b-lg shadow-lg p-4 grid grid-cols-2 gap-4">
@@ -116,11 +126,11 @@ const Header = () => {
               </div>
             )}
           </div>
-          <Link to="/manufacturers" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">Manufacturers</Link>
-          <Link to="/catalog" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">Full Catalog</Link>
-          <Link to="/new-products" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">New Products</Link>
-          <Link to="/resources" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">Resources</Link>
-          <Link to="/contact" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">Contact</Link>
+          <Link to="/manufacturers" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.manufacturers")}</Link>
+          <Link to="/catalog" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.full_catalog")}</Link>
+          <Link to="/new-products" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.new_products")}</Link>
+          <Link to="/resources" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.resources")}</Link>
+          <Link to="/contact" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.contact")}</Link>
         </div>
       </nav>
 
@@ -138,8 +148,8 @@ const Header = () => {
             </Link>
           ))}
           <hr className="border-border" />
-          <Link to="/manufacturers" className="block py-2 text-sm text-foreground" onClick={() => setMobileMenuOpen(false)}>Manufacturers</Link>
-          <Link to="/contact" className="block py-2 text-sm text-foreground" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+          <Link to="/manufacturers" className="block py-2 text-sm text-foreground" onClick={() => setMobileMenuOpen(false)}>{t("header.manufacturers")}</Link>
+          <Link to="/contact" className="block py-2 text-sm text-foreground" onClick={() => setMobileMenuOpen(false)}>{t("header.contact")}</Link>
         </div>
       )}
     </header>

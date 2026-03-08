@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, Filter, X, Download, GitCompare } from "lucide-
 import Layout from "@/components/layout/Layout";
 import { products, categories, Product } from "@/data/mockData";
 import { useCompare } from "@/contexts/CompareContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 type SortKey = "partNumber" | "manufacturer" | "price" | "stock";
 
@@ -12,6 +13,7 @@ const Catalog = () => {
   const query = searchParams.get("q") || "";
   const categorySlug = searchParams.get("category") || "";
   const subSlug = searchParams.get("sub") || "";
+  const { t } = useI18n();
 
   const [sortKey, setSortKey] = useState<SortKey>("partNumber");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
@@ -101,10 +103,10 @@ const Catalog = () => {
       {/* Breadcrumb */}
       <div className="bg-muted border-b border-border">
         <div className="container py-3 text-xs text-muted-foreground flex items-center gap-1.5">
-          <Link to="/" className="hover:text-foreground">Home</Link>
+          <Link to="/" className="hover:text-foreground">{t("catalog.home")}</Link>
           <span>/</span>
           <span className="text-foreground font-medium">
-            {query ? `Search: "${query}"` : categorySlug ? categories.find((c) => c.slug === categorySlug)?.name || "Catalog" : "Full Catalog"}
+            {query ? `${t("catalog.results_for")}: "${query}"` : categorySlug ? categories.find((c) => c.slug === categorySlug)?.name || t("catalog.title") : t("catalog.title")}
           </span>
         </div>
       </div>
@@ -113,9 +115,9 @@ const Catalog = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-bold text-foreground">
-              {query ? `Results for "${query}"` : "Product Catalog"}
+              {query ? `${t("catalog.results_for")} "${query}"` : t("catalog.title")}
             </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">{filteredProducts.length} products found</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{filteredProducts.length} {t("catalog.products_found")}</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -123,11 +125,11 @@ const Catalog = () => {
               className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
             >
               <Filter className="h-3.5 w-3.5" />
-              Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
+              {t("catalog.filters")} {activeFilterCount > 0 && `(${activeFilterCount})`}
             </button>
             <button className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors">
               <Download className="h-3.5 w-3.5" />
-              Export
+              {t("catalog.export")}
             </button>
           </div>
         </div>
@@ -137,25 +139,25 @@ const Catalog = () => {
           {showFilters && (
             <aside className="w-56 shrink-0 hidden lg:block space-y-5">
               <FilterGroup
-                title="Manufacturer"
+                title={t("catalog.manufacturer")}
                 options={uniqueValues("manufacturer")}
                 selected={filters.manufacturer || []}
                 onToggle={(v) => toggleFilter("manufacturer", v)}
               />
               <FilterGroup
-                title="Package"
+                title={t("catalog.package")}
                 options={uniqueValues("package")}
                 selected={filters.package || []}
                 onToggle={(v) => toggleFilter("package", v)}
               />
               <FilterGroup
-                title="RoHS"
+                title={t("catalog.rohs")}
                 options={["Yes", "No"]}
                 selected={filters.rohs || []}
                 onToggle={(v) => toggleFilter("rohs", v)}
               />
               <FilterGroup
-                title="Availability"
+                title={t("catalog.availability")}
                 options={["In Stock"]}
                 selected={filters.stock || []}
                 onToggle={(v) => toggleFilter("stock", v)}
@@ -165,7 +167,7 @@ const Catalog = () => {
                   onClick={() => setFilters({})}
                   className="flex items-center gap-1 text-xs text-accent hover:underline"
                 >
-                  <X className="h-3 w-3" /> Clear all filters
+                  <X className="h-3 w-3" /> {t("catalog.clear_filters")}
                 </button>
               )}
             </aside>
@@ -180,18 +182,18 @@ const Catalog = () => {
                     <GitCompare className="h-3.5 w-3.5 mx-auto text-muted-foreground" />
                   </th>
                   <th onClick={() => toggleSort("partNumber")} className="min-w-[160px]">
-                    <span className="flex items-center gap-1">Part Number <SortIcon col="partNumber" /></span>
+                    <span className="flex items-center gap-1">{t("catalog.part_number")} <SortIcon col="partNumber" /></span>
                   </th>
                   <th onClick={() => toggleSort("manufacturer")}>
-                    <span className="flex items-center gap-1">Manufacturer <SortIcon col="manufacturer" /></span>
+                    <span className="flex items-center gap-1">{t("catalog.manufacturer")} <SortIcon col="manufacturer" /></span>
                   </th>
-                  <th className="min-w-[250px]">Description</th>
-                  <th>Package</th>
+                  <th className="min-w-[250px]">{t("catalog.description")}</th>
+                  <th>{t("catalog.package")}</th>
                   <th onClick={() => toggleSort("stock")}>
-                    <span className="flex items-center gap-1">Stock <SortIcon col="stock" /></span>
+                    <span className="flex items-center gap-1">{t("catalog.stock")} <SortIcon col="stock" /></span>
                   </th>
                   <th onClick={() => toggleSort("price")} className="text-right">
-                    <span className="flex items-center gap-1 justify-end">Price <SortIcon col="price" /></span>
+                    <span className="flex items-center gap-1 justify-end">{t("catalog.price")} <SortIcon col="price" /></span>
                   </th>
                 </tr>
               </thead>
@@ -206,6 +208,7 @@ const Catalog = () => {
 
 const CatalogBody = ({ products: filteredProducts }: { products: Product[] }) => {
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
+  const { t } = useI18n();
 
   return (
     <tbody>
@@ -217,7 +220,7 @@ const CatalogBody = ({ products: filteredProducts }: { products: Product[] }) =>
               checked={isInCompare(p.id)}
               onChange={() => isInCompare(p.id) ? removeFromCompare(p.id) : addToCompare(p)}
               className="rounded border-border text-accent focus:ring-accent h-3.5 w-3.5"
-              title="Add to compare"
+              title={t("product.compare")}
             />
           </td>
           <td>
@@ -230,7 +233,7 @@ const CatalogBody = ({ products: filteredProducts }: { products: Product[] }) =>
           <td className="text-xs font-mono">{p.package}</td>
           <td>
             <span className={`chip ${p.stock > 0 ? "chip-success" : "chip-warning"}`}>
-              {p.stock > 0 ? p.stock.toLocaleString() : "Contact"}
+              {p.stock > 0 ? p.stock.toLocaleString() : t("catalog.contact")}
             </span>
           </td>
           <td className="text-right">
@@ -242,7 +245,7 @@ const CatalogBody = ({ products: filteredProducts }: { products: Product[] }) =>
       {filteredProducts.length === 0 && (
         <tr>
           <td colSpan={7} className="text-center py-12 text-muted-foreground">
-            No products found. Try adjusting your search or filters.
+            {t("catalog.no_products")}
           </td>
         </tr>
       )}

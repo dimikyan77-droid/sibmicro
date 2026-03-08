@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { X, GitCompare } from "lucide-react";
 import { useCompare } from "@/contexts/CompareContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 const CompareBar = () => {
   const { compareItems, removeFromCompare, clearCompare } = useCompare();
+  const { t } = useI18n();
 
   if (compareItems.length === 0) return null;
 
@@ -12,7 +14,7 @@ const CompareBar = () => {
       <div className="container py-3 flex items-center gap-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground shrink-0">
           <GitCompare className="h-4 w-4 text-accent" />
-          Compare ({compareItems.length}/5)
+          {t("compare.bar_compare")} ({compareItems.length}/5)
         </div>
 
         <div className="flex-1 flex items-center gap-2 overflow-x-auto">
@@ -37,13 +39,13 @@ const CompareBar = () => {
             onClick={clearCompare}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            Clear
+            {t("compare.bar_clear")}
           </button>
           <Link
             to="/compare"
             className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/90 transition-colors"
           >
-            Compare Now
+            {t("compare.bar_now")}
           </Link>
         </div>
       </div>
