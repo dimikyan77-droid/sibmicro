@@ -221,6 +221,11 @@ const translations = {
   "octopart.close": { en: "Close", ru: "Закрыть" },
   "octopart.sellers": { en: "Distributors & Pricing", ru: "Дистрибьюторы и цены" },
   "octopart.nav": { en: "Part Search", ru: "Поиск деталей" },
+  "octopart.searching": { en: "Searching Octopart...", ru: "Поиск в Octopart..." },
+  "octopart.fallback_hint": {
+    en: "No local results found — showing results from Octopart",
+    ru: "Локальных результатов нет — показаны результаты из Octopart",
+  },
 } as const;
 
 type TranslationKey = keyof typeof translations;
