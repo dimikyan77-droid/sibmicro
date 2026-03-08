@@ -2,3 +2,6 @@ project_id = "nvtxjskwskwxqsaifneo"
 
 [functions.octopart-search]
 verify_jwt = false
+
+[functions.digikey-search]
+verify_jwt = false
