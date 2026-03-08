@@ -208,6 +208,19 @@ const translations = {
   "order.manufacturer": { en: "Manufacturer", ru: "Производитель" },
   "order.quantity": { en: "Qty", ru: "Кол-во" },
   "order.unit_price": { en: "Unit Price", ru: "Цена за шт." },
+
+  // Octopart
+  "octopart.title": { en: "Part Search (Octopart)", ru: "Поиск деталей (Octopart)" },
+  "octopart.subtitle": {
+    en: "Search millions of electronic components. Real-time pricing and stock from authorized distributors.",
+    ru: "Поиск миллионов электронных компонентов. Актуальные цены и наличие от авторизованных дистрибьюторов.",
+  },
+  "octopart.search_placeholder": { en: "e.g. STM32F103, LM7805, 100nF...", ru: "напр. STM32F103, LM7805, 100nF..." },
+  "octopart.found": { en: "Found", ru: "Найдено" },
+  "octopart.results": { en: "results", ru: "результатов" },
+  "octopart.close": { en: "Close", ru: "Закрыть" },
+  "octopart.sellers": { en: "Distributors & Pricing", ru: "Дистрибьюторы и цены" },
+  "octopart.nav": { en: "Part Search", ru: "Поиск деталей" },
 } as const;
 
 type TranslationKey = keyof typeof translations;

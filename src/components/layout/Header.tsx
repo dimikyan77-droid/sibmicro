@@ -133,6 +133,7 @@ const Header = () => {
             )}
           </div>
           <Link to="/manufacturers" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.manufacturers")}</Link>
+          <Link to="/octopart" className="px-4 py-2.5 text-accent font-medium hover:bg-muted transition-colors">{t("octopart.nav")}</Link>
           <Link to="/catalog" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.full_catalog")}</Link>
           <Link to="/new-products" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.new_products")}</Link>
           <Link to="/resources" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.resources")}</Link>
