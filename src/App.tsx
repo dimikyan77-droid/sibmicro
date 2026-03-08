@@ -45,6 +45,7 @@ const App = () => (
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/order/:id" element={<OrderDetail />} />
+                  <Route path="/octopart" element={<OctopartSearch />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CompareBar />
