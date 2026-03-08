@@ -122,7 +122,7 @@ const Header = () => {
                             to={`/catalog?category=${cat.slug}&sub=${sub.slug}`}
                             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                           >
-                            {sub.name} ({sub.count.toLocaleString()})
+                            {tc(sub.name)} ({sub.count.toLocaleString()})
                           </Link>
                         </li>
                       ))}
