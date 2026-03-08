@@ -2,9 +2,11 @@ import { useParams, Link } from "react-router-dom";
 import { FileText, ShoppingCart, Heart, GitCompare, Share2, ArrowLeft } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { products } from "@/data/mockData";
+import { useCompare } from "@/contexts/CompareContext";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const product = products.find((p) => p.id === id);
 
   if (!product) {
@@ -157,8 +159,15 @@ const ProductDetail = () => {
               <button className="flex-1 flex items-center justify-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs hover:bg-muted transition-colors">
                 <Heart className="h-3.5 w-3.5" /> Save
               </button>
-              <button className="flex-1 flex items-center justify-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs hover:bg-muted transition-colors">
-                <GitCompare className="h-3.5 w-3.5" /> Compare
+              <button
+                onClick={() => product && (isInCompare(product.id) ? removeFromCompare(product.id) : addToCompare(product))}
+                className={`flex-1 flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-xs transition-colors ${
+                  product && isInCompare(product.id)
+                    ? "border-accent bg-accent/10 text-accent font-semibold"
+                    : "border-border hover:bg-muted"
+                }`}
+              >
+                <GitCompare className="h-3.5 w-3.5" /> {product && isInCompare(product.id) ? "In Compare" : "Compare"}
               </button>
               <button className="flex-1 flex items-center justify-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs hover:bg-muted transition-colors">
                 <Share2 className="h-3.5 w-3.5" /> Share
