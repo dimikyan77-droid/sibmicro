@@ -527,6 +527,25 @@ const ExternalSearchResults = ({
                   ) : <span className="text-xs text-muted-foreground">—</span>}
                 </td>
                 <td>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setQty(item.key, getQty(item.key) - 1)}
+                      className="w-6 h-6 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center"
+                    >−</button>
+                    <input
+                      type="number"
+                      min={1}
+                      value={getQty(item.key)}
+                      onChange={(e) => setQty(item.key, parseInt(e.target.value) || 1)}
+                      className="w-12 h-6 text-center text-xs border border-border rounded bg-background focus:outline-none focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <button
+                      onClick={() => setQty(item.key, getQty(item.key) + 1)}
+                      className="w-6 h-6 rounded border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors flex items-center justify-center"
+                    >+</button>
+                  </div>
+                </td>
+                <td>
                   {item.datasheetUrl && (
                     <a href={item.datasheetUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-accent" title={t("product.datasheet")}>
                       <ExternalLink className="h-3.5 w-3.5" />
