@@ -51,6 +51,7 @@ const App = () => (
                   <Route path="/octopart" element={<OctopartSearch />} />
                   <Route path="/quote" element={<Quote />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/resources" element={<Resources />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CompareBar />
