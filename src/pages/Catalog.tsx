@@ -476,22 +476,6 @@ const ExternalSearchResults = ({
               </th>
               <th className="w-[130px]">{t("product.qty")}</th>
               <th className="w-10"></th>
-              </th>
-              <th className="min-w-[140px] cursor-pointer" onClick={() => toggleExtSort("mpn")}>
-                <span className="flex items-center gap-1">{t("catalog.part_number")} <ExtSortIcon col="mpn" /></span>
-              </th>
-              <th className="cursor-pointer" onClick={() => toggleExtSort("manufacturer")}>
-                <span className="flex items-center gap-1">{t("catalog.manufacturer")} <ExtSortIcon col="manufacturer" /></span>
-              </th>
-              <th className="min-w-[200px]">{t("catalog.description")}</th>
-              <th>{t("catalog.package")}</th>
-              <th className="cursor-pointer" onClick={() => toggleExtSort("stock")}>
-                <span className="flex items-center gap-1">{t("catalog.stock")} <ExtSortIcon col="stock" /></span>
-              </th>
-              <th className="text-right cursor-pointer" onClick={() => toggleExtSort("price")}>
-                <span className="flex items-center gap-1 justify-end">{t("catalog.price")} <ExtSortIcon col="price" /></span>
-              </th>
-              <th className="w-10"></th>
             </tr>
           </thead>
           <tbody>
