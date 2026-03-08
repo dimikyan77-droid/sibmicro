@@ -413,7 +413,7 @@ const ExternalSearchResults = ({
           onClick={() => setActiveTab("all")}
           className={`text-xs font-medium rounded px-2 py-0.5 transition-colors ${activeTab === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"}`}
         >
-          Все источники ({allItems.length})
+          {t("ext.all_sources")} ({allItems.length})
         </button>
         {octopart.results.length > 0 && (
           <button
