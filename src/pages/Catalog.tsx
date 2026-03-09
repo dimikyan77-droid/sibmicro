@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import { ChevronDown, ChevronUp, Filter, X, Download, GitCompare, Loader2, ShoppingCart, Check, ExternalLink, ArrowUpDown, ArrowLeft, Search, Upload, LayoutGrid, List, ChevronRight, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, X, Download, GitCompare, Loader2, ShoppingCart, Check, ExternalLink, ArrowUpDown, ArrowLeft, Search, Upload, LayoutGrid, List, ChevronRight, SlidersHorizontal, Warehouse } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { products, categories, Product } from "@/data/mockData";
 import { useCompare } from "@/contexts/CompareContext";
@@ -8,6 +8,7 @@ import { useI18n } from "@/contexts/I18nContext";
 import { useCart } from "@/contexts/CartContext";
 import { useOctopartSearch, getBestPrice, getTotalStock, type OctopartResult } from "@/hooks/useOctopartSearch";
 import { useDigiKeySearch, getDigiKeyBestPrice, type DigiKeyResult } from "@/hooks/useDigiKeySearch";
+import { useInventorySearch, type InventoryItem } from "@/hooks/useInventorySearch";
 import { toast } from "sonner";
 
 type SortKey = "partNumber" | "manufacturer" | "price" | "stock";
@@ -34,6 +35,7 @@ const Catalog = () => {
 
   const octopart = useOctopartSearch();
   const digikey = useDigiKeySearch();
+  const inventorySearch = useInventorySearch(query || localSearch);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -362,6 +364,15 @@ const Catalog = () => {
 
             {/* Main content */}
             <div className="flex-1 min-w-0">
+              {/* Warehouse inventory results */}
+              {(query || localSearch).length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
+                <WarehouseSection
+                  items={inventorySearch.data ?? []}
+                  loading={inventorySearch.isLoading}
+                  searchTerm={query || localSearch}
+                />
+              ) : null}
+
               {/* Count */}
               <div className="text-sm text-muted-foreground mb-4">
                 {t("catalog.shown_of")} <span className="font-bold text-foreground">{filteredProducts.length}</span> {t("catalog.of")} {products.length} {t("catalog.products")}
@@ -480,6 +491,119 @@ const Catalog = () => {
     </Layout>
   );
 };
+
+/* ─── Warehouse Section ─── */
+function WarehouseSection({
+  items,
+  loading,
+  searchTerm,
+}: {
+  items: InventoryItem[];
+  loading: boolean;
+  searchTerm: string;
+}) {
+  const { addToCart } = useCart();
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+
+  const handleAdd = (item: InventoryItem) => {
+    const product: Product = {
+      id: `inv-${item.id}`,
+      partNumber: item.part_number,
+      manufacturer: item.manufacturer || "",
+      description: item.description || "",
+      category: "Inventory",
+      subcategory: "",
+      stock: item.quantity,
+      leadTime: "In Stock",
+      rohs: true,
+      datasheetUrl: "",
+      temperatureRange: "",
+      priceTiers: [{ qty: 1, price: item.price ?? 0 }],
+      moq: 1,
+      package: "",
+    };
+    addToCart(product, 1);
+    setAddedIds((prev) => new Set(prev).add(item.id));
+    toast.success("Добавлено в корзину", { description: `${item.part_number} × 1` });
+    setTimeout(() => {
+      setAddedIds((prev) => {
+        const n = new Set(prev);
+        n.delete(item.id);
+        return n;
+      });
+    }, 2000);
+  };
+
+  if (loading) {
+    return (
+      <div className="mb-5 rounded-lg border border-border bg-card p-4 flex items-center gap-2 text-muted-foreground text-sm">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Поиск по складу…
+      </div>
+    );
+  }
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mb-5 rounded-lg border border-primary/30 bg-primary/5 overflow-hidden">
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-primary/20">
+        <Warehouse className="h-4 w-4 text-primary" />
+        <span className="text-sm font-semibold text-foreground">Наш склад</span>
+        <span className="ml-1 rounded-full bg-primary/15 text-primary text-xs px-2 py-0.5 font-medium">{items.length}</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-primary/10">
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Артикул</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Производитель</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[180px]">Описание</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Кол-во</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Цена</th>
+              <th className="px-4 py-2 w-[110px]"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => {
+              const added = addedIds.has(item.id);
+              return (
+                <tr key={item.id} className="border-b border-primary/10 last:border-0 hover:bg-primary/5 transition-colors">
+                  <td className="px-4 py-2.5">
+                    <span className="font-mono text-xs font-semibold text-primary">{item.part_number}</span>
+                  </td>
+                  <td className="px-4 py-2.5 text-sm text-foreground">{item.manufacturer || "—"}</td>
+                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{item.description || "—"}</td>
+                  <td className="px-4 py-2.5">
+                    <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 px-2 py-0.5 text-xs font-medium">
+                      {item.quantity.toLocaleString()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 font-semibold text-foreground text-sm">
+                    {item.price != null ? `${item.price.toFixed(2)} ${item.currency ?? "RUB"}` : "—"}
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <button
+                      onClick={() => handleAdd(item)}
+                      className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                        added
+                          ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/30"
+                          : "border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      }`}
+                    >
+                      {added ? <Check className="h-3.5 w-3.5" /> : <ShoppingCart className="h-3.5 w-3.5" />}
+                      В корзину
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 /* ─── Unified item for sorting ─── */
 interface UnifiedItem {
