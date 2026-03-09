@@ -35,7 +35,8 @@ const Catalog = () => {
 
   const octopart = useOctopartSearch();
   const digikey = useDigiKeySearch();
-  const inventorySearch = useInventorySearch(query || localSearch);
+  const searchTerm = query || localSearch;
+  const inventorySearch = useInventorySearch(searchTerm);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
