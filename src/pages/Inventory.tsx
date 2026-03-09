@@ -141,7 +141,7 @@ const Inventory = () => {
         const manufacturer = getCol(row, "manufacturer", "производитель") || undefined;
         const description = getCol(row, "description", "описание") || undefined;
         const location = getCol(row, "location", "место", "склад") || undefined;
-        const currency = getCol(row, "currency", "валюта") || "RUB";
+        const currency = getCol(row, "currency", "валюта") || defaultCurrency;
 
         return { part_number: pn, quantity: isNaN(qty) ? 0 : qty, price, manufacturer, description, location, currency };
       }).filter((r) => r.part_number);
