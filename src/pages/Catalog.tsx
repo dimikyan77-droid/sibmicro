@@ -215,6 +215,17 @@ const Catalog = () => {
   const showExternalSearch = query && filteredProducts.length === 0;
   const externalLoading = octopart.loading || digikey.loading;
 
+  // Determine if warehouse items will be shown
+  const hasWarehouseItems = useMemo(() => {
+    const hasSearch = searchTerm.length >= 2;
+    if (hasSearch && selectedMfgs.length > 0) {
+      return (inventorySearch.data ?? []).some(item => item.manufacturer && selectedMfgs.includes(item.manufacturer));
+    }
+    if (hasSearch) return (inventorySearch.data ?? []).length > 0;
+    if (selectedMfgs.length > 0) return (inventoryByMfg ?? []).length > 0;
+    return false;
+  }, [searchTerm, selectedMfgs, inventorySearch.data, inventoryByMfg]);
+
   const getAvailabilityBadge = (p: Product) => {
     if (p.stock > 0) return { label: t("catalog.in_stock"), cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
     if (p.leadTime === "Contact") return { label: t("catalog.preorder"), cls: "bg-violet-500/15 text-violet-400 border-violet-500/30" };
@@ -289,10 +300,10 @@ const Catalog = () => {
       <div className="container py-6">
         {/* Warehouse section */}
         {(() => {
-          let warehouseItems = inventorySearch.data ?? [];
-          let warehouseLoading = inventorySearch.isLoading;
-          let warehouseLabel = searchTerm;
           const hasSearch = searchTerm.length >= 2;
+          let warehouseItems = hasSearch ? (inventorySearch.data ?? []) : [];
+          let warehouseLoading = hasSearch ? inventorySearch.isLoading : false;
+          let warehouseLabel = searchTerm;
 
           // Filter search results by selected manufacturers
           if (hasSearch && selectedMfgs.length > 0) {
@@ -306,6 +317,7 @@ const Catalog = () => {
             warehouseLabel = selectedMfgs.join(", ");
           }
 
+          
           const show = (hasSearch || selectedMfgs.length > 0) && (warehouseItems.length > 0 || warehouseLoading);
           return show ? (
             <WarehouseSection
@@ -439,11 +451,13 @@ const Catalog = () => {
             <div className="flex-1 min-w-0">
 
               {/* Count */}
+              {(filteredProducts.length > 0 || !hasWarehouseItems) && (
               <div className="text-sm text-muted-foreground mb-4">
                 {t("catalog.shown_of")} <span className="font-bold text-foreground">{filteredProducts.length}</span> {t("catalog.of")} {products.length} {t("catalog.products")}
               </div>
+              )}
 
-              {viewMode === "list" ? (
+              {(filteredProducts.length > 0 || !hasWarehouseItems) && (viewMode === "list" ? (
                 /* List / Table view */
                 <div className="overflow-x-auto rounded-lg border border-border bg-card">
                   <table className="w-full text-sm">
@@ -503,7 +517,7 @@ const Catalog = () => {
                           </tr>
                         );
                       })}
-                      {filteredProducts.length === 0 && (
+                      {filteredProducts.length === 0 && !hasWarehouseItems && (
                         <tr>
                           <td colSpan={6} className="text-center py-12 text-muted-foreground">
                             {t("catalog.no_products")}
@@ -548,7 +562,8 @@ const Catalog = () => {
                     );
                   })}
                 </div>
-              )}
+              ))}
+
             </div>
           </div>
         )}
