@@ -209,6 +209,7 @@ const translations = {
   // Account
   "account.title": { en: "My Account", ru: "Личный кабинет" },
   "account.logout": { en: "Sign Out", ru: "Выйти" },
+  "account.dashboard": { en: "Dashboard", ru: "Дашборд" },
   "account.profile": { en: "Profile", ru: "Профиль" },
   "account.orders": { en: "Order History", ru: "История заказов" },
   "account.phone": { en: "Phone", ru: "Телефон" },
