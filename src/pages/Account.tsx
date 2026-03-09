@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LogOut, Save, Package, User, LayoutDashboard, FileText, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { orderStatusConfig, getStatusLabel } from "@/components/order/orderStatusConfig";
 import AccountDashboard from "@/components/account/AccountDashboard";
+import OrderStatusTimeline from "@/components/order/OrderStatusTimeline";
 
 interface QuoteRequest {
   id: string;
