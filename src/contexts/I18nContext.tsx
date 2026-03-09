@@ -434,6 +434,17 @@ const translations = {
   "inventory.empty": { en: "No items yet. Upload a CSV or Excel file to start.", ru: "Склад пуст. Загрузите CSV или Excel-файл." },
   "inventory.search_placeholder": { en: "Search by part number, manufacturer...", ru: "Поиск по артикулу, производителю..." },
 
+  // Quote requests in account
+  "account.quotes": { en: "Quote Requests", ru: "Запросы цен" },
+  "account.no_quotes": { en: "No quote requests yet", ru: "Нет запросов цен" },
+  "account.quote_date": { en: "Date", ru: "Дата" },
+  "account.quote_parts": { en: "Parts", ru: "Детали" },
+  "account.quote_status": { en: "Status", ru: "Статус" },
+  "account.quote_status_new": { en: "New", ru: "Новый" },
+  "account.quote_status_processing": { en: "Processing", ru: "В обработке" },
+  "account.quote_status_quoted": { en: "Quoted", ru: "Расценён" },
+  "account.quote_status_closed": { en: "Closed", ru: "Закрыт" },
+
   // Common
   "common.cancel": { en: "Cancel", ru: "Отмена" },
 } as const;

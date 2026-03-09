@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useI18n } from "@/contexts/I18nContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
