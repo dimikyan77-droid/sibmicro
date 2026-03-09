@@ -86,32 +86,37 @@ const Header = () => {
             <button className="flex items-center gap-1 px-4 py-2.5 font-medium text-primary hover:bg-muted transition-colors">
               {t("header.products")} <ChevronDown className="h-3.5 w-3.5" />
             </button>
-            {categoryMenuOpen && (
-              <div className="absolute top-full left-0 w-[600px] bg-background border border-border rounded-b-lg shadow-lg p-4 grid grid-cols-2 gap-4">
-                {categories.map((cat) => (
-                  <div key={cat.slug}>
-                    <Link
-                      to={`/catalog?category=${cat.slug}`}
-                      className="font-semibold text-sm text-primary hover:underline"
-                    >
-                      {tc(cat.name)}
-                    </Link>
-                    <ul className="mt-1 space-y-0.5">
-                      {cat.subcategories.map((sub) => (
-                        <li key={sub.slug}>
-                          <Link
-                            to={`/catalog?category=${cat.slug}&sub=${sub.slug}`}
-                            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            {tc(sub.name)} ({sub.count.toLocaleString()})
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div
+              className={`absolute top-full left-0 w-[600px] bg-background border border-border rounded-b-lg shadow-lg p-4 grid grid-cols-2 gap-4
+                transition-all duration-200 ease-out origin-top
+                ${categoryMenuOpen
+                  ? "opacity-100 translate-y-0 scale-y-100 pointer-events-auto"
+                  : "opacity-0 -translate-y-2 scale-y-95 pointer-events-none"
+                }`}
+            >
+              {categories.map((cat) => (
+                <div key={cat.slug}>
+                  <Link
+                    to={`/catalog?category=${cat.slug}`}
+                    className="font-semibold text-sm text-primary hover:underline"
+                  >
+                    {tc(cat.name)}
+                  </Link>
+                  <ul className="mt-1 space-y-0.5">
+                    {cat.subcategories.map((sub) => (
+                      <li key={sub.slug}>
+                        <Link
+                          to={`/catalog?category=${cat.slug}&sub=${sub.slug}`}
+                          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {tc(sub.name)} ({sub.count.toLocaleString()})
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
           <Link to="/manufacturers" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.manufacturers")}</Link>
           <Link to="/octopart" className="px-4 py-2.5 text-accent font-medium hover:bg-muted transition-colors">{t("octopart.nav")}</Link>
