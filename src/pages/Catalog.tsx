@@ -41,20 +41,26 @@ const Catalog = () => {
   const inventorySearch = useInventorySearch(searchTerm);
 
   // Fetch distinct manufacturers from inventory DB
-  const { data: inventoryManufacturers } = useQuery({
-    queryKey: ["inventory-manufacturers"],
+  const { data: inventoryManufacturerCounts } = useQuery({
+    queryKey: ["inventory-manufacturer-counts"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("inventory")
-        .select("manufacturer")
-        .not("manufacturer", "is", null);
+        .select("manufacturer, quantity")
+        .not("manufacturer", "is", null)
+        .gt("quantity", 0);
       if (error) throw error;
-      const unique = new Set<string>();
-      data?.forEach((row) => { if (row.manufacturer) unique.add(row.manufacturer); });
-      return Array.from(unique);
+      const counts: Record<string, number> = {};
+      data?.forEach((row) => {
+        if (row.manufacturer) {
+          counts[row.manufacturer] = (counts[row.manufacturer] || 0) + 1;
+        }
+      });
+      return counts;
     },
     staleTime: 60_000,
   });
+  const inventoryManufacturers = inventoryManufacturerCounts ? Object.keys(inventoryManufacturerCounts) : undefined;
 
   // Fetch inventory items filtered by selected manufacturers
   const selectedMfgs = filters.manufacturer || [];
