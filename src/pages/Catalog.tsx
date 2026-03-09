@@ -190,16 +190,16 @@ const Catalog = () => {
     for (const p of products) {
       counts[p.manufacturer] = (counts[p.manufacturer] || 0) + 1;
     }
-    // Merge manufacturers from inventory DB
-    if (inventoryManufacturers) {
-      for (const m of inventoryManufacturers) {
-        if (!counts[m]) counts[m] = 0;
+    // Merge manufacturers from inventory DB with their counts
+    if (inventoryManufacturerCounts) {
+      for (const [m, invCount] of Object.entries(inventoryManufacturerCounts)) {
+        counts[m] = (counts[m] || 0) + invCount;
       }
     }
     return Object.entries(counts)
       .sort(([a], [b]) => a.localeCompare(b))
       .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
-  }, [mfgSearch, inventoryManufacturers]);
+  }, [mfgSearch, inventoryManufacturerCounts]);
 
   const categoryProductCounts = useMemo(() => {
     const counts: Record<string, number> = {};
