@@ -373,14 +373,6 @@ const Catalog = () => {
 
             {/* Main content */}
             <div className="flex-1 min-w-0">
-              {/* Warehouse inventory results */}
-              {(query || localSearch).length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
-                <WarehouseSection
-                  items={inventorySearch.data ?? []}
-                  loading={inventorySearch.isLoading}
-                  searchTerm={query || localSearch}
-                />
-              ) : null}
 
               {/* Count */}
               <div className="text-sm text-muted-foreground mb-4">
