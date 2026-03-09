@@ -55,6 +55,7 @@ const App = () => (
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/resources" element={<Resources />} />
                   <Route path="/bom" element={<Bom />} />
+                  <Route path="/inventory" element={<Inventory />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CompareBar />
