@@ -128,23 +128,29 @@ const Header = () => {
       </nav>
 
       {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-background p-4 space-y-2">
+      <div
+        className={`lg:hidden border-border bg-background overflow-hidden transition-all duration-300 ease-in-out
+          ${mobileMenuOpen
+            ? "max-h-[600px] opacity-100 border-t"
+            : "max-h-0 opacity-0 border-t-0"
+          }`}
+      >
+        <div className={`p-4 space-y-2 transition-transform duration-300 ${mobileMenuOpen ? "translate-y-0" : "-translate-y-2"}`}>
           {categories.map((cat) => (
             <Link
               key={cat.slug}
               to={`/catalog?category=${cat.slug}`}
-              className="block py-2 text-sm font-medium text-foreground"
+              className="block py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               {tc(cat.name)}
             </Link>
           ))}
           <hr className="border-border" />
-          <Link to="/manufacturers" className="block py-2 text-sm text-foreground" onClick={() => setMobileMenuOpen(false)}>{t("header.manufacturers")}</Link>
-          <Link to="/contact" className="block py-2 text-sm text-foreground" onClick={() => setMobileMenuOpen(false)}>{t("header.contact")}</Link>
+          <Link to="/manufacturers" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{t("header.manufacturers")}</Link>
+          <Link to="/contact" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{t("header.contact")}</Link>
         </div>
-      )}
+      </div>
     </header>
   );
 };
