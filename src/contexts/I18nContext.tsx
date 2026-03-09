@@ -419,6 +419,23 @@ const translations = {
   "bom.step1": { en: "1. Upload", ru: "1. Загрузка" },
   "bom.step2": { en: "2. Map Columns", ru: "2. Маппинг" },
   "bom.step3": { en: "3. Results", ru: "3. Результаты" },
+
+  // Inventory
+  "inventory.title": { en: "Warehouse / Inventory", ru: "Склад" },
+  "inventory.subtitle": { en: "Upload and manage your stock", ru: "Загрузите и управляйте своим складом" },
+  "inventory.upload": { en: "Upload CSV/Excel", ru: "Загрузить CSV/Excel" },
+  "inventory.positions": { en: "SKU Lines", ru: "Позиций" },
+  "inventory.total_qty": { en: "Total Qty", ru: "Всего штук" },
+  "inventory.total_value": { en: "Total Value", ru: "Общая стоимость" },
+  "inventory.preview": { en: "Upload Preview", ru: "Предпросмотр загрузки" },
+  "inventory.confirm": { en: "Confirm", ru: "Загрузить" },
+  "inventory.uploaded": { en: "Inventory updated", ru: "Склад обновлён" },
+  "inventory.deleted": { en: "Item deleted", ru: "Позиция удалена" },
+  "inventory.empty": { en: "No items yet. Upload a CSV or Excel file to start.", ru: "Склад пуст. Загрузите CSV или Excel-файл." },
+  "inventory.search_placeholder": { en: "Search by part number, manufacturer...", ru: "Поиск по артикулу, производителю..." },
+
+  // Common
+  "common.cancel": { en: "Cancel", ru: "Отмена" },
 } as const;
 
 // Category & subcategory localization map (key = English name)
