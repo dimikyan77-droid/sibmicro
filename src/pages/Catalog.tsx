@@ -287,23 +287,34 @@ const Catalog = () => {
       </div>
 
       <div className="container py-6">
-        {/* Warehouse section from search */}
-        {searchTerm.length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
-          <WarehouseSection
-            items={inventorySearch.data ?? []}
-            loading={inventorySearch.isLoading}
-            searchTerm={searchTerm}
-          />
-        ) : null}
+        {/* Warehouse section */}
+        {(() => {
+          let warehouseItems = inventorySearch.data ?? [];
+          let warehouseLoading = inventorySearch.isLoading;
+          let warehouseLabel = searchTerm;
+          const hasSearch = searchTerm.length >= 2;
 
-        {/* Warehouse section from manufacturer filter */}
-        {!searchTerm && selectedMfgs.length > 0 && (inventoryByMfg?.length || inventoryByMfgLoading) ? (
-          <WarehouseSection
-            items={inventoryByMfg ?? []}
-            loading={inventoryByMfgLoading}
-            searchTerm={selectedMfgs.join(", ")}
-          />
-        ) : null}
+          // Filter search results by selected manufacturers
+          if (hasSearch && selectedMfgs.length > 0) {
+            warehouseItems = warehouseItems.filter(item => item.manufacturer && selectedMfgs.includes(item.manufacturer));
+          }
+
+          // If no search but manufacturer filter active, use manufacturer query
+          if (!hasSearch && selectedMfgs.length > 0) {
+            warehouseItems = inventoryByMfg ?? [];
+            warehouseLoading = inventoryByMfgLoading;
+            warehouseLabel = selectedMfgs.join(", ");
+          }
+
+          const show = (hasSearch || selectedMfgs.length > 0) && (warehouseItems.length > 0 || warehouseLoading);
+          return show ? (
+            <WarehouseSection
+              items={warehouseItems}
+              loading={warehouseLoading}
+              searchTerm={warehouseLabel}
+            />
+          ) : null;
+        })()}
 
         {showExternalSearch ? (
           <ExternalSearchResults octopart={octopart} digikey={digikey} />
