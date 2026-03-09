@@ -243,6 +243,15 @@ const Catalog = () => {
       </div>
 
       <div className="container py-6">
+        {/* Warehouse section always visible when searching */}
+        {query.length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
+          <WarehouseSection
+            items={inventorySearch.data ?? []}
+            loading={inventorySearch.isLoading}
+            searchTerm={query}
+          />
+        ) : null}
+
         {showExternalSearch ? (
           <ExternalSearchResults octopart={octopart} digikey={digikey} />
         ) : (
@@ -364,14 +373,6 @@ const Catalog = () => {
 
             {/* Main content */}
             <div className="flex-1 min-w-0">
-              {/* Warehouse inventory results */}
-              {(query || localSearch).length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
-                <WarehouseSection
-                  items={inventorySearch.data ?? []}
-                  loading={inventorySearch.isLoading}
-                  searchTerm={query || localSearch}
-                />
-              ) : null}
 
               {/* Count */}
               <div className="text-sm text-muted-foreground mb-4">
@@ -575,7 +576,7 @@ function WarehouseSection({
                   <td className="px-4 py-2.5 text-sm text-foreground">{item.manufacturer || "—"}</td>
                   <td className="px-4 py-2.5 text-xs text-muted-foreground">{item.description || "—"}</td>
                   <td className="px-4 py-2.5">
-                    <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 px-2 py-0.5 text-xs font-medium">
+                    <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 text-primary px-2 py-0.5 text-xs font-medium">
                       {item.quantity.toLocaleString()}
                     </span>
                   </td>
