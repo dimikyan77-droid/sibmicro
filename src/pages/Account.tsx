@@ -140,6 +140,7 @@ const Account = () => {
             <TabsTrigger value="dashboard" className="gap-2"><LayoutDashboard className="h-4 w-4" />{t("account.dashboard")}</TabsTrigger>
             <TabsTrigger value="profile" className="gap-2"><User className="h-4 w-4" />{t("account.profile")}</TabsTrigger>
             <TabsTrigger value="orders" className="gap-2"><Package className="h-4 w-4" />{t("account.orders")}</TabsTrigger>
+            <TabsTrigger value="quotes" className="gap-2"><FileText className="h-4 w-4" />{t("account.quotes")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
