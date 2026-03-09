@@ -8,6 +8,7 @@ import { Send, Loader2 } from "lucide-react";
 
 const Quote = () => {
   const { t } = useI18n();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
