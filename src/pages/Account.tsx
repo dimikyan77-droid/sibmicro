@@ -45,6 +45,8 @@ const Account = () => {
   const [saving, setSaving] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
+  const [quotesLoading, setQuotesLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
