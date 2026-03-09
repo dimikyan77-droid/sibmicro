@@ -287,12 +287,21 @@ const Catalog = () => {
       </div>
 
       <div className="container py-6">
-        {/* Warehouse section always visible when searching */}
+        {/* Warehouse section from search */}
         {searchTerm.length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
           <WarehouseSection
             items={inventorySearch.data ?? []}
             loading={inventorySearch.isLoading}
             searchTerm={searchTerm}
+          />
+        ) : null}
+
+        {/* Warehouse section from manufacturer filter */}
+        {!searchTerm && selectedMfgs.length > 0 && (inventoryByMfg?.length || inventoryByMfgLoading) ? (
+          <WarehouseSection
+            items={inventoryByMfg ?? []}
+            loading={inventoryByMfgLoading}
+            searchTerm={selectedMfgs.join(", ")}
           />
         ) : null}
 
