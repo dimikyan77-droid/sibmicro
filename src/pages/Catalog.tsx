@@ -317,7 +317,7 @@ const Catalog = () => {
             warehouseLabel = selectedMfgs.join(", ");
           }
 
-          hasWarehouseItems = warehouseItems.length > 0;
+          
           const show = (hasSearch || selectedMfgs.length > 0) && (warehouseItems.length > 0 || warehouseLoading);
           return show ? (
             <WarehouseSection
