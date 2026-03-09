@@ -43,15 +43,29 @@ const Cart = () => {
       currency: "USD",
     });
 
-    setPlacing(false);
-
     if (error) {
+      setPlacing(false);
       toast({ title: t("auth.error"), description: error.message, variant: "destructive" });
-    } else {
-      clearCart();
-      toast({ title: t("cart.order_placed"), description: `${t("account.order_number")}: ${orderNumber}` });
-      navigate("/account");
+      return;
     }
+
+    // Send email notification about the order
+    const partNumbersList = orderItems.map((i) => `${i.partNumber} (${i.manufacturer})`).join(", ");
+    const quantitiesList = orderItems.map((i) => `${i.partNumber}: ${i.quantity} шт.`).join(", ");
+    await supabase.functions.invoke("send-quote-email", {
+      body: {
+        name: user.email,
+        email: user.email,
+        partNumbers: partNumbersList,
+        quantities: quantitiesList,
+        message: `Заказ #${orderNumber}, сумма: $${totalPrice.toFixed(2)}`,
+      },
+    });
+
+    setPlacing(false);
+    clearCart();
+    toast({ title: t("cart.order_placed"), description: `${t("account.order_number")}: ${orderNumber}` });
+    navigate("/account");
   };
 
   const formatPrice = (price: number) => `$${price.toFixed(price < 1 ? 4 : 2)}`;
