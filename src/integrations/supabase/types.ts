@@ -53,6 +53,41 @@ export type Database = {
         }
         Relationships: []
       }
+      order_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          note: string | null
+          order_id: string
+          status: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id: string
+          status: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           created_at: string
