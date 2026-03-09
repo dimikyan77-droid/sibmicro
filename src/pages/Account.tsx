@@ -114,11 +114,21 @@ const Account = () => {
           </Button>
         </div>
 
-        <Tabs defaultValue="profile">
+        <Tabs defaultValue="dashboard">
           <TabsList className="mb-6">
+            <TabsTrigger value="dashboard" className="gap-2"><LayoutDashboard className="h-4 w-4" />{t("account.dashboard")}</TabsTrigger>
             <TabsTrigger value="profile" className="gap-2"><User className="h-4 w-4" />{t("account.profile")}</TabsTrigger>
             <TabsTrigger value="orders" className="gap-2"><Package className="h-4 w-4" />{t("account.orders")}</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="dashboard">
+            <AccountDashboard
+              orders={orders}
+              loading={ordersLoading}
+              userEmail={user.email}
+              fullName={profile?.full_name || ""}
+            />
+          </TabsContent>
 
           <TabsContent value="profile">
             <div className="rounded-lg border border-border bg-card p-6">
