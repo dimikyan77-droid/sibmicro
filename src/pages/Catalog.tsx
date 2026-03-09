@@ -515,7 +515,7 @@ const Catalog = () => {
                           </tr>
                         );
                       })}
-                      {filteredProducts.length === 0 && (
+                      {filteredProducts.length === 0 && !hasWarehouseItems && (
                         <tr>
                           <td colSpan={6} className="text-center py-12 text-muted-foreground">
                             {t("catalog.no_products")}
