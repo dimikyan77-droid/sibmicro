@@ -10,8 +10,17 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Save, Package, User, LayoutDashboard } from "lucide-react";
+import { LogOut, Save, Package, User, LayoutDashboard, FileText, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import AccountDashboard from "@/components/account/AccountDashboard";
+
+interface QuoteRequest {
+  id: string;
+  part_numbers: string;
+  quantities: string | null;
+  status: string;
+  created_at: string;
+  message: string | null;
+}
 
 interface Order {
   id: string;
@@ -25,7 +34,7 @@ interface Order {
 
 const Account = () => {
   const { user, profile, loading, signOut, refreshProfile } = useAuth();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -36,6 +45,8 @@ const Account = () => {
   const [saving, setSaving] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
+  const [quotesLoading, setQuotesLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -62,6 +73,16 @@ const Account = () => {
         .then(({ data }) => {
           setOrders(data || []);
           setOrdersLoading(false);
+        });
+
+      supabase
+        .from("quote_requests")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .then(({ data }) => {
+          setQuotes((data as any) || []);
+          setQuotesLoading(false);
         });
     }
   }, [user]);
@@ -97,6 +118,13 @@ const Account = () => {
     }
   };
 
+  const quoteStatusConfig: Record<string, { label: { en: string; ru: string }; color: string; bg: string; icon: React.ElementType }> = {
+    new: { label: { en: "New", ru: "Новый" }, color: "text-blue-600", bg: "bg-blue-100", icon: Clock },
+    processing: { label: { en: "Processing", ru: "В обработке" }, color: "text-yellow-600", bg: "bg-yellow-100", icon: Loader2 },
+    quoted: { label: { en: "Quoted", ru: "Расценён" }, color: "text-green-600", bg: "bg-green-100", icon: CheckCircle2 },
+    closed: { label: { en: "Closed", ru: "Закрыт" }, color: "text-muted-foreground", bg: "bg-muted", icon: AlertCircle },
+  };
+
   if (loading) {
     return <Layout><div className="container py-16 text-center text-muted-foreground">Loading...</div></Layout>;
   }
@@ -119,6 +147,7 @@ const Account = () => {
             <TabsTrigger value="dashboard" className="gap-2"><LayoutDashboard className="h-4 w-4" />{t("account.dashboard")}</TabsTrigger>
             <TabsTrigger value="profile" className="gap-2"><User className="h-4 w-4" />{t("account.profile")}</TabsTrigger>
             <TabsTrigger value="orders" className="gap-2"><Package className="h-4 w-4" />{t("account.orders")}</TabsTrigger>
+            <TabsTrigger value="quotes" className="gap-2"><FileText className="h-4 w-4" />{t("account.quotes")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -192,6 +221,49 @@ const Account = () => {
                         </TableCell>
                       </TableRow>
                     ))}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="quotes">
+            <div className="rounded-lg border border-border bg-card">
+              {quotesLoading ? (
+                <div className="p-8 text-center text-muted-foreground">Loading...</div>
+              ) : quotes.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">{t("account.no_quotes")}</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t("account.quote_date")}</TableHead>
+                      <TableHead>{t("account.quote_parts")}</TableHead>
+                      <TableHead>{t("account.quote_status")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {quotes.map((q) => {
+                      const cfg = quoteStatusConfig[q.status] || quoteStatusConfig["new"];
+                      const StatusIcon = cfg.icon;
+                      return (
+                        <TableRow key={q.id}>
+                          <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                            {new Date(q.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <span className="font-mono text-sm font-medium text-foreground">{q.part_numbers.substring(0, 80)}{q.part_numbers.length > 80 ? "…" : ""}</span>
+                            {q.quantities && <span className="block text-xs text-muted-foreground mt-0.5">Кол-во: {q.quantities}</span>}
+                          </TableCell>
+                          <TableCell>
+                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}>
+                              <StatusIcon className="h-3 w-3" />
+                              {cfg.label[lang as "en" | "ru"] || cfg.label.en}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               )}

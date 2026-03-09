@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useI18n } from "@/contexts/I18nContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +8,7 @@ import { Send, Loader2 } from "lucide-react";
 
 const Quote = () => {
   const { t } = useI18n();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -38,7 +40,8 @@ const Quote = () => {
         part_numbers: form.partNumbers,
         quantities: form.quantities || null,
         message: form.message || null,
-      });
+        user_id: user?.id || null,
+      } as any);
 
       if (dbError) throw dbError;
 

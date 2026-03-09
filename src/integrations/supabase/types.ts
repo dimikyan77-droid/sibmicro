@@ -136,6 +136,8 @@ export type Database = {
           part_numbers: string
           phone: string | null
           quantities: string | null
+          status: string
+          user_id: string | null
         }
         Insert: {
           company?: string | null
@@ -147,6 +149,8 @@ export type Database = {
           part_numbers: string
           phone?: string | null
           quantities?: string | null
+          status?: string
+          user_id?: string | null
         }
         Update: {
           company?: string | null
@@ -158,6 +162,8 @@ export type Database = {
           part_numbers?: string
           phone?: string | null
           quantities?: string | null
+          status?: string
+          user_id?: string | null
         }
         Relationships: []
       }
