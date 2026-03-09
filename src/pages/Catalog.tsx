@@ -184,14 +184,13 @@ const Catalog = () => {
     for (const p of products) {
       counts[p.manufacturer] = (counts[p.manufacturer] || 0) + 1;
     }
-    // Merge manufacturers from inventory DB with their counts
+    // Merge manufacturers from inventory DB
     if (inventoryManufacturers) {
       for (const m of inventoryManufacturers) {
-        counts[m] = (counts[m] || 0);
+        if (!counts[m]) counts[m] = 0;
       }
     }
     return Object.entries(counts)
-      .filter(([, count]) => count > 0)
       .sort(([a], [b]) => a.localeCompare(b))
       .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
   }, [mfgSearch, inventoryManufacturers]);
