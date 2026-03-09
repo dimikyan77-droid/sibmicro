@@ -23,6 +23,7 @@ import Quote from "./pages/Quote";
 import Contact from "./pages/Contact";
 import Resources from "./pages/Resources";
 import Bom from "./pages/Bom";
+import Inventory from "./pages/Inventory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/resources" element={<Resources />} />
                   <Route path="/bom" element={<Bom />} />
+                  <Route path="/inventory" element={<Inventory />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CompareBar />

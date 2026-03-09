@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, ChevronDown, Globe, LogIn } from "lucide-react";
+import { ShoppingCart, User, Menu, X, ChevronDown, Globe, LogIn, Warehouse } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { categories } from "@/data/mockData";
 import { useI18n } from "@/contexts/I18nContext";
@@ -28,6 +28,11 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <Link to="/quote" className="hover:underline">{t("header.request_quote")}</Link>
             <Link to="/bom" className="hover:underline">{t("header.bom_upload")}</Link>
+            {user && (
+              <Link to="/inventory" className="hover:underline flex items-center gap-1">
+                <Warehouse className="h-3 w-3" />{t("inventory.title").split("/")[0].trim()}
+              </Link>
+            )}
             <button
               onClick={() => setLang(lang === "en" ? "ru" : "en")}
               className="flex items-center gap-1 hover:underline font-medium"
