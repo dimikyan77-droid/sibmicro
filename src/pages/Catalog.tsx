@@ -215,6 +215,17 @@ const Catalog = () => {
   const showExternalSearch = query && filteredProducts.length === 0;
   const externalLoading = octopart.loading || digikey.loading;
 
+  // Determine if warehouse items will be shown
+  const hasWarehouseItems = useMemo(() => {
+    const hasSearch = searchTerm.length >= 2;
+    if (hasSearch && selectedMfgs.length > 0) {
+      return (inventorySearch.data ?? []).some(item => item.manufacturer && selectedMfgs.includes(item.manufacturer));
+    }
+    if (hasSearch) return (inventorySearch.data ?? []).length > 0;
+    if (selectedMfgs.length > 0) return (inventoryByMfg ?? []).length > 0;
+    return false;
+  }, [searchTerm, selectedMfgs, inventorySearch.data, inventoryByMfg]);
+
   const getAvailabilityBadge = (p: Product) => {
     if (p.stock > 0) return { label: t("catalog.in_stock"), cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
     if (p.leadTime === "Contact") return { label: t("catalog.preorder"), cls: "bg-violet-500/15 text-violet-400 border-violet-500/30" };
