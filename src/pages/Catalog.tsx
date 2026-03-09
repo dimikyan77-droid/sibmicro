@@ -56,6 +56,25 @@ const Catalog = () => {
     staleTime: 60_000,
   });
 
+  // Fetch inventory items filtered by selected manufacturers
+  const selectedMfgs = filters.manufacturer || [];
+  const { data: inventoryByMfg, isLoading: inventoryByMfgLoading } = useQuery({
+    queryKey: ["inventory-by-manufacturer", selectedMfgs],
+    queryFn: async () => {
+      if (selectedMfgs.length === 0) return [];
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("id, part_number, manufacturer, description, quantity, price, currency, location")
+        .in("manufacturer", selectedMfgs)
+        .gt("quantity", 0)
+        .limit(100);
+      if (error) throw error;
+      return (data as InventoryItem[]) ?? [];
+    },
+    enabled: selectedMfgs.length > 0,
+    staleTime: 30_000,
+  });
+
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("asc"); }
@@ -165,14 +184,13 @@ const Catalog = () => {
     for (const p of products) {
       counts[p.manufacturer] = (counts[p.manufacturer] || 0) + 1;
     }
-    // Merge manufacturers from inventory DB with their counts
+    // Merge manufacturers from inventory DB
     if (inventoryManufacturers) {
       for (const m of inventoryManufacturers) {
-        counts[m] = (counts[m] || 0);
+        if (!counts[m]) counts[m] = 0;
       }
     }
     return Object.entries(counts)
-      .filter(([, count]) => count > 0)
       .sort(([a], [b]) => a.localeCompare(b))
       .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
   }, [mfgSearch, inventoryManufacturers]);
@@ -269,12 +287,21 @@ const Catalog = () => {
       </div>
 
       <div className="container py-6">
-        {/* Warehouse section always visible when searching */}
+        {/* Warehouse section from search */}
         {searchTerm.length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
           <WarehouseSection
             items={inventorySearch.data ?? []}
             loading={inventorySearch.isLoading}
             searchTerm={searchTerm}
+          />
+        ) : null}
+
+        {/* Warehouse section from manufacturer filter */}
+        {!searchTerm && selectedMfgs.length > 0 && (inventoryByMfg?.length || inventoryByMfgLoading) ? (
+          <WarehouseSection
+            items={inventoryByMfg ?? []}
+            loading={inventoryByMfgLoading}
+            searchTerm={selectedMfgs.join(", ")}
           />
         ) : null}
 
