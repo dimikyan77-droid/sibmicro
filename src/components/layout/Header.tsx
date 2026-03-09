@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, ChevronDown, Globe, LogIn, Warehouse } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { ShoppingCart, User, Menu, X, ChevronDown, ChevronRight, Globe, LogIn, Warehouse } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { categories } from "@/data/mockData";
 import { useI18n } from "@/contexts/I18nContext";
@@ -12,9 +12,22 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { lang, setLang, t, tc } = useI18n();
   const { user } = useAuth();
   const { totalItems } = useCart();
+
+  const isActiveRoute = (path: string) => {
+    if (path === "/catalog") {
+      return location.pathname === "/catalog" && !location.search;
+    }
+    return location.pathname === path;
+  };
+
+  const isActiveCategory = (categorySlug: string) => {
+    const params = new URLSearchParams(location.search);
+    return location.pathname === "/catalog" && params.get("category") === categorySlug;
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 overflow-visible">
@@ -118,12 +131,12 @@ const Header = () => {
               ))}
             </div>
           </div>
-          <Link to="/manufacturers" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.manufacturers")}</Link>
-          <Link to="/octopart" className="px-4 py-2.5 text-accent font-medium hover:bg-muted transition-colors">{t("octopart.nav")}</Link>
-          <Link to="/catalog" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.full_catalog")}</Link>
-          <Link to="/new-products" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.new_products")}</Link>
-          <Link to="/resources" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.resources")}</Link>
-          <Link to="/contact" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.contact")}</Link>
+          <Link to="/manufacturers" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/manufacturers") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.manufacturers")}</Link>
+          <Link to="/octopart" className={`px-4 py-2.5 font-medium transition-colors ${isActiveRoute("/octopart") ? "text-accent bg-accent/10" : "text-accent hover:bg-muted"}`}>{t("octopart.nav")}</Link>
+          <Link to="/catalog" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/catalog") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.full_catalog")}</Link>
+          <Link to="/new-products" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/new-products") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.new_products")}</Link>
+          <Link to="/resources" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/resources") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.resources")}</Link>
+          <Link to="/contact" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/contact") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.contact")}</Link>
         </div>
       </nav>
 
