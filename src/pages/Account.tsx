@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Save, Package, User } from "lucide-react";
+import { LogOut, Save, Package, User, LayoutDashboard } from "lucide-react";
+import AccountDashboard from "@/components/account/AccountDashboard";
 
 interface Order {
   id: string;
