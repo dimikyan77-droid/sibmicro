@@ -97,16 +97,46 @@ const Inventory = () => {
       );
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
       setParsedData([]);
       setShowPreview(false);
-      toast({ title: t("inventory.uploaded"), description: `${parsedData.length} позиций загружено` });
+      toast({
+        title: t("inventory.uploaded"),
+        description: `${variables.length} уникальных позиций загружено`,
+      });
     },
     onError: (error: Error) => {
       toast({ title: t("auth.error"), description: error.message, variant: "destructive" });
     },
   });
+
+  const dedupeRowsByPartNumber = (rows: ParsedRow[]): ParsedRow[] => {
+    const map = new Map<string, ParsedRow>();
+
+    for (const row of rows) {
+      const key = row.part_number.trim();
+      if (!key) continue;
+
+      const prev = map.get(key);
+      if (!prev) {
+        map.set(key, { ...row, part_number: key });
+        continue;
+      }
+
+      map.set(key, {
+        part_number: key,
+        quantity: (prev.quantity ?? 0) + (row.quantity ?? 0),
+        price: row.price ?? prev.price,
+        currency: row.currency ?? prev.currency,
+        manufacturer: row.manufacturer ?? prev.manufacturer,
+        description: row.description ?? prev.description,
+        location: row.location ?? prev.location,
+      });
+    }
+
+    return Array.from(map.values());
+  };
 
   // Parse file
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,19 +164,29 @@ const Inventory = () => {
       };
 
       // Map columns (flexible naming — supports EN/RU and composite headers)
-      const rows: ParsedRow[] = json.map((row) => {
-        const pn = getCol(row, "part_number", "partnumber", "артикул", "mpn", "partno");
-        const qtyStr = getCol(row, "in_stock", "instock", "наличие", "quantity", "кол-во", "qty");
-        const qty = parseInt(qtyStr, 10);
-        const priceStr = getCol(row, "price", "цена");
-        const price = parseFloat(priceStr) || undefined;
-        const manufacturer = getCol(row, "manufacturer", "производитель") || undefined;
-        const description = getCol(row, "description", "описание") || undefined;
-        const location = getCol(row, "location", "место", "склад") || undefined;
-        const currency = getCol(row, "currency", "валюта") || defaultCurrency;
+      const rows: ParsedRow[] = json
+        .map((row) => {
+          const pn = getCol(row, "part_number", "partnumber", "артикул", "mpn", "partno");
+          const qtyStr = getCol(row, "in_stock", "instock", "наличие", "quantity", "кол-во", "qty");
+          const qty = parseInt(qtyStr, 10);
+          const priceStr = getCol(row, "price", "цена");
+          const price = parseFloat(priceStr) || undefined;
+          const manufacturer = getCol(row, "manufacturer", "производитель") || undefined;
+          const description = getCol(row, "description", "описание") || undefined;
+          const location = getCol(row, "location", "место", "склад") || undefined;
+          const currency = getCol(row, "currency", "валюта") || defaultCurrency;
 
-        return { part_number: pn, quantity: isNaN(qty) ? 0 : qty, price, manufacturer, description, location, currency };
-      }).filter((r) => r.part_number);
+          return {
+            part_number: pn,
+            quantity: isNaN(qty) ? 0 : qty,
+            price,
+            manufacturer,
+            description,
+            location,
+            currency,
+          };
+        })
+        .filter((r) => r.part_number);
 
       setParsedData(rows);
       setShowPreview(true);
@@ -156,11 +196,12 @@ const Inventory = () => {
       setUploading(false);
       e.target.value = "";
     }
-  }, [toast, t]);
+  }, [toast, t, defaultCurrency]);
 
   const confirmUpload = () => {
     if (parsedData.length === 0) return;
-    bulkInsertMutation.mutate(parsedData);
+    const deduped = dedupeRowsByPartNumber(parsedData);
+    bulkInsertMutation.mutate(deduped);
   };
 
   const cancelUpload = () => {
