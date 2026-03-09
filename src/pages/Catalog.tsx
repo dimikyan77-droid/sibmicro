@@ -9,6 +9,8 @@ import { useCart } from "@/contexts/CartContext";
 import { useOctopartSearch, getBestPrice, getTotalStock, type OctopartResult } from "@/hooks/useOctopartSearch";
 import { useDigiKeySearch, getDigiKeyBestPrice, type DigiKeyResult } from "@/hooks/useDigiKeySearch";
 import { useInventorySearch, type InventoryItem } from "@/hooks/useInventorySearch";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type SortKey = "partNumber" | "manufacturer" | "price" | "stock";
