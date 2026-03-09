@@ -516,11 +516,11 @@ function WarehouseSection({
       stock: item.quantity,
       leadTime: "In Stock",
       rohs: true,
-      datasheet: null,
+      datasheetUrl: "",
+      temperatureRange: "",
       priceTiers: [{ qty: 1, price: item.price ?? 0 }],
       moq: 1,
       package: "",
-      specs: {},
     };
     addToCart(product, 1);
     setAddedIds((prev) => new Set(prev).add(item.id));
