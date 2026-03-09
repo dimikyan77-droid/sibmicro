@@ -87,7 +87,14 @@ export function useOctopartSearch() {
 
         throw new Error(detailedMessage);
       }
-      if (data?.error) throw new Error(data.error);
+      
+      if (data?.error) {
+        // Handle API limit exceeded case specifically
+        if (data.code === "OCTOPART_LIMIT_EXCEEDED") {
+          throw new Error("Octopart API daily limit reached. Search will be available again tomorrow. Try searching our warehouse inventory in the meantime.");
+        }
+        throw new Error(data.error);
+      }
 
       setResults(data.results || []);
       setTotalHits(data.hits || 0);
