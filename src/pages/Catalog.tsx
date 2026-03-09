@@ -457,7 +457,7 @@ const Catalog = () => {
               </div>
               )}
 
-              {viewMode === "list" ? (
+              {(filteredProducts.length > 0 || !hasWarehouseItems) && (viewMode === "list" ? (
                 /* List / Table view */
                 <div className="overflow-x-auto rounded-lg border border-border bg-card">
                   <table className="w-full text-sm">
