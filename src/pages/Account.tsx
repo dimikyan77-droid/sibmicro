@@ -10,8 +10,17 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Save, Package, User, LayoutDashboard } from "lucide-react";
+import { LogOut, Save, Package, User, LayoutDashboard, FileText, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import AccountDashboard from "@/components/account/AccountDashboard";
+
+interface QuoteRequest {
+  id: string;
+  part_numbers: string;
+  quantities: string | null;
+  status: string;
+  created_at: string;
+  message: string | null;
+}
 
 interface Order {
   id: string;
