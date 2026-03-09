@@ -219,7 +219,7 @@ const Account = () => {
                           </Link>
                         </TableCell>
                         <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell><span className={statusColor(order.status)}>{order.status}</span></TableCell>
+                        <TableCell>{getOrderStatusBadge(order.status)}</TableCell>
                         <TableCell className="text-right font-medium">
                           {order.currency === "USD" ? "$" : "₽"}{order.total_amount.toFixed(2)}
                         </TableCell>
