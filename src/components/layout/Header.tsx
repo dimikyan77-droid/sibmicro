@@ -76,7 +76,7 @@ const Header = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="border-t border-border hidden lg:block">
+      <nav className="border-t border-border hidden lg:block overflow-visible">
         <div className="container flex items-center gap-0 text-sm">
           <div
             className="relative"
