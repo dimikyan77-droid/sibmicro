@@ -24,6 +24,7 @@ import Contact from "./pages/Contact";
 import Resources from "./pages/Resources";
 import Bom from "./pages/Bom";
 import Inventory from "./pages/Inventory";
+import AdminOrders from "./pages/AdminOrders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const App = () => (
                   <Route path="/resources" element={<Resources />} />
                   <Route path="/bom" element={<Bom />} />
                   <Route path="/inventory" element={<Inventory />} />
+                  <Route path="/admin/orders" element={<AdminOrders />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CompareBar />
