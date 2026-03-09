@@ -118,6 +118,13 @@ const Account = () => {
     }
   };
 
+  const quoteStatusConfig: Record<string, { label: { en: string; ru: string }; color: string; bg: string; icon: React.ElementType }> = {
+    new: { label: { en: "New", ru: "Новый" }, color: "text-blue-600", bg: "bg-blue-100", icon: Clock },
+    processing: { label: { en: "Processing", ru: "В обработке" }, color: "text-yellow-600", bg: "bg-yellow-100", icon: Loader2 },
+    quoted: { label: { en: "Quoted", ru: "Расценён" }, color: "text-green-600", bg: "bg-green-100", icon: CheckCircle2 },
+    closed: { label: { en: "Closed", ru: "Закрыт" }, color: "text-muted-foreground", bg: "bg-muted", icon: AlertCircle },
+  };
+
   if (loading) {
     return <Layout><div className="container py-16 text-center text-muted-foreground">Loading...</div></Layout>;
   }
