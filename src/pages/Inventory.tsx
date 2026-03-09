@@ -46,6 +46,7 @@ const Inventory = () => {
   const [uploading, setUploading] = useState(false);
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [defaultCurrency, setDefaultCurrency] = useState<"USD" | "RUB" | "EUR">("USD");
 
   // Fetch inventory
   const { data: inventory = [], isLoading } = useQuery({
