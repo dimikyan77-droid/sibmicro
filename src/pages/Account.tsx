@@ -111,13 +111,15 @@ const Account = () => {
     navigate("/");
   };
 
-  const statusColor = (status: string) => {
-    switch (status) {
-      case "completed": return "chip chip-success";
-      case "processing": return "chip chip-info";
-      case "pending": return "chip chip-warning";
-      default: return "chip";
-    }
+  const getOrderStatusBadge = (status: string) => {
+    const cfg = orderStatusConfig[status] || orderStatusConfig["pending"];
+    const StatusIcon = cfg.icon;
+    return (
+      <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}>
+        <StatusIcon className="h-3 w-3" />
+        {getStatusLabel(status, lang as "en" | "ru")}
+      </span>
+    );
   };
 
   const quoteStatusConfig: Record<string, { label: { en: string; ru: string }; color: string; bg: string; icon: React.ElementType }> = {
