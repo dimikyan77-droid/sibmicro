@@ -299,7 +299,7 @@ const Inventory = () => {
               <CardTitle className="text-sm text-muted-foreground">{t("inventory.total_value")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">₽{totalValue.toLocaleString()}</p>
+              <p className="text-2xl font-bold font-mono">{totalValueDisplay}</p>
             </CardContent>
           </Card>
         </div>
