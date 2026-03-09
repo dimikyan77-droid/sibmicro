@@ -219,6 +219,49 @@ const Account = () => {
               )}
             </div>
           </TabsContent>
+
+          <TabsContent value="quotes">
+            <div className="rounded-lg border border-border bg-card">
+              {quotesLoading ? (
+                <div className="p-8 text-center text-muted-foreground">Loading...</div>
+              ) : quotes.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">{t("account.no_quotes")}</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t("account.quote_date")}</TableHead>
+                      <TableHead>{t("account.quote_parts")}</TableHead>
+                      <TableHead>{t("account.quote_status")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {quotes.map((q) => {
+                      const cfg = quoteStatusConfig[q.status] || quoteStatusConfig["new"];
+                      const StatusIcon = cfg.icon;
+                      return (
+                        <TableRow key={q.id}>
+                          <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                            {new Date(q.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <span className="font-mono text-sm font-medium text-foreground">{q.part_numbers.substring(0, 80)}{q.part_numbers.length > 80 ? "…" : ""}</span>
+                            {q.quantities && <span className="block text-xs text-muted-foreground mt-0.5">Кол-во: {q.quantities}</span>}
+                          </TableCell>
+                          <TableCell>
+                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}>
+                              <StatusIcon className="h-3 w-3" />
+                              {cfg.label[lang as "en" | "ru"] || cfg.label.en}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </Layout>
