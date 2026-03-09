@@ -492,6 +492,119 @@ const Catalog = () => {
   );
 };
 
+/* ─── Warehouse Section ─── */
+function WarehouseSection({
+  items,
+  loading,
+  searchTerm,
+}: {
+  items: InventoryItem[];
+  loading: boolean;
+  searchTerm: string;
+}) {
+  const { addToCart } = useCart();
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+
+  const handleAdd = (item: InventoryItem) => {
+    const product: Product = {
+      id: `inv-${item.id}`,
+      partNumber: item.part_number,
+      manufacturer: item.manufacturer || "",
+      description: item.description || "",
+      category: "Inventory",
+      subcategory: "",
+      stock: item.quantity,
+      leadTime: "In Stock",
+      rohs: true,
+      datasheet: null,
+      priceTiers: [{ qty: 1, price: item.price ?? 0 }],
+      moq: 1,
+      package: "",
+      specs: {},
+    };
+    addToCart(product, 1);
+    setAddedIds((prev) => new Set(prev).add(item.id));
+    toast.success("Добавлено в корзину", { description: `${item.part_number} × 1` });
+    setTimeout(() => {
+      setAddedIds((prev) => {
+        const n = new Set(prev);
+        n.delete(item.id);
+        return n;
+      });
+    }, 2000);
+  };
+
+  if (loading) {
+    return (
+      <div className="mb-5 rounded-lg border border-border bg-card p-4 flex items-center gap-2 text-muted-foreground text-sm">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Поиск по складу…
+      </div>
+    );
+  }
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mb-5 rounded-lg border border-primary/30 bg-primary/5 overflow-hidden">
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-primary/20">
+        <Warehouse className="h-4 w-4 text-primary" />
+        <span className="text-sm font-semibold text-foreground">Наш склад</span>
+        <span className="ml-1 rounded-full bg-primary/15 text-primary text-xs px-2 py-0.5 font-medium">{items.length}</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-primary/10">
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Артикул</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Производитель</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[180px]">Описание</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Кол-во</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Цена</th>
+              <th className="px-4 py-2 w-[110px]"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => {
+              const added = addedIds.has(item.id);
+              return (
+                <tr key={item.id} className="border-b border-primary/10 last:border-0 hover:bg-primary/5 transition-colors">
+                  <td className="px-4 py-2.5">
+                    <span className="font-mono text-xs font-semibold text-primary">{item.part_number}</span>
+                  </td>
+                  <td className="px-4 py-2.5 text-sm text-foreground">{item.manufacturer || "—"}</td>
+                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{item.description || "—"}</td>
+                  <td className="px-4 py-2.5">
+                    <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 px-2 py-0.5 text-xs font-medium">
+                      {item.quantity.toLocaleString()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 font-semibold text-foreground text-sm">
+                    {item.price != null ? `${item.price.toFixed(2)} ${item.currency ?? "RUB"}` : "—"}
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <button
+                      onClick={() => handleAdd(item)}
+                      className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                        added
+                          ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/30"
+                          : "border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      }`}
+                    >
+                      {added ? <Check className="h-3.5 w-3.5" /> : <ShoppingCart className="h-3.5 w-3.5" />}
+                      В корзину
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Unified item for sorting ─── */
 interface UnifiedItem {
   key: string;
