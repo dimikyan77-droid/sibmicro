@@ -40,7 +40,8 @@ const Quote = () => {
         part_numbers: form.partNumbers,
         quantities: form.quantities || null,
         message: form.message || null,
-      });
+        user_id: user?.id || null,
+      } as any);
 
       if (dbError) throw dbError;
 
