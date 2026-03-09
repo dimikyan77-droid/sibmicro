@@ -41,20 +41,26 @@ const Catalog = () => {
   const inventorySearch = useInventorySearch(searchTerm);
 
   // Fetch distinct manufacturers from inventory DB
-  const { data: inventoryManufacturers } = useQuery({
-    queryKey: ["inventory-manufacturers"],
+  const { data: inventoryManufacturerCounts } = useQuery({
+    queryKey: ["inventory-manufacturer-counts"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("inventory")
-        .select("manufacturer")
-        .not("manufacturer", "is", null);
+        .select("manufacturer, quantity")
+        .not("manufacturer", "is", null)
+        .gt("quantity", 0);
       if (error) throw error;
-      const unique = new Set<string>();
-      data?.forEach((row) => { if (row.manufacturer) unique.add(row.manufacturer); });
-      return Array.from(unique);
+      const counts: Record<string, number> = {};
+      data?.forEach((row) => {
+        if (row.manufacturer) {
+          counts[row.manufacturer] = (counts[row.manufacturer] || 0) + 1;
+        }
+      });
+      return counts;
     },
     staleTime: 60_000,
   });
+  const inventoryManufacturers = inventoryManufacturerCounts ? Object.keys(inventoryManufacturerCounts) : undefined;
 
   // Fetch inventory items filtered by selected manufacturers
   const selectedMfgs = filters.manufacturer || [];
@@ -184,16 +190,16 @@ const Catalog = () => {
     for (const p of products) {
       counts[p.manufacturer] = (counts[p.manufacturer] || 0) + 1;
     }
-    // Merge manufacturers from inventory DB
-    if (inventoryManufacturers) {
-      for (const m of inventoryManufacturers) {
-        if (!counts[m]) counts[m] = 0;
+    // Merge manufacturers from inventory DB with their counts
+    if (inventoryManufacturerCounts) {
+      for (const [m, invCount] of Object.entries(inventoryManufacturerCounts)) {
+        counts[m] = (counts[m] || 0) + invCount;
       }
     }
     return Object.entries(counts)
       .sort(([a], [b]) => a.localeCompare(b))
       .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
-  }, [mfgSearch, inventoryManufacturers]);
+  }, [mfgSearch, inventoryManufacturerCounts]);
 
   const categoryProductCounts = useMemo(() => {
     const counts: Record<string, number> = {};
