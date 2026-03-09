@@ -17,7 +17,7 @@ const Header = () => {
   const { totalItems } = useCart();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 overflow-visible">
       {/* Top bar */}
       <div className="bg-primary">
         <div className="container flex h-8 items-center justify-between text-xs text-primary-foreground">
