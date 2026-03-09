@@ -210,7 +210,20 @@ const Inventory = () => {
   };
 
   const totalQuantity = inventory.reduce((acc, i) => acc + i.quantity, 0);
-  const totalValue = inventory.reduce((acc, i) => acc + (i.price || 0) * i.quantity, 0);
+
+  // Group total value by currency
+  const totalValueByCurrency = inventory.reduce((acc, i) => {
+    if (!i.price) return acc;
+    const cur = (i.currency || "RUB").toUpperCase();
+    acc[cur] = (acc[cur] || 0) + i.price * i.quantity;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const currencySymbol: Record<string, string> = { USD: "$", RUB: "₽", EUR: "€" };
+
+  const totalValueDisplay = Object.entries(totalValueByCurrency)
+    .map(([cur, val]) => `${currencySymbol[cur] ?? cur}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
+    .join(" + ") || "—";
 
   if (!user) {
     return (
@@ -286,7 +299,7 @@ const Inventory = () => {
               <CardTitle className="text-sm text-muted-foreground">{t("inventory.total_value")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">₽{totalValue.toLocaleString()}</p>
+              <p className="text-2xl font-bold font-mono">{totalValueDisplay}</p>
             </CardContent>
           </Card>
         </div>
