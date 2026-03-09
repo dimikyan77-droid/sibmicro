@@ -40,6 +40,22 @@ const Catalog = () => {
   const searchTerm = query || localSearch;
   const inventorySearch = useInventorySearch(searchTerm);
 
+  // Fetch distinct manufacturers from inventory DB
+  const { data: inventoryManufacturers } = useQuery({
+    queryKey: ["inventory-manufacturers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("manufacturer")
+        .not("manufacturer", "is", null);
+      if (error) throw error;
+      const unique = new Set<string>();
+      data?.forEach((row) => { if (row.manufacturer) unique.add(row.manufacturer); });
+      return Array.from(unique);
+    },
+    staleTime: 60_000,
+  });
+
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("asc"); }
