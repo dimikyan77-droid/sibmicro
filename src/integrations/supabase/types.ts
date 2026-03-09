@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      inventory: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          part_number: string
+          price: number | null
+          quantity: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          manufacturer?: string | null
+          part_number: string
+          price?: number | null
+          quantity?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          manufacturer?: string | null
+          part_number?: string
+          price?: number | null
+          quantity?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
