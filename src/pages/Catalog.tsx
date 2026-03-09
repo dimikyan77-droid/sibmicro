@@ -245,11 +245,11 @@ const Catalog = () => {
 
       <div className="container py-6">
         {/* Warehouse section always visible when searching */}
-        {query.length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
+        {searchTerm.length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
           <WarehouseSection
             items={inventorySearch.data ?? []}
             loading={inventorySearch.isLoading}
-            searchTerm={query}
+            searchTerm={searchTerm}
           />
         ) : null}
 
