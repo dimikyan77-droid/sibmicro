@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, ChevronDown, Globe, LogIn, Warehouse } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { ShoppingCart, User, Menu, X, ChevronDown, ChevronRight, Globe, LogIn, Warehouse } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { categories } from "@/data/mockData";
 import { useI18n } from "@/contexts/I18nContext";
@@ -12,9 +12,22 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { lang, setLang, t, tc } = useI18n();
   const { user } = useAuth();
   const { totalItems } = useCart();
+
+  const isActiveRoute = (path: string) => {
+    if (path === "/catalog") {
+      return location.pathname === "/catalog" && !location.search;
+    }
+    return location.pathname === path;
+  };
+
+  const isActiveCategory = (categorySlug: string) => {
+    const params = new URLSearchParams(location.search);
+    return location.pathname === "/catalog" && params.get("category") === categorySlug;
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 overflow-visible">
