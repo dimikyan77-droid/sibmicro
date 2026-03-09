@@ -9,6 +9,8 @@ import { useCart } from "@/contexts/CartContext";
 import { useOctopartSearch, getBestPrice, getTotalStock, type OctopartResult } from "@/hooks/useOctopartSearch";
 import { useDigiKeySearch, getDigiKeyBestPrice, type DigiKeyResult } from "@/hooks/useDigiKeySearch";
 import { useInventorySearch, type InventoryItem } from "@/hooks/useInventorySearch";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type SortKey = "partNumber" | "manufacturer" | "price" | "stock";
@@ -37,6 +39,22 @@ const Catalog = () => {
   const digikey = useDigiKeySearch();
   const searchTerm = query || localSearch;
   const inventorySearch = useInventorySearch(searchTerm);
+
+  // Fetch distinct manufacturers from inventory DB
+  const { data: inventoryManufacturers } = useQuery({
+    queryKey: ["inventory-manufacturers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("manufacturer")
+        .not("manufacturer", "is", null);
+      if (error) throw error;
+      const unique = new Set<string>();
+      data?.forEach((row) => { if (row.manufacturer) unique.add(row.manufacturer); });
+      return Array.from(unique);
+    },
+    staleTime: 60_000,
+  });
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -147,10 +165,16 @@ const Catalog = () => {
     for (const p of products) {
       counts[p.manufacturer] = (counts[p.manufacturer] || 0) + 1;
     }
+    // Merge manufacturers from inventory DB
+    if (inventoryManufacturers) {
+      for (const m of inventoryManufacturers) {
+        if (!counts[m]) counts[m] = 0;
+      }
+    }
     return Object.entries(counts)
       .sort(([a], [b]) => a.localeCompare(b))
       .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
-  }, [mfgSearch]);
+  }, [mfgSearch, inventoryManufacturers]);
 
   const categoryProductCounts = useMemo(() => {
     const counts: Record<string, number> = {};
