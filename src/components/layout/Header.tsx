@@ -28,6 +28,11 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <Link to="/quote" className="hover:underline">{t("header.request_quote")}</Link>
             <Link to="/bom" className="hover:underline">{t("header.bom_upload")}</Link>
+            {user && (
+              <Link to="/inventory" className="hover:underline flex items-center gap-1">
+                <Warehouse className="h-3 w-3" />{t("inventory.title").split("/")[0].trim()}
+              </Link>
+            )}
             <button
               onClick={() => setLang(lang === "en" ? "ru" : "en")}
               className="flex items-center gap-1 hover:underline font-medium"
