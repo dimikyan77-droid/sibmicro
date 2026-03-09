@@ -131,12 +131,12 @@ const Header = () => {
               ))}
             </div>
           </div>
-          <Link to="/manufacturers" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.manufacturers")}</Link>
-          <Link to="/octopart" className="px-4 py-2.5 text-accent font-medium hover:bg-muted transition-colors">{t("octopart.nav")}</Link>
-          <Link to="/catalog" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.full_catalog")}</Link>
-          <Link to="/new-products" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.new_products")}</Link>
-          <Link to="/resources" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.resources")}</Link>
-          <Link to="/contact" className="px-4 py-2.5 text-foreground hover:bg-muted transition-colors">{t("header.contact")}</Link>
+          <Link to="/manufacturers" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/manufacturers") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.manufacturers")}</Link>
+          <Link to="/octopart" className={`px-4 py-2.5 font-medium transition-colors ${isActiveRoute("/octopart") ? "text-accent bg-accent/10" : "text-accent hover:bg-muted"}`}>{t("octopart.nav")}</Link>
+          <Link to="/catalog" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/catalog") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.full_catalog")}</Link>
+          <Link to="/new-products" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/new-products") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.new_products")}</Link>
+          <Link to="/resources" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/resources") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.resources")}</Link>
+          <Link to="/contact" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/contact") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.contact")}</Link>
         </div>
       </nav>
 
