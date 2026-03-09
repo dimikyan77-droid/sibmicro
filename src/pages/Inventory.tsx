@@ -80,10 +80,10 @@ const Inventory = () => {
     },
   });
 
-  // Bulk insert mutation
+  // Bulk upsert mutation (updates existing by part_number, inserts new ones)
   const bulkInsertMutation = useMutation({
     mutationFn: async (rows: ParsedRow[]) => {
-      const { error } = await supabase.from("inventory").insert(
+      const { error } = await supabase.from("inventory").upsert(
         rows.map((r) => ({
           part_number: r.part_number,
           manufacturer: r.manufacturer || null,
@@ -92,7 +92,8 @@ const Inventory = () => {
           price: r.price || null,
           currency: r.currency || "RUB",
           location: r.location || null,
-        }))
+        })),
+        { onConflict: "part_number" }
       );
       if (error) throw error;
     },
@@ -100,7 +101,7 @@ const Inventory = () => {
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
       setParsedData([]);
       setShowPreview(false);
-      toast({ title: t("inventory.uploaded"), description: `${parsedData.length} позиций добавлено` });
+      toast({ title: t("inventory.uploaded"), description: `${parsedData.length} позиций загружено` });
     },
     onError: (error: Error) => {
       toast({ title: t("auth.error"), description: error.message, variant: "destructive" });
