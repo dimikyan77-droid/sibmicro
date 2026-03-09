@@ -24,11 +24,10 @@ serve(async (req) => {
     }
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    const sanitize = (s: string) => s.replace(/[\r\n]+/g, " ").trim();
 
-    if (RESEND_API_KEY) {
-      // Send via Resend
-      const emailBody = `
-Новый запрос цены от ${name}
+    const emailBody = `
+Новый запрос от ${name}
 
 Компания: ${company || "—"}
 Email: ${email}
@@ -39,9 +38,13 @@ Email: ${email}
 
 Сообщение:
 ${message || "—"}
-      `.trim();
+    `.trim();
 
-      const res = await fetch("https://api.resend.com/emails", {
+    const subject = sanitize(`Запрос: ${partNumbers.substring(0, 60)}`);
+
+    if (RESEND_API_KEY) {
+      // 1) Email to sales
+      const salesRes = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${RESEND_API_KEY}`,
@@ -50,20 +53,50 @@ ${message || "—"}
         body: JSON.stringify({
           from: "SibMicro <noreply@sibmicro.ru>",
           to: [RECIPIENT],
-          subject: `Запрос цены: ${partNumbers.substring(0, 60)}`,
+          subject,
           text: emailBody,
           reply_to: email,
         }),
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Resend error:", text);
-        // Still return success since data is saved in DB
+      if (!salesRes.ok) {
+        console.error("Resend sales error:", await salesRes.text());
+      }
+
+      // 2) Confirmation to client
+      const clientBody = `
+Здравствуйте, ${name}!
+
+Мы получили ваш запрос и скоро свяжемся с вами.
+
+Детали запроса:
+- Номера деталей: ${partNumbers}
+- Количество: ${quantities || "—"}
+${message ? `- Сообщение: ${message}` : ""}
+
+С уважением,
+Команда SibMicro
+      `.trim();
+
+      const clientRes = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "SibMicro <noreply@sibmicro.ru>",
+          to: [email],
+          subject: "SibMicro — Ваш запрос получен",
+          text: clientBody,
+        }),
+      });
+
+      if (!clientRes.ok) {
+        console.error("Resend client error:", await clientRes.text());
       }
     } else {
-      console.log("RESEND_API_KEY not configured. Quote request saved to DB only.");
-      console.log(`Quote from ${name} (${email}): ${partNumbers}`);
+      console.log("RESEND_API_KEY not configured.");
     }
 
     return new Response(
@@ -72,9 +105,9 @@ ${message || "—"}
     );
   } catch (error: unknown) {
     console.error("Send quote email error:", error);
-    const message = error instanceof Error ? error.message : "Unknown error";
+    const msg = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: msg }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
