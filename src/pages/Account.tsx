@@ -74,6 +74,16 @@ const Account = () => {
           setOrders(data || []);
           setOrdersLoading(false);
         });
+
+      supabase
+        .from("quote_requests")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .then(({ data }) => {
+          setQuotes((data as any) || []);
+          setQuotesLoading(false);
+        });
     }
   }, [user]);
 
