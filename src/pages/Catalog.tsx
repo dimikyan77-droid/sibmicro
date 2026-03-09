@@ -289,10 +289,10 @@ const Catalog = () => {
       <div className="container py-6">
         {/* Warehouse section */}
         {(() => {
-          let warehouseItems = inventorySearch.data ?? [];
-          let warehouseLoading = inventorySearch.isLoading;
-          let warehouseLabel = searchTerm;
           const hasSearch = searchTerm.length >= 2;
+          let warehouseItems = hasSearch ? (inventorySearch.data ?? []) : [];
+          let warehouseLoading = hasSearch ? inventorySearch.isLoading : false;
+          let warehouseLabel = searchTerm;
 
           // Filter search results by selected manufacturers
           if (hasSearch && selectedMfgs.length > 0) {
@@ -306,6 +306,7 @@ const Catalog = () => {
             warehouseLabel = selectedMfgs.join(", ");
           }
 
+          hasWarehouseItems = warehouseItems.length > 0;
           const show = (hasSearch || selectedMfgs.length > 0) && (warehouseItems.length > 0 || warehouseLoading);
           return show ? (
             <WarehouseSection
