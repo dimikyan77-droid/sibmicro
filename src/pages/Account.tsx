@@ -34,7 +34,7 @@ interface Order {
 
 const Account = () => {
   const { user, profile, loading, signOut, refreshProfile } = useAuth();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const navigate = useNavigate();
   const { toast } = useToast();
 
