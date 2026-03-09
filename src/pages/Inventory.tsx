@@ -46,6 +46,7 @@ const Inventory = () => {
   const [uploading, setUploading] = useState(false);
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [defaultCurrency, setDefaultCurrency] = useState<"USD" | "RUB" | "EUR">("USD");
 
   // Fetch inventory
   const { data: inventory = [], isLoading } = useQuery({
@@ -141,7 +142,7 @@ const Inventory = () => {
         const manufacturer = getCol(row, "manufacturer", "производитель") || undefined;
         const description = getCol(row, "description", "описание") || undefined;
         const location = getCol(row, "location", "место", "склад") || undefined;
-        const currency = getCol(row, "currency", "валюта") || "RUB";
+        const currency = getCol(row, "currency", "валюта") || defaultCurrency;
 
         return { part_number: pn, quantity: isNaN(qty) ? 0 : qty, price, manufacturer, description, location, currency };
       }).filter((r) => r.part_number);
@@ -191,7 +192,16 @@ const Inventory = () => {
             <h1 className="text-2xl font-bold text-foreground">{t("inventory.title")}</h1>
             <p className="text-muted-foreground">{t("inventory.subtitle")}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <select
+              value={defaultCurrency}
+              onChange={(e) => setDefaultCurrency(e.target.value as "USD" | "RUB" | "EUR")}
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
+            >
+              <option value="USD">$ USD</option>
+              <option value="RUB">₽ RUB</option>
+              <option value="EUR">€ EUR</option>
+            </select>
             <Label htmlFor="file-upload" className="cursor-pointer">
               <Button asChild variant="default" disabled={uploading}>
                 <span className="flex items-center gap-2">
