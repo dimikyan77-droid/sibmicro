@@ -56,6 +56,25 @@ const Catalog = () => {
     staleTime: 60_000,
   });
 
+  // Fetch inventory items filtered by selected manufacturers
+  const selectedMfgs = filters.manufacturer || [];
+  const { data: inventoryByMfg, isLoading: inventoryByMfgLoading } = useQuery({
+    queryKey: ["inventory-by-manufacturer", selectedMfgs],
+    queryFn: async () => {
+      if (selectedMfgs.length === 0) return [];
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("id, part_number, manufacturer, description, quantity, price, currency, location")
+        .in("manufacturer", selectedMfgs)
+        .gt("quantity", 0)
+        .limit(100);
+      if (error) throw error;
+      return (data as InventoryItem[]) ?? [];
+    },
+    enabled: selectedMfgs.length > 0,
+    staleTime: 30_000,
+  });
+
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("asc"); }
