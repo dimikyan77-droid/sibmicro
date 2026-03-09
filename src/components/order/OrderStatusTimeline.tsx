@@ -55,7 +55,7 @@ const OrderStatusTimeline = ({ currentStatus, history = [] }: OrderStatusTimelin
                         ? `${cfg.bg} border-current ${cfg.color} ring-2 ring-offset-2 ring-offset-background`
                         : "bg-muted border-border"
                     }`}
-                    style={isCurrent ? { ringColor: cfg.progressColor } : undefined}
+                    
                   >
                     {isCompleted ? (
                       <Check className={`h-4 w-4 ${cfg.color}`} />
