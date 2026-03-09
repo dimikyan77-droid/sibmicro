@@ -243,6 +243,15 @@ const Catalog = () => {
       </div>
 
       <div className="container py-6">
+        {/* Warehouse section always visible when searching */}
+        {query.length >= 2 && (inventorySearch.data?.length || inventorySearch.isLoading) ? (
+          <WarehouseSection
+            items={inventorySearch.data ?? []}
+            loading={inventorySearch.isLoading}
+            searchTerm={query}
+          />
+        ) : null}
+
         {showExternalSearch ? (
           <ExternalSearchResults octopart={octopart} digikey={digikey} />
         ) : (
