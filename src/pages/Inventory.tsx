@@ -118,15 +118,30 @@ const Inventory = () => {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
 
-      // Map columns (flexible naming)
+      // Flexible column name resolver (handles composite headers like "Part_Number (Артикул)")
+      const getCol = (row: Record<string, unknown>, ...keys: string[]): string => {
+        for (const key of keys) {
+          for (const col of Object.keys(row)) {
+            if (col.toLowerCase().replace(/[\s_\-()]/g, "").includes(key.toLowerCase().replace(/[\s_\-()]/g, ""))) {
+              const val = String(row[col] ?? "").trim();
+              if (val) return val;
+            }
+          }
+        }
+        return "";
+      };
+
+      // Map columns (flexible naming — supports EN/RU and composite headers)
       const rows: ParsedRow[] = json.map((row) => {
-        const pn = String(row["part_number"] || row["PartNumber"] || row["Артикул"] || row["артикул"] || row["MPN"] || row["mpn"] || "").trim();
-        const qty = parseInt(String(row["quantity"] || row["Quantity"] || row["Кол-во"] || row["кол-во"] || row["qty"] || row["Qty"] || "0"), 10);
-        const price = parseFloat(String(row["price"] || row["Price"] || row["Цена"] || row["цена"] || "")) || undefined;
-        const manufacturer = String(row["manufacturer"] || row["Manufacturer"] || row["Производитель"] || row["производитель"] || "").trim() || undefined;
-        const description = String(row["description"] || row["Description"] || row["Описание"] || row["описание"] || "").trim() || undefined;
-        const location = String(row["location"] || row["Location"] || row["Место"] || row["место"] || "").trim() || undefined;
-        const currency = String(row["currency"] || row["Currency"] || row["Валюта"] || "RUB").trim();
+        const pn = getCol(row, "part_number", "partnumber", "артикул", "mpn", "partno");
+        const qtyStr = getCol(row, "in_stock", "instock", "наличие", "quantity", "кол-во", "qty");
+        const qty = parseInt(qtyStr, 10);
+        const priceStr = getCol(row, "price", "цена");
+        const price = parseFloat(priceStr) || undefined;
+        const manufacturer = getCol(row, "manufacturer", "производитель") || undefined;
+        const description = getCol(row, "description", "описание") || undefined;
+        const location = getCol(row, "location", "место", "склад") || undefined;
+        const currency = getCol(row, "currency", "валюта") || "RUB";
 
         return { part_number: pn, quantity: isNaN(qty) ? 0 : qty, price, manufacturer, description, location, currency };
       }).filter((r) => r.part_number);
