@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import { TrendingUp, Package, Clock, CheckCircle2, AlertCircle, Loader2, ShoppingBag, Activity } from "lucide-react";
+import { TrendingUp, Package, Clock, ShoppingBag, Activity } from "lucide-react";
 import { useI18n } from "@/contexts/I18nContext";
+import { ALL_STATUSES, orderStatusConfig, getStatusLabel } from "@/components/order/orderStatusConfig";
 
 interface Order {
   id: string;
@@ -45,13 +46,6 @@ const StatCard = ({
     </div>
   </div>
 );
-
-const statusConfig: Record<string, { label: { en: string; ru: string }; color: string; bg: string; icon: React.ElementType }> = {
-  pending: { label: { en: "Pending", ru: "В ожидании" }, color: "text-yellow-600", bg: "bg-yellow-100", icon: Clock },
-  processing: { label: { en: "Processing", ru: "В обработке" }, color: "text-blue-600", bg: "bg-blue-100", icon: Loader2 },
-  completed: { label: { en: "Completed", ru: "Завершён" }, color: "text-green-600", bg: "bg-green-100", icon: CheckCircle2 },
-  cancelled: { label: { en: "Cancelled", ru: "Отменён" }, color: "text-red-500", bg: "bg-red-100", icon: AlertCircle },
-};
 
 const AccountDashboard = ({ orders, loading, userEmail, fullName }: AccountDashboardProps) => {
   const { lang } = useI18n();
@@ -131,7 +125,7 @@ const AccountDashboard = ({ orders, loading, userEmail, fullName }: AccountDashb
           sub={lang === "ru" ? "компонентов" : "components"}
         />
         <StatCard
-          icon={CheckCircle2}
+          icon={Clock}
           label={lang === "ru" ? "Завершено" : "Completed"}
           value={stats.byStatus["completed"] || 0}
           sub={`${orders.length ? Math.round(((stats.byStatus["completed"] || 0) / orders.length) * 100) : 0}%`}
@@ -151,7 +145,8 @@ const AccountDashboard = ({ orders, loading, userEmail, fullName }: AccountDashb
             <p className="text-sm text-muted-foreground">{lang === "ru" ? "Нет заказов" : "No orders yet"}</p>
           ) : (
             <div className="space-y-3">
-              {Object.entries(statusConfig).map(([status, cfg]) => {
+              {ALL_STATUSES.map((status) => {
+                const cfg = orderStatusConfig[status];
                 const count = stats.byStatus[status] || 0;
                 const pct = orders.length ? (count / orders.length) * 100 : 0;
                 const StatusIcon = cfg.icon;
@@ -161,18 +156,14 @@ const AccountDashboard = ({ orders, loading, userEmail, fullName }: AccountDashb
                       <div className="flex items-center gap-2">
                         <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}>
                           <StatusIcon className="h-3 w-3" />
-                          {cfg.label[lang as "en" | "ru"] || cfg.label.en}
+                          {cfg.label[lang as "en" | "ru"]}
                         </span>
                       </div>
                       <span className="text-sm font-semibold text-foreground">{count}</span>
                     </div>
                     <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all duration-700 ${
-                          status === "completed" ? "bg-green-500" :
-                          status === "processing" ? "bg-blue-500" :
-                          status === "pending" ? "bg-yellow-500" : "bg-red-400"
-                        }`}
+                        className={`h-full rounded-full transition-all duration-700 ${cfg.progressColor}`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -194,7 +185,7 @@ const AccountDashboard = ({ orders, loading, userEmail, fullName }: AccountDashb
           ) : (
             <div className="space-y-3">
               {recentOrders.map((order) => {
-                const cfg = statusConfig[order.status] || statusConfig["pending"];
+                const cfg = orderStatusConfig[order.status] || orderStatusConfig["pending"];
                 const StatusIcon = cfg.icon;
                 return (
                   <div key={order.id} className="flex items-center gap-3 py-1.5 border-b border-border last:border-0">
@@ -207,7 +198,7 @@ const AccountDashboard = ({ orders, loading, userEmail, fullName }: AccountDashb
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm font-semibold text-foreground">{formatCurrency(order.total_amount, order.currency)}</p>
-                      <p className={`text-xs font-medium ${cfg.color}`}>{cfg.label[lang as "en" | "ru"] || cfg.label.en}</p>
+                      <p className={`text-xs font-medium ${cfg.color}`}>{cfg.label[lang as "en" | "ru"]}</p>
                     </div>
                   </div>
                 );

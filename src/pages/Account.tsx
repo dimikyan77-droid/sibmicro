@@ -11,7 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { LogOut, Save, Package, User, LayoutDashboard, FileText, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { orderStatusConfig, getStatusLabel } from "@/components/order/orderStatusConfig";
 import AccountDashboard from "@/components/account/AccountDashboard";
+import OrderStatusTimeline from "@/components/order/OrderStatusTimeline";
 
 interface QuoteRequest {
   id: string;
@@ -109,13 +111,15 @@ const Account = () => {
     navigate("/");
   };
 
-  const statusColor = (status: string) => {
-    switch (status) {
-      case "completed": return "chip chip-success";
-      case "processing": return "chip chip-info";
-      case "pending": return "chip chip-warning";
-      default: return "chip";
-    }
+  const getOrderStatusBadge = (status: string) => {
+    const cfg = orderStatusConfig[status] || orderStatusConfig["pending"];
+    const StatusIcon = cfg.icon;
+    return (
+      <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}>
+        <StatusIcon className="h-3 w-3" />
+        {getStatusLabel(status, lang as "en" | "ru")}
+      </span>
+    );
   };
 
   const quoteStatusConfig: Record<string, { label: { en: string; ru: string }; color: string; bg: string; icon: React.ElementType }> = {
@@ -215,7 +219,7 @@ const Account = () => {
                           </Link>
                         </TableCell>
                         <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell><span className={statusColor(order.status)}>{order.status}</span></TableCell>
+                        <TableCell>{getOrderStatusBadge(order.status)}</TableCell>
                         <TableCell className="text-right font-medium">
                           {order.currency === "USD" ? "$" : "₽"}{order.total_amount.toFixed(2)}
                         </TableCell>
