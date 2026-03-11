@@ -1,75 +1,45 @@
 import { Link } from "react-router-dom";
 import { useI18n } from "@/contexts/I18nContext";
-import logo from "@/assets/logo.png";
 
 const Footer = () => {
-  const { lang } = useI18n();
+  const { t } = useI18n();
 
   return (
     <footer className="bg-primary text-primary-foreground">
-      <div className="container py-14 grid grid-cols-1 md:grid-cols-3 gap-10">
-        {/* Column 1: Logo + Description */}
+      <div className="container py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
         <div>
-          <div className="flex items-center gap-2.5 mb-4">
-            <img src={logo} alt="SibMicro" className="h-7 w-7" />
-            <span className="text-lg font-bold tracking-tight">SibMicro</span>
-          </div>
-          <p className="text-sm text-primary-foreground/60 leading-relaxed max-w-xs">
-            {lang === "ru"
-              ? "SibMicro — Дистрибуция электронных компонентов"
-              : "SibMicro — Electronic Components Distribution"}
-          </p>
+          <h3 className="text-lg font-bold tracking-tight mb-3">SibMicro</h3>
+          <p className="text-sm text-primary-foreground/60 leading-relaxed">{t("footer.desc")}</p>
         </div>
-
-        {/* Column 2: Navigation */}
         <div>
-          <h4 className="text-[11px] font-semibold uppercase tracking-widest text-primary-foreground/40 mb-4">
-            {lang === "ru" ? "Навигация" : "Navigation"}
-          </h4>
+          <h4 className="text-[11px] font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">{t("footer.products")}</h4>
           <ul className="space-y-2.5 text-sm">
-            <li>
-              <Link to="/catalog" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                {lang === "ru" ? "Поиск компонентов" : "Component Search"}
-              </Link>
-            </li>
-            <li>
-              <Link to="/manufacturers" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                {lang === "ru" ? "Поставщики" : "Suppliers"}
-              </Link>
-            </li>
-            <li>
-              <Link to="/resources" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                {lang === "ru" ? "О компании" : "About"}
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                {lang === "ru" ? "Контакты" : "Contacts"}
-              </Link>
-            </li>
+            <li><Link to="/catalog?category=semiconductors" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">{t("footer.semiconductors")}</Link></li>
+            <li><Link to="/catalog?category=passive-components" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">{t("footer.passive")}</Link></li>
+            <li><Link to="/catalog?category=rf-microwave" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">{t("footer.rf")}</Link></li>
+            <li><Link to="/catalog?category=connectors" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">{t("footer.connectors")}</Link></li>
           </ul>
         </div>
-
-        {/* Column 3: Contact */}
         <div>
-          <h4 className="text-[11px] font-semibold uppercase tracking-widest text-primary-foreground/40 mb-4">
-            {lang === "ru" ? "Контакты" : "Contact"}
-          </h4>
+          <h4 className="text-[11px] font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">{t("footer.services")}</h4>
+          <ul className="space-y-2.5 text-sm">
+            <li><Link to="/quote" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">{t("footer.request_quote")}</Link></li>
+            <li><Link to="/bom" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">{t("footer.bom_upload")}</Link></li>
+            <li><Link to="/resources" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">{t("footer.tech_resources")}</Link></li>
+            <li><Link to="/contact" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">{t("footer.contact_sales")}</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="text-[11px] font-semibold uppercase tracking-widest text-primary-foreground/50 mb-4">{t("footer.contact")}</h4>
           <ul className="space-y-2.5 text-sm text-primary-foreground/70">
-            <li>{lang === "ru" ? "Москва, ул. Грайвороновская, 23" : "Moscow, Graivoronovskaya street 23"}</li>
-            <li>
-              <a href="mailto:main@sibmicro.ru" className="hover:text-primary-foreground transition-colors">
-                main@sibmicro.ru
-              </a>
-            </li>
+            <li>+7 (495) 123-45-67</li>
+            <li>sales@sibmicro.ru</li>
+            <li>Moscow, Russia</li>
           </ul>
         </div>
       </div>
-
       <div className="border-t border-primary-foreground/10">
-        <div className="container py-5 text-xs text-primary-foreground/40 text-center">
-          © SibMicro
-        </div>
+        <div className="container py-5 text-xs text-primary-foreground/40 text-center">{t("footer.rights")}</div>
       </div>
     </footer>
   );
