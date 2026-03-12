@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      catalog_products: {
+        Row: {
+          category: string | null
+          created_at: string
+          currency: string | null
+          datasheet_url: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_new: boolean | null
+          manufacturer: string | null
+          package: string | null
+          part_number: string
+          price: number | null
+          quantity: number
+          subcategory: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          currency?: string | null
+          datasheet_url?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_new?: boolean | null
+          manufacturer?: string | null
+          package?: string | null
+          part_number: string
+          price?: number | null
+          quantity?: number
+          subcategory?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          currency?: string | null
+          datasheet_url?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_new?: boolean | null
+          manufacturer?: string | null
+          package?: string | null
+          part_number?: string
+          price?: number | null
+          quantity?: number
+          subcategory?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inventory: {
         Row: {
           created_at: string | null
