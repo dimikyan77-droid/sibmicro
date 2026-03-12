@@ -172,6 +172,61 @@ const Index = () => {
         </div>
       </section>
 
+      {/* New Products from DB */}
+      {newProducts.length > 0 && (
+        <section className="bg-accent/5 border-y border-border">
+          <div className="container py-12">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-accent" />
+                <h2 className="text-2xl font-bold text-foreground">{t("header.new_products")}</h2>
+              </div>
+              <Link to="/new-products" className="text-sm text-accent hover:underline flex items-center gap-1">
+                {t("index.view_all")} <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {newProducts.map((p) => {
+                const sym = p.currency === "USD" ? "$" : p.currency === "EUR" ? "€" : "₽";
+                return (
+                  <Link
+                    key={p.id}
+                    to={`/catalog?q=${encodeURIComponent(p.part_number)}`}
+                    className="group rounded-lg border border-border bg-card p-4 hover:shadow-md hover:border-accent transition-all"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs text-muted-foreground">{p.manufacturer || "—"}</span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 border border-accent/30 px-2 py-0.5 text-[10px] font-bold text-accent">
+                        <Sparkles className="h-2.5 w-2.5" />
+                        {lang === "ru" ? "Новинка" : "New"}
+                      </span>
+                    </div>
+                    <div className="text-sm font-semibold text-primary group-hover:text-accent transition-colors font-mono">
+                      {p.part_number}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
+                      {p.description || "—"}
+                    </p>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                      <div>
+                        {p.price ? (
+                          <div className="text-sm font-bold text-foreground">{sym}{Number(p.price).toLocaleString()}</div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">{lang === "ru" ? "По запросу" : "On request"}</span>
+                        )}
+                      </div>
+                      <span className={`text-[10px] font-semibold rounded-full px-2 py-0.5 ${p.quantity > 0 ? "bg-emerald-500/15 text-emerald-600" : "bg-amber-500/15 text-amber-600"}`}>
+                        {p.quantity > 0 ? `${p.quantity.toLocaleString()} ${lang === "ru" ? "шт." : "pcs"}` : lang === "ru" ? "Под заказ" : "On order"}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Manufacturers */}
       <section className="container py-12">
         <h2 className="text-2xl font-bold text-foreground mb-6">{t("index.auth_manufacturers")}</h2>
