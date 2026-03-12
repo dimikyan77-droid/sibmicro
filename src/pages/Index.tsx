@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Search, Cpu, Radio, CircuitBoard, Cable, Gauge, Lightbulb, ArrowRight, Shield, Truck, Headphones, Wrench, Zap, MemoryStick } from "lucide-react";
+import { Search, Cpu, Radio, CircuitBoard, Cable, Gauge, Lightbulb, ArrowRight, Shield, Truck, Headphones, Wrench, Zap, MemoryStick, Sparkles } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
 import heroImg from "@/assets/hero-electronics.jpg";
 import { categories, manufacturers, products } from "@/data/mockData";
