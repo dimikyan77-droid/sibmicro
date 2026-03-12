@@ -25,6 +25,8 @@ import Resources from "./pages/Resources";
 import Bom from "./pages/Bom";
 import Inventory from "./pages/Inventory";
 import AdminOrders from "./pages/AdminOrders";
+import AdminProducts from "./pages/AdminProducts";
+import NewProducts from "./pages/NewProducts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
