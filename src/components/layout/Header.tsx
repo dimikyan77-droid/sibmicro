@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, ChevronDown, ChevronRight, Globe, LogIn, Warehouse } from "lucide-react";
+import { ShoppingCart, User, Menu, X, ChevronDown, ChevronRight, Globe, LogIn, Warehouse, ShieldCheck } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 import { categories } from "@/data/mockData";
 import { useI18n } from "@/contexts/I18nContext";
