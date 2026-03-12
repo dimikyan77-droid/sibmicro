@@ -19,6 +19,18 @@ const Header = () => {
   const { user } = useAuth();
   const { totalItems } = useCart();
 
+  // Check admin role
+  const { data: isAdmin } = useQuery({
+    queryKey: ["user-role-admin-header", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      return !!data;
+    },
+    enabled: !!user,
+    staleTime: 300_000,
+  });
+
   const isActiveRoute = (path: string) => {
     if (path === "/catalog") {
       return location.pathname === "/catalog" && !location.search;
