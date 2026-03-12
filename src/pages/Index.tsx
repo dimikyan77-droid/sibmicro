@@ -20,7 +20,22 @@ const iconMap: Record<string, React.ReactNode> = {
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const { t, tc } = useI18n();
+  const { t, tc, lang } = useI18n();
+
+  // Fetch new products from DB
+  const { data: newProducts = [] } = useQuery({
+    queryKey: ["new-catalog-products-home"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("catalog_products")
+        .select("id, part_number, manufacturer, description, quantity, price, currency, is_new, created_at")
+        .eq("is_new", true)
+        .order("created_at", { ascending: false })
+        .limit(4);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
