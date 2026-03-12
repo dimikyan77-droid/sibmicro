@@ -25,6 +25,8 @@ import Resources from "./pages/Resources";
 import Bom from "./pages/Bom";
 import Inventory from "./pages/Inventory";
 import AdminOrders from "./pages/AdminOrders";
+import AdminProducts from "./pages/AdminProducts";
+import NewProducts from "./pages/NewProducts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,7 +59,9 @@ const App = () => (
                   <Route path="/resources" element={<Resources />} />
                   <Route path="/bom" element={<Bom />} />
                   <Route path="/inventory" element={<Inventory />} />
+                  <Route path="/new-products" element={<NewProducts />} />
                   <Route path="/admin/orders" element={<AdminOrders />} />
+                  <Route path="/admin/products" element={<AdminProducts />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CompareBar />

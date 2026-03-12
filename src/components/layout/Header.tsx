@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, ChevronDown, ChevronRight, Globe, LogIn, Warehouse } from "lucide-react";
+import { ShoppingCart, User, Menu, X, ChevronDown, ChevronRight, Globe, LogIn, Warehouse, ShieldCheck } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 import { categories } from "@/data/mockData";
 import { useI18n } from "@/contexts/I18nContext";
@@ -16,6 +18,18 @@ const Header = () => {
   const { lang, setLang, t, tc } = useI18n();
   const { user } = useAuth();
   const { totalItems } = useCart();
+
+  // Check admin role
+  const { data: isAdmin } = useQuery({
+    queryKey: ["user-role-admin-header", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      return !!data;
+    },
+    enabled: !!user,
+    staleTime: 300_000,
+  });
 
   const isActiveRoute = (path: string) => {
     if (path === "/catalog") {
@@ -45,6 +59,16 @@ const Header = () => {
               <Link to="/inventory" className="hover:underline flex items-center gap-1">
                 <Warehouse className="h-3 w-3" />{t("inventory.title").split("/")[0].trim()}
               </Link>
+            )}
+            {isAdmin && (
+              <>
+                <Link to="/admin/orders" className="hover:underline flex items-center gap-1">
+                  <ShieldCheck className="h-3 w-3" />{lang === "ru" ? "Заказы" : "Orders"}
+                </Link>
+                <Link to="/admin/products" className="hover:underline flex items-center gap-1">
+                  <ShieldCheck className="h-3 w-3" />{lang === "ru" ? "Каталог" : "Catalog"}
+                </Link>
+              </>
             )}
             <button
               onClick={() => setLang(lang === "en" ? "ru" : "en")}

@@ -1,0 +1,1 @@
+ALTER TABLE public.catalog_products ADD CONSTRAINT catalog_products_part_number_key UNIQUE (part_number);
