@@ -60,6 +60,16 @@ const Header = () => {
                 <Warehouse className="h-3 w-3" />{t("inventory.title").split("/")[0].trim()}
               </Link>
             )}
+            {isAdmin && (
+              <>
+                <Link to="/admin/orders" className="hover:underline flex items-center gap-1">
+                  <ShieldCheck className="h-3 w-3" />{lang === "ru" ? "Заказы" : "Orders"}
+                </Link>
+                <Link to="/admin/products" className="hover:underline flex items-center gap-1">
+                  <ShieldCheck className="h-3 w-3" />{lang === "ru" ? "Каталог" : "Catalog"}
+                </Link>
+              </>
+            )}
             <button
               onClick={() => setLang(lang === "en" ? "ru" : "en")}
               className="flex items-center gap-1 hover:underline font-medium"
