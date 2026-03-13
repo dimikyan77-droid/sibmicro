@@ -603,7 +603,7 @@ const Catalog = () => {
               ) : (
                 /* Grid view */
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {filteredProducts.map((p) => {
+                  {paginatedProducts.map((p) => {
                     const badge = getAvailabilityBadge(p);
                     const added = addedIds.has(p.id);
                     return (
