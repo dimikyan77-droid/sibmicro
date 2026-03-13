@@ -251,19 +251,19 @@ const Catalog = () => {
 
   const categoryProductCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const p of products) {
+    for (const p of allProducts) {
       const cat = p.category;
       counts[cat] = (counts[cat] || 0) + 1;
     }
     return counts;
-  }, []);
+  }, [allProducts]);
 
   const stockCounts = useMemo(() => {
-    const inStock = products.filter((p) => p.stock > 0).length;
-    const onOrder = products.filter((p) => p.stock === 0 && p.leadTime !== "Contact").length;
-    const preorder = products.filter((p) => p.leadTime === "Contact").length;
+    const inStock = allProducts.filter((p) => p.stock > 0).length;
+    const onOrder = allProducts.filter((p) => p.stock === 0 && p.leadTime !== "Contact").length;
+    const preorder = allProducts.filter((p) => p.leadTime === "Contact").length;
     return { inStock, onOrder, preorder };
-  }, []);
+  }, [allProducts]);
 
   const activeFilterCount = Object.values(filters).flat().length;
   const showExternalSearch = query && filteredProducts.length === 0;
