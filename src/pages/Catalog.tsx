@@ -239,15 +239,6 @@ const Catalog = () => {
       .sort(([a], [b]) => a.localeCompare(b))
       .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
   }, [mfgSearch, inventoryManufacturerCounts, allProducts]);
-    if (inventoryManufacturerCounts) {
-      for (const [m, invCount] of Object.entries(inventoryManufacturerCounts)) {
-        counts[m] = (counts[m] || 0) + invCount;
-      }
-    }
-    return Object.entries(counts)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
-  }, [mfgSearch, inventoryManufacturerCounts]);
 
   const categoryProductCounts = useMemo(() => {
     const counts: Record<string, number> = {};
