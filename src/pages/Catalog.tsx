@@ -553,7 +553,7 @@ const Catalog = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProducts.map((p) => {
+                      {paginatedProducts.map((p) => {
                         const badge = getAvailabilityBadge(p);
                         const added = addedIds.has(p.id);
                         return (
