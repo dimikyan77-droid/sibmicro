@@ -40,6 +40,45 @@ const Catalog = () => {
   const searchTerm = query || localSearch;
   const inventorySearch = useInventorySearch(searchTerm);
 
+  // Fetch catalog products from DB
+  const { data: catalogProducts } = useQuery({
+    queryKey: ["catalog-products-all"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("catalog_products")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    staleTime: 60_000,
+  });
+
+  // Convert DB products to Product interface
+  const dbProducts: Product[] = useMemo(() => {
+    if (!catalogProducts) return [];
+    return catalogProducts.map((cp) => ({
+      id: `cp-${cp.id}`,
+      partNumber: cp.part_number,
+      manufacturer: cp.manufacturer || "Unknown",
+      category: cp.category || "Other",
+      subcategory: cp.subcategory || "",
+      description: cp.description || cp.part_number,
+      package: cp.package || "",
+      temperatureRange: "",
+      rohs: true,
+      stock: cp.quantity,
+      leadTime: cp.quantity > 0 ? "In Stock" : "Contact",
+      priceTiers: [{ qty: 1, price: cp.price ?? 0 }],
+      moq: 1,
+      datasheetUrl: cp.datasheet_url || "",
+      image: cp.image_url || undefined,
+    }));
+  }, [catalogProducts]);
+
+  // Merge mock + DB products
+  const allProducts = useMemo(() => [...products, ...dbProducts], [dbProducts]);
+
   // Fetch distinct manufacturers from inventory DB
   const { data: inventoryManufacturerCounts } = useQuery({
     queryKey: ["inventory-manufacturer-counts"],
@@ -107,7 +146,7 @@ const Catalog = () => {
   }, [addToCart, t]);
 
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    let result = [...allProducts];
 
     // Global query from URL
     if (query) {
@@ -172,7 +211,7 @@ const Catalog = () => {
     });
 
     return result;
-  }, [query, localSearch, categorySlug, subSlug, filters, sortKey, sortDir, inStockOnly]);
+  }, [query, localSearch, categorySlug, subSlug, filters, sortKey, sortDir, inStockOnly, allProducts]);
 
   // Auto-search external sources when local results are empty and there's a query
   useEffect(() => {
@@ -187,7 +226,7 @@ const Catalog = () => {
 
   const uniqueManufacturers = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const p of products) {
+    for (const p of allProducts) {
       counts[p.manufacturer] = (counts[p.manufacturer] || 0) + 1;
     }
     // Merge manufacturers from inventory DB with their counts
@@ -199,23 +238,23 @@ const Catalog = () => {
     return Object.entries(counts)
       .sort(([a], [b]) => a.localeCompare(b))
       .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
-  }, [mfgSearch, inventoryManufacturerCounts]);
+  }, [mfgSearch, inventoryManufacturerCounts, allProducts]);
 
   const categoryProductCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const p of products) {
+    for (const p of allProducts) {
       const cat = p.category;
       counts[cat] = (counts[cat] || 0) + 1;
     }
     return counts;
-  }, []);
+  }, [allProducts]);
 
   const stockCounts = useMemo(() => {
-    const inStock = products.filter((p) => p.stock > 0).length;
-    const onOrder = products.filter((p) => p.stock === 0 && p.leadTime !== "Contact").length;
-    const preorder = products.filter((p) => p.leadTime === "Contact").length;
+    const inStock = allProducts.filter((p) => p.stock > 0).length;
+    const onOrder = allProducts.filter((p) => p.stock === 0 && p.leadTime !== "Contact").length;
+    const preorder = allProducts.filter((p) => p.leadTime === "Contact").length;
     return { inStock, onOrder, preorder };
-  }, []);
+  }, [allProducts]);
 
   const activeFilterCount = Object.values(filters).flat().length;
   const showExternalSearch = query && filteredProducts.length === 0;
@@ -459,7 +498,7 @@ const Catalog = () => {
               {/* Count */}
               {(filteredProducts.length > 0 || !hasWarehouseItems) && (
               <div className="text-sm text-muted-foreground mb-4">
-                {t("catalog.shown_of")} <span className="font-bold text-foreground">{filteredProducts.length}</span> {t("catalog.of")} {products.length} {t("catalog.products")}
+                {t("catalog.shown_of")} <span className="font-bold text-foreground">{filteredProducts.length}</span> {t("catalog.of")} {allProducts.length} {t("catalog.products")}
               </div>
               )}
 
