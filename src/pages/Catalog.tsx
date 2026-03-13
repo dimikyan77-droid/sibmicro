@@ -526,7 +526,7 @@ const Catalog = () => {
               {/* Count */}
               {(filteredProducts.length > 0 || !hasWarehouseItems) && (
               <div className="text-sm text-muted-foreground mb-4">
-                {t("catalog.shown_of")} <span className="font-bold text-foreground">{filteredProducts.length}</span> {t("catalog.of")} {allProducts.length} {t("catalog.products")}
+                {t("catalog.shown_of")} <span className="font-bold text-foreground">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}</span> {t("catalog.of")} {filteredProducts.length} {t("catalog.products")}
               </div>
               )}
 
