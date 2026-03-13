@@ -34,6 +34,8 @@ const Catalog = () => {
   const [authorizedOnly, setAuthorizedOnly] = useState(false);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({ category: true, manufacturer: true, availability: true });
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 24;
 
   const octopart = useOctopartSearch();
   const digikey = useDigiKeySearch();
