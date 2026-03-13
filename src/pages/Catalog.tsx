@@ -34,6 +34,8 @@ const Catalog = () => {
   const [authorizedOnly, setAuthorizedOnly] = useState(false);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({ category: true, manufacturer: true, availability: true });
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 24;
 
   const octopart = useOctopartSearch();
   const digikey = useDigiKeySearch();
@@ -212,6 +214,32 @@ const Catalog = () => {
 
     return result;
   }, [query, localSearch, categorySlug, subSlug, filters, sortKey, sortDir, inStockOnly, allProducts]);
+
+  // Reset page when filters/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query, localSearch, categorySlug, subSlug, filters, sortKey, sortDir, inStockOnly]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage, ITEMS_PER_PAGE]);
+
+  const getPageNumbers = () => {
+    const pages: (number | "ellipsis")[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("ellipsis");
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push("ellipsis");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   // Auto-search external sources when local results are empty and there's a query
   useEffect(() => {
@@ -498,7 +526,7 @@ const Catalog = () => {
               {/* Count */}
               {(filteredProducts.length > 0 || !hasWarehouseItems) && (
               <div className="text-sm text-muted-foreground mb-4">
-                {t("catalog.shown_of")} <span className="font-bold text-foreground">{filteredProducts.length}</span> {t("catalog.of")} {allProducts.length} {t("catalog.products")}
+                {t("catalog.shown_of")} <span className="font-bold text-foreground">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}</span> {t("catalog.of")} {filteredProducts.length} {t("catalog.products")}
               </div>
               )}
 
@@ -525,7 +553,7 @@ const Catalog = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredProducts.map((p) => {
+                      {paginatedProducts.map((p) => {
                         const badge = getAvailabilityBadge(p);
                         const added = addedIds.has(p.id);
                         return (
@@ -575,7 +603,7 @@ const Catalog = () => {
               ) : (
                 /* Grid view */
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {filteredProducts.map((p) => {
+                  {paginatedProducts.map((p) => {
                     const badge = getAvailabilityBadge(p);
                     const added = addedIds.has(p.id);
                     return (
@@ -608,6 +636,43 @@ const Catalog = () => {
                   })}
                 </div>
               ))}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <nav className="flex items-center justify-center gap-1 mt-6" aria-label="Pagination">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-2 rounded-md text-sm font-medium border border-border bg-card text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    ←
+                  </button>
+                  {getPageNumbers().map((page, i) =>
+                    page === "ellipsis" ? (
+                      <span key={`e-${i}`} className="px-2 text-muted-foreground">…</span>
+                    ) : (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`min-w-[36px] px-2 py-2 rounded-md text-sm font-medium transition-colors ${
+                          currentPage === page
+                            ? "bg-primary text-primary-foreground"
+                            : "border border-border bg-card text-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-2 rounded-md text-sm font-medium border border-border bg-card text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    →
+                  </button>
+                </nav>
+              )}
 
             </div>
           </div>
