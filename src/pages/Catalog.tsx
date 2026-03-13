@@ -226,10 +226,19 @@ const Catalog = () => {
 
   const uniqueManufacturers = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const p of products) {
+    for (const p of allProducts) {
       counts[p.manufacturer] = (counts[p.manufacturer] || 0) + 1;
     }
     // Merge manufacturers from inventory DB with their counts
+    if (inventoryManufacturerCounts) {
+      for (const [m, invCount] of Object.entries(inventoryManufacturerCounts)) {
+        counts[m] = (counts[m] || 0) + invCount;
+      }
+    }
+    return Object.entries(counts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .filter(([name]) => !mfgSearch || name.toLowerCase().includes(mfgSearch.toLowerCase()));
+  }, [mfgSearch, inventoryManufacturerCounts, allProducts]);
     if (inventoryManufacturerCounts) {
       for (const [m, invCount] of Object.entries(inventoryManufacturerCounts)) {
         counts[m] = (counts[m] || 0) + invCount;
