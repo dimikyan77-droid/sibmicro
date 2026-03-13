@@ -40,6 +40,45 @@ const Catalog = () => {
   const searchTerm = query || localSearch;
   const inventorySearch = useInventorySearch(searchTerm);
 
+  // Fetch catalog products from DB
+  const { data: catalogProducts } = useQuery({
+    queryKey: ["catalog-products-all"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("catalog_products")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    staleTime: 60_000,
+  });
+
+  // Convert DB products to Product interface
+  const dbProducts: Product[] = useMemo(() => {
+    if (!catalogProducts) return [];
+    return catalogProducts.map((cp) => ({
+      id: `cp-${cp.id}`,
+      partNumber: cp.part_number,
+      manufacturer: cp.manufacturer || "Unknown",
+      category: cp.category || "Other",
+      subcategory: cp.subcategory || "",
+      description: cp.description || cp.part_number,
+      package: cp.package || "",
+      temperatureRange: "",
+      rohs: true,
+      stock: cp.quantity,
+      leadTime: cp.quantity > 0 ? "In Stock" : "Contact",
+      priceTiers: [{ qty: 1, price: cp.price ?? 0 }],
+      moq: 1,
+      datasheetUrl: cp.datasheet_url || "",
+      image: cp.image_url || undefined,
+    }));
+  }, [catalogProducts]);
+
+  // Merge mock + DB products
+  const allProducts = useMemo(() => [...products, ...dbProducts], [dbProducts]);
+
   // Fetch distinct manufacturers from inventory DB
   const { data: inventoryManufacturerCounts } = useQuery({
     queryKey: ["inventory-manufacturer-counts"],
