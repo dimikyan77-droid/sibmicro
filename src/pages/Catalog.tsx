@@ -146,7 +146,7 @@ const Catalog = () => {
   }, [addToCart, t]);
 
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    let result = [...allProducts];
 
     // Global query from URL
     if (query) {
