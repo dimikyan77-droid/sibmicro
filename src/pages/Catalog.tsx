@@ -215,6 +215,32 @@ const Catalog = () => {
     return result;
   }, [query, localSearch, categorySlug, subSlug, filters, sortKey, sortDir, inStockOnly, allProducts]);
 
+  // Reset page when filters/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query, localSearch, categorySlug, subSlug, filters, sortKey, sortDir, inStockOnly]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage, ITEMS_PER_PAGE]);
+
+  const getPageNumbers = () => {
+    const pages: (number | "ellipsis")[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("ellipsis");
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push("ellipsis");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
   // Auto-search external sources when local results are empty and there's a query
   useEffect(() => {
     if (query && filteredProducts.length === 0) {
