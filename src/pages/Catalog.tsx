@@ -211,7 +211,7 @@ const Catalog = () => {
     });
 
     return result;
-  }, [query, localSearch, categorySlug, subSlug, filters, sortKey, sortDir, inStockOnly]);
+  }, [query, localSearch, categorySlug, subSlug, filters, sortKey, sortDir, inStockOnly, allProducts]);
 
   // Auto-search external sources when local results are empty and there's a query
   useEffect(() => {
