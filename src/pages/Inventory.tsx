@@ -48,6 +48,17 @@ const Inventory = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [defaultCurrency, setDefaultCurrency] = useState<"USD" | "RUB" | "EUR">("USD");
 
+  // Check admin role
+  const { data: isAdmin } = useQuery({
+    queryKey: ["user-role-admin-inventory", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      return !!data;
+    },
+    enabled: !!user,
+  });
+
   // Fetch inventory
   const { data: inventory = [], isLoading } = useQuery({
     queryKey: ["inventory", searchQuery],
