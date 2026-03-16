@@ -70,7 +70,7 @@ const Catalog = () => {
       temperatureRange: "",
       rohs: true,
       stock: cp.quantity,
-      leadTime: cp.quantity > 0 ? "In Stock" : "Contact",
+      leadTime: "Order",
       priceTiers: [{ qty: 1, price: cp.price ?? 0 }],
       moq: 1,
       datasheetUrl: cp.datasheet_url || "",
