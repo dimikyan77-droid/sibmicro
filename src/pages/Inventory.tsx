@@ -258,33 +258,35 @@ const Inventory = () => {
             <h1 className="text-2xl font-bold text-foreground">{t("inventory.title")}</h1>
             <p className="text-muted-foreground">{t("inventory.subtitle")}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <select
-              value={defaultCurrency}
-              onChange={(e) => setDefaultCurrency(e.target.value as "USD" | "RUB" | "EUR")}
-              className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
-            >
-              <option value="USD">$ USD</option>
-              <option value="RUB">₽ RUB</option>
-              <option value="EUR">€ EUR</option>
-            </select>
-            <Label htmlFor="file-upload" className="cursor-pointer">
-              <Button asChild variant="default" disabled={uploading}>
-                <span className="flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  {t("inventory.upload")}
-                  <input
-                    id="file-upload"
-                    type="file"
-                    accept=".csv,.xlsx,.xls"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                    disabled={uploading}
-                  />
-                </span>
-              </Button>
-            </Label>
-          </div>
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <select
+                value={defaultCurrency}
+                onChange={(e) => setDefaultCurrency(e.target.value as "USD" | "RUB" | "EUR")}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
+              >
+                <option value="USD">$ USD</option>
+                <option value="RUB">₽ RUB</option>
+                <option value="EUR">€ EUR</option>
+              </select>
+              <Label htmlFor="file-upload" className="cursor-pointer">
+                <Button asChild variant="default" disabled={uploading}>
+                  <span className="flex items-center gap-2">
+                    <Upload className="h-4 w-4" />
+                    {t("inventory.upload")}
+                    <input
+                      id="file-upload"
+                      type="file"
+                      accept=".csv,.xlsx,.xls"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                    />
+                  </span>
+                </Button>
+              </Label>
+            </div>
+          )}
         </div>
 
         {/* Stats */}
