@@ -415,7 +415,7 @@ const Inventory = () => {
                       <TableHead>{t("catalog.description")}</TableHead>
                       <TableHead className="text-right">{t("order.quantity")}</TableHead>
                       <TableHead className="text-right">{t("catalog.price")}</TableHead>
-                      <TableHead></TableHead>
+                      {isAdmin && <TableHead></TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
