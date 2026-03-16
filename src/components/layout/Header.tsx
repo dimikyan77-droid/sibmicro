@@ -56,7 +56,7 @@ const Header = () => {
             <Link to="/quote" className="hover:underline">{t("header.request_quote")}</Link>
             <Link to="/bom" className="hover:underline">{t("header.bom_upload")}</Link>
             {user && (
-              <Link to="/inventory" className="hover:underline flex items-center gap-1">
+              <Link to="/catalog" className="hover:underline flex items-center gap-1">
                 <Warehouse className="h-3 w-3" />{t("inventory.title").split("/")[0].trim()}
               </Link>
             )}
