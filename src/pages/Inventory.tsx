@@ -387,21 +387,23 @@ const Inventory = () => {
               <div className="p-16 text-center">
                 <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground mb-4">{t("inventory.empty")}</p>
-                <Label htmlFor="file-upload-empty" className="cursor-pointer">
-                  <Button asChild variant="outline">
-                    <span className="flex items-center gap-2">
-                      <Upload className="h-4 w-4" />
-                      {t("inventory.upload")}
-                      <input
-                        id="file-upload-empty"
-                        type="file"
-                        accept=".csv,.xlsx,.xls"
-                        className="hidden"
-                        onChange={handleFileUpload}
-                      />
-                    </span>
-                  </Button>
-                </Label>
+                {isAdmin && (
+                  <Label htmlFor="file-upload-empty" className="cursor-pointer">
+                    <Button asChild variant="outline">
+                      <span className="flex items-center gap-2">
+                        <Upload className="h-4 w-4" />
+                        {t("inventory.upload")}
+                        <input
+                          id="file-upload-empty"
+                          type="file"
+                          accept=".csv,.xlsx,.xls"
+                          className="hidden"
+                          onChange={handleFileUpload}
+                        />
+                      </span>
+                    </Button>
+                  </Label>
+                )}
               </div>
             ) : (
               <div className="overflow-auto">
