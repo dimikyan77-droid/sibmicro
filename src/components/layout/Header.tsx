@@ -55,7 +55,7 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <Link to="/quote" className="hover:underline">{t("header.request_quote")}</Link>
             <Link to="/bom" className="hover:underline">{t("header.bom_upload")}</Link>
-            <Link to="/catalog" className="hover:underline flex items-center gap-1">
+            <Link to={isAdmin ? "/inventory" : "/catalog"} className="hover:underline flex items-center gap-1">
               <Warehouse className="h-3 w-3" />{lang === "ru" ? "Склад" : "Warehouse"}
             </Link>
             {isAdmin && (
@@ -155,7 +155,7 @@ const Header = () => {
           </div>
           <Link to="/manufacturers" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/manufacturers") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.manufacturers")}</Link>
           <Link to="/octopart" className={`px-4 py-2.5 font-medium transition-colors ${isActiveRoute("/octopart") ? "text-accent bg-accent/10" : "text-accent hover:bg-muted"}`}>{t("octopart.nav")}</Link>
-          <Link to="/catalog" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/catalog") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.full_catalog")}</Link>
+          <Link to={isAdmin ? "/admin/products" : "/catalog"} className={`px-4 py-2.5 transition-colors ${isActiveRoute("/catalog") || isActiveRoute("/admin/products") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.full_catalog")}</Link>
           <Link to="/new-products" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/new-products") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.new_products")}</Link>
           <Link to="/resources" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/resources") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.resources")}</Link>
           <Link to="/contact" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/contact") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.contact")}</Link>
