@@ -48,6 +48,17 @@ const Inventory = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [defaultCurrency, setDefaultCurrency] = useState<"USD" | "RUB" | "EUR">("USD");
 
+  // Check admin role
+  const { data: isAdmin } = useQuery({
+    queryKey: ["user-role-admin-inventory", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      return !!data;
+    },
+    enabled: !!user,
+  });
+
   // Fetch inventory
   const { data: inventory = [], isLoading } = useQuery({
     queryKey: ["inventory", searchQuery],
@@ -247,33 +258,35 @@ const Inventory = () => {
             <h1 className="text-2xl font-bold text-foreground">{t("inventory.title")}</h1>
             <p className="text-muted-foreground">{t("inventory.subtitle")}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <select
-              value={defaultCurrency}
-              onChange={(e) => setDefaultCurrency(e.target.value as "USD" | "RUB" | "EUR")}
-              className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
-            >
-              <option value="USD">$ USD</option>
-              <option value="RUB">₽ RUB</option>
-              <option value="EUR">€ EUR</option>
-            </select>
-            <Label htmlFor="file-upload" className="cursor-pointer">
-              <Button asChild variant="default" disabled={uploading}>
-                <span className="flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  {t("inventory.upload")}
-                  <input
-                    id="file-upload"
-                    type="file"
-                    accept=".csv,.xlsx,.xls"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                    disabled={uploading}
-                  />
-                </span>
-              </Button>
-            </Label>
-          </div>
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <select
+                value={defaultCurrency}
+                onChange={(e) => setDefaultCurrency(e.target.value as "USD" | "RUB" | "EUR")}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
+              >
+                <option value="USD">$ USD</option>
+                <option value="RUB">₽ RUB</option>
+                <option value="EUR">€ EUR</option>
+              </select>
+              <Label htmlFor="file-upload" className="cursor-pointer">
+                <Button asChild variant="default" disabled={uploading}>
+                  <span className="flex items-center gap-2">
+                    <Upload className="h-4 w-4" />
+                    {t("inventory.upload")}
+                    <input
+                      id="file-upload"
+                      type="file"
+                      accept=".csv,.xlsx,.xls"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                    />
+                  </span>
+                </Button>
+              </Label>
+            </div>
+          )}
         </div>
 
         {/* Stats */}
@@ -374,21 +387,23 @@ const Inventory = () => {
               <div className="p-16 text-center">
                 <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground mb-4">{t("inventory.empty")}</p>
-                <Label htmlFor="file-upload-empty" className="cursor-pointer">
-                  <Button asChild variant="outline">
-                    <span className="flex items-center gap-2">
-                      <Upload className="h-4 w-4" />
-                      {t("inventory.upload")}
-                      <input
-                        id="file-upload-empty"
-                        type="file"
-                        accept=".csv,.xlsx,.xls"
-                        className="hidden"
-                        onChange={handleFileUpload}
-                      />
-                    </span>
-                  </Button>
-                </Label>
+                {isAdmin && (
+                  <Label htmlFor="file-upload-empty" className="cursor-pointer">
+                    <Button asChild variant="outline">
+                      <span className="flex items-center gap-2">
+                        <Upload className="h-4 w-4" />
+                        {t("inventory.upload")}
+                        <input
+                          id="file-upload-empty"
+                          type="file"
+                          accept=".csv,.xlsx,.xls"
+                          className="hidden"
+                          onChange={handleFileUpload}
+                        />
+                      </span>
+                    </Button>
+                  </Label>
+                )}
               </div>
             ) : (
               <div className="overflow-auto">
@@ -400,7 +415,7 @@ const Inventory = () => {
                       <TableHead>{t("catalog.description")}</TableHead>
                       <TableHead className="text-right">{t("order.quantity")}</TableHead>
                       <TableHead className="text-right">{t("catalog.price")}</TableHead>
-                      <TableHead></TableHead>
+                      {isAdmin && <TableHead></TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -413,16 +428,18 @@ const Inventory = () => {
                         <TableCell className="text-right">
                           {item.price ? `${item.currency === "USD" ? "$" : "₽"}${item.price.toLocaleString()}` : "—"}
                         </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteMutation.mutate(item.id)}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                          </Button>
-                        </TableCell>
+                        {isAdmin && (
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteMutation.mutate(item.id)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                            </Button>
+                          </TableCell>
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>
