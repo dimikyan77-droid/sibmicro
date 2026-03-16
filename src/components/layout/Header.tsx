@@ -55,7 +55,7 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <Link to="/quote" className="hover:underline">{t("header.request_quote")}</Link>
             <Link to="/bom" className="hover:underline">{t("header.bom_upload")}</Link>
-            <Link to="/catalog" className="hover:underline flex items-center gap-1">
+            <Link to={isAdmin ? "/inventory" : "/catalog"} className="hover:underline flex items-center gap-1">
               <Warehouse className="h-3 w-3" />{lang === "ru" ? "Склад" : "Warehouse"}
             </Link>
             {isAdmin && (
