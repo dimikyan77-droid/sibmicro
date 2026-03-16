@@ -70,7 +70,7 @@ const Catalog = () => {
       temperatureRange: "",
       rohs: true,
       stock: cp.quantity,
-      leadTime: cp.quantity > 0 ? "In Stock" : "Contact",
+      leadTime: "Order",
       priceTiers: [{ qty: 1, price: cp.price ?? 0 }],
       moq: 1,
       datasheetUrl: cp.datasheet_url || "",
@@ -300,6 +300,9 @@ const Catalog = () => {
   }, [searchTerm, selectedMfgs, inventorySearch.data, inventoryByMfg]);
 
   const getAvailabilityBadge = (p: Product) => {
+    // Catalog products (from DB) are always "Под заказ"
+    if (p.id.startsWith("cp-")) return { label: t("catalog.on_order"), cls: "bg-amber-500/15 text-amber-400 border-amber-500/30" };
+    // Inventory / in-stock items
     if (p.stock > 0) return { label: t("catalog.in_stock"), cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
     if (p.leadTime === "Contact") return { label: t("catalog.preorder"), cls: "bg-violet-500/15 text-violet-400 border-violet-500/30" };
     return { label: t("catalog.on_order"), cls: "bg-amber-500/15 text-amber-400 border-amber-500/30" };
