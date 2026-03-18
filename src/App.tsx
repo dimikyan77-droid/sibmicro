@@ -53,7 +53,8 @@ const App = () => (
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/order/:id" element={<OrderDetail />} />
-                  <Route path="/octopart" element={<OctopartSearch />} />
+                  {/* Octopart temporarily disabled — tokens exhausted */}
+                  <Route path="/octopart" element={<NotFound />} />
                   <Route path="/quote" element={<Quote />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/resources" element={<Resources />} />
