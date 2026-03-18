@@ -118,7 +118,7 @@ const Header = () => {
             onMouseEnter={() => setCategoryMenuOpen(true)}
             onMouseLeave={() => setCategoryMenuOpen(false)}
           >
-            <button className="flex items-center gap-1 px-4 py-2.5 font-medium text-primary hover:bg-muted transition-colors">
+            <button className={`flex items-center gap-1 px-4 py-2.5 font-medium border-b-2 transition-colors ${categoryMenuOpen ? "text-primary border-primary" : "text-primary border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>
               {t("header.products")} <ChevronDown className="h-3.5 w-3.5" />
             </button>
             <div
@@ -153,12 +153,12 @@ const Header = () => {
               ))}
             </div>
           </div>
-          <Link to="/manufacturers" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/manufacturers") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.manufacturers")}</Link>
-          <Link to="/octopart" className={`px-4 py-2.5 font-medium transition-colors ${isActiveRoute("/octopart") ? "text-accent bg-accent/10" : "text-accent hover:bg-muted"}`}>{t("octopart.nav")}</Link>
-          <Link to={isAdmin ? "/admin/products" : "/catalog"} className={`px-4 py-2.5 transition-colors ${isActiveRoute("/catalog") || isActiveRoute("/admin/products") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.full_catalog")}</Link>
-          <Link to="/new-products" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/new-products") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.new_products")}</Link>
-          <Link to="/resources" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/resources") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.resources")}</Link>
-          <Link to="/contact" className={`px-4 py-2.5 transition-colors ${isActiveRoute("/contact") ? "text-primary bg-primary/10 font-medium" : "text-foreground hover:bg-muted"}`}>{t("header.contact")}</Link>
+          <Link to="/manufacturers" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/manufacturers") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.manufacturers")}</Link>
+          <Link to="/octopart" className={`px-4 py-2.5 font-medium border-b-2 transition-colors ${isActiveRoute("/octopart") ? "text-accent border-accent" : "text-accent border-transparent hover:border-accent/40 hover:bg-muted/50"}`}>{t("octopart.nav")}</Link>
+          <Link to={isAdmin ? "/admin/products" : "/catalog"} className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/catalog") || isActiveRoute("/admin/products") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.full_catalog")}</Link>
+          <Link to="/new-products" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/new-products") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.new_products")}</Link>
+          <Link to="/resources" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/resources") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.resources")}</Link>
+          <Link to="/contact" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/contact") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.contact")}</Link>
         </div>
       </nav>
 
