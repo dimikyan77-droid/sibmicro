@@ -154,7 +154,7 @@ const Header = () => {
             </div>
           </div>
           <Link to="/manufacturers" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/manufacturers") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.manufacturers")}</Link>
-          <Link to="/octopart" className={`px-4 py-2.5 font-medium border-b-2 transition-colors ${isActiveRoute("/octopart") ? "text-accent border-accent" : "text-accent border-transparent hover:border-accent/40 hover:bg-muted/50"}`}>{t("octopart.nav")}</Link>
+          {/* Octopart temporarily disabled — tokens exhausted */}
           <Link to={isAdmin ? "/admin/products" : "/catalog"} className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/catalog") || isActiveRoute("/admin/products") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.full_catalog")}</Link>
           <Link to="/new-products" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/new-products") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.new_products")}</Link>
           <Link to="/resources" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/resources") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.resources")}</Link>
