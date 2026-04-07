@@ -27,6 +27,7 @@ import Inventory from "./pages/Inventory";
 import AdminOrders from "./pages/AdminOrders";
 import AdminProducts from "./pages/AdminProducts";
 import NewProducts from "./pages/NewProducts";
+import CrossReference from "./pages/CrossReference";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +62,7 @@ const App = () => (
                   <Route path="/bom" element={<Bom />} />
                   <Route path="/inventory" element={<Inventory />} />
                   <Route path="/new-products" element={<NewProducts />} />
+                  <Route path="/cross-reference" element={<CrossReference />} />
                   <Route path="/admin/orders" element={<AdminOrders />} />
                   <Route path="/admin/products" element={<AdminProducts />} />
                   <Route path="*" element={<NotFound />} />
