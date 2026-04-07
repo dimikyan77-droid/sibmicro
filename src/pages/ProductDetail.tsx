@@ -31,7 +31,81 @@ const generatePriceHistory = (basePrice: number) => {
   return data;
 };
 
-const ProductDetail = () => {
+const RestockNotifyForm = ({ partNumber }: { partNumber: string }) => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = async () => {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Введите корректный email");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.from("restock_notifications" as any).insert({
+        part_number: partNumber,
+        email,
+      } as any);
+      if (error) {
+        if (error.code === "23505") {
+          toast.info("Вы уже подписаны на уведомление");
+          setSubscribed(true);
+        } else {
+          throw error;
+        }
+      } else {
+        setSubscribed(true);
+        toast.success("Вы будете уведомлены о поступлении!");
+      }
+    } catch {
+      toast.error("Ошибка при подписке");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (subscribed) {
+    return (
+      <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-center">
+        <div className="flex items-center justify-center gap-2 text-sm font-medium text-primary">
+          <Bell className="h-4 w-4" />
+          Уведомление оформлено
+        </div>
+        <p className="text-xs text-muted-foreground mt-1">Мы сообщим на {email}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-2">
+      <div className="flex items-center gap-2 text-sm font-medium text-amber-700">
+        <Bell className="h-4 w-4" />
+        Нет в наличии
+      </div>
+      <p className="text-xs text-muted-foreground">Оставьте email — мы уведомим о поступлении</p>
+      <div className="flex gap-2">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="your@email.com"
+          className="flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-sm"
+          onKeyDown={(e) => e.key === "Enter" && handleSubscribe()}
+        />
+        <button
+          onClick={handleSubscribe}
+          disabled={loading}
+          className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+        >
+          {loading ? "..." : "Подписаться"}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
   const { id } = useParams();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const { t, tc } = useI18n();
