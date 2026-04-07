@@ -105,7 +105,7 @@ const RestockNotifyForm = ({ partNumber }: { partNumber: string }) => {
   );
 };
 
-
+const ProductDetail = () => {
   const { id } = useParams();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const { t, tc } = useI18n();
