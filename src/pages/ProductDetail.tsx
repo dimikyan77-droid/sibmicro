@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Bell } from "lucide-react";
 import {
   FileText, ShoppingCart, Heart, GitCompare, Share2, ArrowLeft,
   Download, Copy, Check, Package, Shield, Truck, ExternalLink, TrendingDown, TrendingUp as TrendingUpIcon, Minus,
@@ -277,6 +279,11 @@ const ProductDetail = () => {
                 <button className="w-full rounded-lg border border-primary px-4 py-2.5 text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
                   {t("product.request_quote")}
                 </button>
+
+                {/* Notify when back in stock */}
+                {product.stock === 0 && (
+                  <RestockNotifyForm partNumber={product.partNumber} />
+                )}
               </div>
             </div>
           </div>
