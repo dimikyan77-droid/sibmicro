@@ -27,6 +27,7 @@ import Inventory from "./pages/Inventory";
 import AdminOrders from "./pages/AdminOrders";
 import AdminProducts from "./pages/AdminProducts";
 import NewProducts from "./pages/NewProducts";
+import CrossReference from "./pages/CrossReference";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
