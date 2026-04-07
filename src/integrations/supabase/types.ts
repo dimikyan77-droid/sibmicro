@@ -256,6 +256,33 @@ export type Database = {
         }
         Relationships: []
       }
+      restock_notifications: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string
+          id: string
+          notified_at: string | null
+          part_number: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          notified_at?: string | null
+          part_number: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          notified_at?: string | null
+          part_number?: string
+        }
+        Relationships: []
+      }
       saved_searches: {
         Row: {
           created_at: string
