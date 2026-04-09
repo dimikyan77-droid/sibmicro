@@ -158,6 +158,7 @@ const Header = () => {
           <Link to={isAdmin ? "/admin/products" : "/catalog"} className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/catalog") || isActiveRoute("/admin/products") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.full_catalog")}</Link>
           <Link to="/new-products" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/new-products") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.new_products")}</Link>
           <Link to="/resources" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/resources") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.resources")}</Link>
+          <Link to="/cross-reference" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/cross-reference") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{lang === "ru" ? "Кросс-референс" : "Cross-Reference"}</Link>
           <Link to="/contact" className={`px-4 py-2.5 border-b-2 transition-colors ${isActiveRoute("/contact") ? "text-primary border-primary font-medium" : "text-foreground border-transparent hover:border-primary/40 hover:bg-muted/50"}`}>{t("header.contact")}</Link>
         </div>
       </nav>
