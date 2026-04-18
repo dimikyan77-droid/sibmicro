@@ -97,32 +97,33 @@ const Cart = () => {
         </div>
       </div>
 
-      <div className="container py-8">
-        <h1 className="text-2xl font-bold text-foreground mb-6">{t("cart.title")}</h1>
+      <div className="container py-6 sm:py-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">{t("cart.title")}</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Items */}
           <div className="lg:col-span-2 space-y-3">
             {items.map(({ product, quantity }) => {
               const unitPrice = getUnitPrice(product, quantity);
               const lineTotal = unitPrice * quantity;
               return (
-                <div key={product.id} className="rounded-lg border border-border bg-card p-4 flex items-center gap-4">
-                  <div className="flex-1 min-w-0">
-                    <Link to={`/product/${product.id}`} className="text-sm font-semibold font-mono text-primary hover:text-accent hover:underline">
+                <div key={product.id} className="rounded-lg border border-border bg-card p-3 sm:p-4 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
+                  <div className="flex-1 min-w-0 w-full sm:w-auto">
+                    <Link to={`/product/${product.id}`} className="text-sm font-semibold font-mono text-primary hover:text-accent hover:underline break-all">
                       {product.partNumber}
                     </Link>
-                    <div className="text-xs text-muted-foreground mt-0.5">{product.manufacturer} — {product.description}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{product.manufacturer} — {product.description}</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {t("product.unit_price")}: <span className="font-mono font-medium text-foreground">{formatPrice(unitPrice)}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       onClick={() => updateQuantity(product.id, quantity - 1)}
                       disabled={quantity <= product.moq}
                       className="p-1 rounded border border-border hover:bg-muted disabled:opacity-30 transition-colors"
+                      aria-label="Decrease quantity"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
@@ -131,23 +132,25 @@ const Cart = () => {
                       value={quantity}
                       min={product.moq}
                       onChange={(e) => updateQuantity(product.id, parseInt(e.target.value) || product.moq)}
-                      className="w-16 text-center rounded border border-input bg-background px-2 py-1 text-sm font-mono"
+                      className="w-14 sm:w-16 text-center rounded border border-input bg-background px-1 sm:px-2 py-1 text-sm font-mono"
                     />
                     <button
                       onClick={() => updateQuantity(product.id, quantity + 1)}
                       className="p-1 rounded border border-border hover:bg-muted transition-colors"
+                      aria-label="Increase quantity"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
                   </div>
 
-                  <div className="text-right w-24 shrink-0">
+                  <div className="text-right w-auto sm:w-24 shrink-0 ml-auto sm:ml-0">
                     <div className="text-sm font-bold font-mono">{formatPrice(lineTotal)}</div>
                   </div>
 
                   <button
                     onClick={() => removeFromCart(product.id)}
-                    className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                    className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                    aria-label="Remove"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

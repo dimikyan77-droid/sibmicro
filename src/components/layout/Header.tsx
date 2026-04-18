@@ -47,23 +47,23 @@ const Header = () => {
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 overflow-visible">
       {/* Top bar */}
       <div className="bg-primary">
-        <div className="container flex h-8 items-center justify-between text-xs text-primary-foreground">
-          <div className="flex gap-4">
-            <span>📞 +7 (495) 123-45-67</span>
-            <span className="hidden sm:inline">✉ sales@sibmicro.ru</span>
+        <div className="container flex h-8 items-center justify-between text-xs text-primary-foreground gap-2">
+          <div className="flex gap-4 min-w-0 truncate">
+            <span className="truncate">📞 +7 (495) 123-45-67</span>
+            <span className="hidden md:inline">✉ sales@sibmicro.ru</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Link to="/quote" className="hover:underline">{t("header.request_quote")}</Link>
-            <Link to="/bom" className="hover:underline">{t("header.bom_upload")}</Link>
-            <Link to={isAdmin ? "/inventory" : "/catalog"} className="hover:underline flex items-center gap-1">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+            <Link to="/quote" className="hover:underline hidden sm:inline">{t("header.request_quote")}</Link>
+            <Link to="/bom" className="hover:underline hidden sm:inline">{t("header.bom_upload")}</Link>
+            <Link to={isAdmin ? "/inventory" : "/catalog"} className="hover:underline hidden md:flex items-center gap-1">
               <Warehouse className="h-3 w-3" />{lang === "ru" ? "Склад" : "Warehouse"}
             </Link>
             {isAdmin && (
               <>
-                <Link to="/admin/orders" className="hover:underline flex items-center gap-1">
+                <Link to="/admin/orders" className="hover:underline hidden lg:flex items-center gap-1">
                   <ShieldCheck className="h-3 w-3" />{lang === "ru" ? "Заказы" : "Orders"}
                 </Link>
-                <Link to="/admin/products" className="hover:underline flex items-center gap-1">
+                <Link to="/admin/products" className="hover:underline hidden lg:flex items-center gap-1">
                   <ShieldCheck className="h-3 w-3" />{lang === "ru" ? "Каталог" : "Catalog"}
                 </Link>
               </>
@@ -167,11 +167,11 @@ const Header = () => {
       <div
         className={`lg:hidden border-border bg-background overflow-hidden transition-all duration-300 ease-in-out
           ${mobileMenuOpen
-            ? "max-h-[600px] opacity-100 border-t"
+            ? "max-h-[80vh] opacity-100 border-t overflow-y-auto"
             : "max-h-0 opacity-0 border-t-0"
           }`}
       >
-        <div className={`p-4 space-y-2 transition-transform duration-300 ${mobileMenuOpen ? "translate-y-0" : "-translate-y-2"}`}>
+        <div className={`p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-1 transition-transform duration-300 ${mobileMenuOpen ? "translate-y-0" : "-translate-y-2"}`}>
           {categories.map((cat) => (
             <Link
               key={cat.slug}
@@ -184,7 +184,22 @@ const Header = () => {
           ))}
           <hr className="border-border" />
           <Link to="/manufacturers" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{t("header.manufacturers")}</Link>
+          <Link to="/new-products" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{t("header.new_products")}</Link>
+          <Link to="/cross-reference" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{lang === "ru" ? "Кросс-референс" : "Cross-Reference"}</Link>
+          <Link to="/bom" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{t("header.bom_upload")}</Link>
+          <Link to="/quote" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{t("header.request_quote")}</Link>
+          <Link to="/resources" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{t("header.resources")}</Link>
           <Link to="/contact" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{t("header.contact")}</Link>
+          <hr className="border-border" />
+          <Link to={user ? "/account" : "/auth"} className="block py-2 text-sm font-medium text-primary hover:underline" onClick={() => setMobileMenuOpen(false)}>
+            {user ? t("header.my_account") : t("header.login")}
+          </Link>
+          {isAdmin && (
+            <>
+              <Link to="/admin/orders" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{lang === "ru" ? "Админ: Заказы" : "Admin: Orders"}</Link>
+              <Link to="/admin/products" className="block py-2 text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>{lang === "ru" ? "Админ: Каталог" : "Admin: Catalog"}</Link>
+            </>
+          )}
         </div>
       </div>
     </header>

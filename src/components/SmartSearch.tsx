@@ -175,9 +175,11 @@ const SmartSearch = () => {
           />
           <button
             type="submit"
-            className="absolute right-1 top-1/2 -translate-y-1/2 rounded bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 rounded bg-primary px-2.5 sm:px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors flex items-center gap-1"
+            aria-label={t("header.search")}
           >
-            {t("header.search")}
+            <Search className="h-3.5 w-3.5 sm:hidden" />
+            <span className="hidden sm:inline">{t("header.search")}</span>
           </button>
         </div>
       </form>
