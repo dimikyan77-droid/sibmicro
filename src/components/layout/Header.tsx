@@ -167,11 +167,11 @@ const Header = () => {
       <div
         className={`lg:hidden border-border bg-background overflow-hidden transition-all duration-300 ease-in-out
           ${mobileMenuOpen
-            ? "max-h-[600px] opacity-100 border-t"
+            ? "max-h-[80vh] opacity-100 border-t overflow-y-auto"
             : "max-h-0 opacity-0 border-t-0"
           }`}
       >
-        <div className={`p-4 space-y-2 transition-transform duration-300 ${mobileMenuOpen ? "translate-y-0" : "-translate-y-2"}`}>
+        <div className={`p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-1 transition-transform duration-300 ${mobileMenuOpen ? "translate-y-0" : "-translate-y-2"}`}>
           {categories.map((cat) => (
             <Link
               key={cat.slug}
