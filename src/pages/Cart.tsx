@@ -97,10 +97,10 @@ const Cart = () => {
         </div>
       </div>
 
-      <div className="container py-8">
-        <h1 className="text-2xl font-bold text-foreground mb-6">{t("cart.title")}</h1>
+      <div className="container py-6 sm:py-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">{t("cart.title")}</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Items */}
           <div className="lg:col-span-2 space-y-3">
             {items.map(({ product, quantity }) => {
