@@ -236,6 +236,8 @@ const ProductDetail = () => {
               <img
                 src={product.image || componentPlaceholder}
                 alt={product.partNumber}
+                loading="lazy"
+                decoding="async"
                 className="w-full max-w-[200px] object-contain"
               />
               {product.rohs && (
