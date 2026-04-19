@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/contexts/I18nContext";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, Package, ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,6 +42,11 @@ const NewProducts = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Новинки электронных компонентов | SibMicro"
+        description="Новые поступления электронных компонентов на склад: микроконтроллеры, датчики, силовые элементы. Свежие позиции от ведущих производителей."
+        canonical="https://sibmicro.lovable.app/new-products"
+      />
       <div className="container py-8">
         <div className="flex items-center gap-3 mb-2">
           <Sparkles className="h-6 w-6 text-accent" />

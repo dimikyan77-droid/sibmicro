@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/contexts/I18nContext";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -252,6 +253,12 @@ const Inventory = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Складские остатки и валютная оценка | SibMicro"
+        description="Управление складом электронных компонентов: загрузка остатков, поиск, оценка стоимости в RUB и USD."
+        canonical="https://sibmicro.lovable.app/inventory"
+        noIndex
+      />
       <div className="container py-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
