@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useMemo } from "react";
 import { useI18n } from "@/contexts/I18nContext";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/SEO";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
@@ -391,6 +392,11 @@ const Bom = () => {
 
   return (
     <Layout>
+      <SEO
+        title="BOM-загрузка: проверка наличия компонентов | SibMicro"
+        description="Загрузите Bill of Materials (Excel/CSV) — мгновенно проверим наличие, цены и сроки поставки по складу и DigiKey."
+        canonical="https://sibmicro.lovable.app/bom"
+      />
       <div className="container py-10 max-w-6xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-2">

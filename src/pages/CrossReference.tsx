@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -66,6 +67,11 @@ const CrossReference = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Кросс-референс: поиск аналогов компонентов | SibMicro"
+        description="AI-поиск аналогов и замен электронных компонентов. Введите part number — получите drop-in, функциональные и похожие альтернативы."
+        canonical="https://sibmicro.lovable.app/cross-reference"
+      />
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="text-center space-y-3">

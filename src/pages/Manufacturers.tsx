@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/SEO";
 import { manufacturers } from "@/data/mockData";
 import { useI18n } from "@/contexts/I18nContext";
 
@@ -8,6 +9,11 @@ const Manufacturers = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Производители электронных компонентов | SibMicro"
+        description="Список ведущих производителей электронных компонентов: ST, NXP, Texas Instruments, Analog Devices и другие. Каталоги по брендам."
+        canonical="https://sibmicro.lovable.app/manufacturers"
+      />
       <div className="bg-muted border-b border-border">
         <div className="container py-3 text-xs text-muted-foreground flex items-center gap-1.5">
           <Link to="/" className="hover:text-foreground">{t("catalog.home")}</Link>
