@@ -8,6 +8,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/SEO";
 import { products } from "@/data/mockData";
 import { useCompare } from "@/contexts/CompareContext";
 import { useI18n } from "@/contexts/I18nContext";
@@ -173,8 +174,39 @@ const ProductDetail = () => {
       ? { label: t("catalog.preorder"), cls: "bg-violet-500/15 text-violet-600 border-violet-500/30" }
       : { label: `${product.leadTime}`, cls: "bg-amber-500/15 text-amber-600 border-amber-500/30" };
 
+  const canonical = `https://sibmicro.lovable.app/product/${encodeURIComponent(product.partNumber)}`;
+  const seoTitle = `${product.partNumber} — ${product.manufacturer} | SibMicro`;
+  const seoDesc = product.description || `Buy ${product.partNumber} from ${product.manufacturer}. Datasheet, price, in-stock availability.`;
+  const productJsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.partNumber,
+    sku: product.partNumber,
+    mpn: product.partNumber,
+    description: seoDesc,
+    image: product.image || `https://sibmicro.lovable.app/icon-512.png`,
+    url: canonical,
+    brand: { "@type": "Brand", name: product.manufacturer },
+    category: `${product.category} / ${product.subcategory}`,
+    offers: {
+      "@type": "Offer",
+      price: String(product.priceTiers[0].price),
+      priceCurrency: "USD",
+      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      url: canonical,
+    },
+  };
+
   return (
     <Layout>
+      <SEO
+        title={seoTitle}
+        description={seoDesc}
+        canonical={canonical}
+        image={product.image || undefined}
+        type="product"
+        jsonLd={productJsonLd}
+      />
       {/* Breadcrumb */}
       <div className="bg-muted/50 border-b border-border">
         <div className="container py-3 text-xs text-muted-foreground flex items-center gap-1.5">
