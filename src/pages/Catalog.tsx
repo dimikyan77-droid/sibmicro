@@ -7,6 +7,7 @@ import { products, categories, Product } from "@/data/mockData";
 import { useCompare } from "@/contexts/CompareContext";
 import { useI18n } from "@/contexts/I18nContext";
 import { useCart } from "@/contexts/CartContext";
+import ProductImage from "@/components/ProductImage";
 import { useOctopartSearch, getBestPrice, getTotalStock, type OctopartResult } from "@/hooks/useOctopartSearch";
 import { useDigiKeySearch, getDigiKeyBestPrice, type DigiKeyResult } from "@/hooks/useDigiKeySearch";
 import { useInventorySearch, type InventoryItem } from "@/hooks/useInventorySearch";
@@ -540,6 +541,7 @@ const Catalog = () => {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border">
+                        <th className="px-4 py-3 w-[72px]"></th>
                         <th className="px-4 py-3 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wider cursor-pointer hover:text-foreground" onClick={() => toggleSort("partNumber")}>
                           <span className="flex items-center gap-1">{t("catalog.part_number")} <SortIcon col="partNumber" /></span>
                         </th>
@@ -562,6 +564,16 @@ const Catalog = () => {
                         const added = addedIds.has(p.id);
                         return (
                           <tr key={p.id} className="border-b border-border last:border-0 hover:bg-muted/40 transition-colors">
+                            <td className="px-4 py-3">
+                              <Link to={`/product/${p.id}`} className="block">
+                                <ProductImage
+                                  src={p.image}
+                                  alt={p.partNumber}
+                                  wrapperClassName="h-12 w-12 rounded-md border border-border bg-background"
+                                  className="absolute inset-0 h-full w-full object-contain p-1"
+                                />
+                              </Link>
+                            </td>
                             <td className="px-4 py-3">
                               <Link to={`/product/${p.id}`} className="font-semibold text-foreground hover:text-primary transition-colors">
                                 {p.description.split(",")[0] || p.partNumber}
@@ -596,7 +608,7 @@ const Catalog = () => {
                       })}
                       {filteredProducts.length === 0 && !hasWarehouseItems && (
                         <tr>
-                          <td colSpan={6} className="text-center py-12 text-muted-foreground">
+                          <td colSpan={7} className="text-center py-12 text-muted-foreground">
                             {t("catalog.no_products")}
                           </td>
                         </tr>
@@ -612,6 +624,14 @@ const Catalog = () => {
                     const added = addedIds.has(p.id);
                     return (
                       <div key={p.id} className="rounded-lg border border-border bg-card p-4 hover:shadow-md transition-shadow">
+                        <Link to={`/product/${p.id}`} className="block mb-3">
+                          <ProductImage
+                            src={p.image}
+                            alt={p.partNumber}
+                            wrapperClassName="aspect-square w-full rounded-md border border-border bg-background"
+                            className="absolute inset-0 h-full w-full object-contain p-3"
+                          />
+                        </Link>
                         <Link to={`/product/${p.id}`} className="font-semibold text-foreground hover:text-primary text-sm transition-colors">
                           {p.description.split(",")[0] || p.partNumber}
                         </Link>
