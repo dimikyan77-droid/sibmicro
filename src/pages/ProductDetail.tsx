@@ -14,7 +14,7 @@ import { useCompare } from "@/contexts/CompareContext";
 import { useI18n } from "@/contexts/I18nContext";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import componentPlaceholder from "@/assets/component-placeholder.png";
+import ProductImage from "@/components/ProductImage";
 
 type Tab = "specs" | "docs" | "analogs" | "pricing";
 
@@ -233,12 +233,11 @@ const ProductDetail = () => {
               className={`relative rounded-xl border border-border bg-card p-6 flex items-center justify-center cursor-zoom-in transition-all ${imgZoom ? "scale-150 z-50 shadow-2xl" : ""}`}
               onClick={() => setImgZoom(!imgZoom)}
             >
-              <img
-                src={product.image || componentPlaceholder}
+              <ProductImage
+                src={product.image}
                 alt={product.partNumber}
-                loading="lazy"
-                decoding="async"
-                className="w-full max-w-[200px] object-contain"
+                wrapperClassName="w-full max-w-[200px] aspect-square"
+                className="w-full h-full object-contain"
               />
               {product.rohs && (
                 <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
