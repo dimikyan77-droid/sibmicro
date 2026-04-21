@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useI18n } from "@/contexts/I18nContext";
 import Layout from "@/components/layout/Layout";
+import SEO from "@/components/SEO";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Phone, Mail, Clock, Send, Loader2 } from "lucide-react";
