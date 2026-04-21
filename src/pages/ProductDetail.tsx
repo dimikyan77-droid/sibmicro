@@ -196,6 +196,16 @@ const ProductDetail = () => {
       url: canonical,
     },
   };
+  const breadcrumbJsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: t("catalog.home"), item: "https://sibmicro.lovable.app/" },
+      { "@type": "ListItem", position: 2, name: t("catalog.title"), item: "https://sibmicro.lovable.app/catalog" },
+      { "@type": "ListItem", position: 3, name: product.manufacturer, item: `https://sibmicro.lovable.app/catalog?q=${encodeURIComponent(product.manufacturer)}` },
+      { "@type": "ListItem", position: 4, name: product.partNumber, item: canonical },
+    ],
+  };
 
   return (
     <Layout>
@@ -205,7 +215,7 @@ const ProductDetail = () => {
         canonical={canonical}
         image={product.image || undefined}
         type="product"
-        jsonLd={productJsonLd}
+        jsonLd={[productJsonLd, breadcrumbJsonLd]}
       />
       {/* Breadcrumb */}
       <div className="bg-muted/50 border-b border-border">
