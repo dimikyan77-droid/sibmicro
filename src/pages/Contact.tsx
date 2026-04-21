@@ -56,11 +56,74 @@ const Contact = () => {
   const inputCls =
     "w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary";
 
+  const canonical = "https://sibmicro.lovable.app/contact";
+  const contactJsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "@id": `${canonical}#contactpage`,
+      url: canonical,
+      name: "Контакты SibMicro",
+      description: "Адрес, телефон, email и часы работы SibMicro — поставщика электронных компонентов.",
+      inLanguage: "ru-RU",
+      isPartOf: { "@id": "https://sibmicro.lovable.app/#website" },
+      about: { "@id": "https://sibmicro.lovable.app/#organization" },
+      mainEntity: {
+        "@type": "Organization",
+        "@id": "https://sibmicro.lovable.app/#organization",
+        name: "SibMicro",
+        url: "https://sibmicro.lovable.app/",
+        email: "sales@sibmicro.ru",
+        telephone: "+7 (495) 123-45-67",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Пресненская наб., 12",
+          addressLocality: "Москва",
+          postalCode: "123112",
+          addressCountry: "RU",
+        },
+        contactPoint: [
+          {
+            "@type": "ContactPoint",
+            telephone: "+7-495-123-45-67",
+            email: "sales@sibmicro.ru",
+            contactType: "sales",
+            areaServed: "RU",
+            availableLanguage: ["Russian", "English"],
+          },
+        ],
+        openingHoursSpecification: [
+          {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            opens: "09:00",
+            closes: "18:00",
+          },
+        ],
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: t("catalog.home"), item: "https://sibmicro.lovable.app/" },
+        { "@type": "ListItem", position: 2, name: t("contact.title"), item: canonical },
+      ],
+    },
+  ];
+
   return (
     <Layout>
+      <SEO
+        title="Контакты SibMicro — адрес, телефон, часы работы"
+        description="Свяжитесь с SibMicro: адрес офиса в Москве, телефон +7 (495) 123-45-67, email sales@sibmicro.ru. Часы работы пн–пт 09:00–18:00."
+        canonical={canonical}
+        jsonLd={contactJsonLd}
+      />
       <div className="container py-10">
         <h1 className="text-2xl font-bold text-foreground mb-2">{t("contact.title")}</h1>
         <p className="text-muted-foreground mb-10 max-w-2xl">{t("contact.subtitle")}</p>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Left — info + map */}
