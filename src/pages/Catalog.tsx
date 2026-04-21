@@ -770,6 +770,7 @@ function WarehouseSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-primary/10">
+              <th className="px-4 py-2 w-[60px]"></th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Артикул</th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Производитель</th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider min-w-[180px]">Описание</th>
@@ -783,6 +784,14 @@ function WarehouseSection({
               const added = addedIds.has(item.id);
               return (
                 <tr key={item.id} className="border-b border-primary/10 last:border-0 hover:bg-primary/5 transition-colors">
+                  <td className="px-4 py-2.5">
+                    <ProductImage
+                      src={null}
+                      alt={item.part_number}
+                      wrapperClassName="h-10 w-10 rounded-md border border-primary/20 bg-background"
+                      className="absolute inset-0 h-full w-full object-contain p-1"
+                    />
+                  </td>
                   <td className="px-4 py-2.5">
                     <span className="font-mono text-xs font-semibold text-primary">{item.part_number}</span>
                   </td>
@@ -1022,6 +1031,7 @@ const ExternalSearchResults = ({
           <thead>
             <tr className="border-b border-border">
               <th className="px-3 py-2.5 w-10"></th>
+              <th className="px-3 py-2.5 w-[60px]"></th>
               <th className="px-3 py-2.5 w-16 cursor-pointer text-left text-xs font-semibold text-muted-foreground uppercase" onClick={() => toggleExtSort("source")}>
                 <span className="flex items-center gap-1">{t("ext.source")} <ExtSortIcon col="source" /></span>
               </th>
@@ -1053,6 +1063,14 @@ const ExternalSearchResults = ({
                   >
                     {addedKeys.has(item.key) ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
                   </button>
+                </td>
+                <td className="px-3 py-2">
+                  <ProductImage
+                    src={(item.raw as any).imageUrl || (item.raw as any).image_url || null}
+                    alt={item.mpn}
+                    wrapperClassName="h-10 w-10 rounded-md border border-border bg-background"
+                    className="absolute inset-0 h-full w-full object-contain p-1"
+                  />
                 </td>
                 <td className="px-3 py-2">
                   <span className={`text-[10px] font-semibold rounded px-1.5 py-0.5 ${
