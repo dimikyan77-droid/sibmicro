@@ -310,8 +310,38 @@ const Catalog = () => {
     return { label: t("catalog.on_order"), cls: "bg-amber-500/15 text-amber-400 border-amber-500/30" };
   };
 
+  const catalogCanonical = "https://sibmicro.lovable.app/catalog";
+  const catalogTitle = query
+    ? `${t("catalog.results_for")} "${query}" | SibMicro`
+    : "Каталог электронных компонентов | SibMicro";
+  const catalogDesc = query
+    ? `Результаты поиска по запросу "${query}" в каталоге SibMicro: цены, наличие, datasheet.`
+    : "Каталог электронных компонентов SibMicro: микросхемы, пассивные компоненты, разъёмы. Поиск по part number, цены и наличие.";
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: t("catalog.home"), item: "https://sibmicro.lovable.app/" },
+      { "@type": "ListItem", position: 2, name: t("catalog.title"), item: catalogCanonical },
+    ],
+  };
+
   return (
     <Layout>
+      <SEO
+        title={catalogTitle}
+        description={catalogDesc}
+        canonical={catalogCanonical}
+        jsonLd={breadcrumbJsonLd}
+      />
+      {/* Breadcrumb */}
+      <div className="bg-muted/50 border-b border-border">
+        <div className="container py-3 text-xs text-muted-foreground flex items-center gap-1.5">
+          <Link to="/" className="hover:text-foreground transition-colors">{t("catalog.home")}</Link>
+          <ChevronRight className="h-3 w-3" />
+          <span className="text-foreground font-medium">{t("catalog.title")}</span>
+        </div>
+      </div>
       {/* Top bar with back, search, BOM */}
       <div className="border-b border-border bg-card">
         <div className="container py-4">

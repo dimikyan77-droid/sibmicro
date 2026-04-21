@@ -7,12 +7,22 @@ import { useI18n } from "@/contexts/I18nContext";
 const Manufacturers = () => {
   const { t } = useI18n();
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: t("catalog.home"), item: "https://sibmicro.lovable.app/" },
+      { "@type": "ListItem", position: 2, name: t("header.manufacturers"), item: "https://sibmicro.lovable.app/manufacturers" },
+    ],
+  };
+
   return (
     <Layout>
       <SEO
         title="Производители электронных компонентов | SibMicro"
         description="Список ведущих производителей электронных компонентов: ST, NXP, Texas Instruments, Analog Devices и другие. Каталоги по брендам."
         canonical="https://sibmicro.lovable.app/manufacturers"
+        jsonLd={breadcrumbJsonLd}
       />
       <div className="bg-muted border-b border-border">
         <div className="container py-3 text-xs text-muted-foreground flex items-center gap-1.5">
