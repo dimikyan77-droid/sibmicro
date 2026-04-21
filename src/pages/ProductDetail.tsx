@@ -249,7 +249,7 @@ const ProductDetail = () => {
         canonical={canonical}
         image={product.image || undefined}
         type="product"
-        jsonLd={[productJsonLd, breadcrumbJsonLd]}
+        jsonLd={[productJsonLd, breadcrumbJsonLd, faqJsonLd]}
       />
       {/* Breadcrumb */}
       <div className="bg-muted/50 border-b border-border">
