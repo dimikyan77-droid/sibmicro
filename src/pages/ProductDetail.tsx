@@ -207,6 +207,40 @@ const ProductDetail = () => {
     ],
   };
 
+  const stockAnswer = product.stock > 0
+    ? `Да, ${product.partNumber} есть в наличии на складе SibMicro: ${product.stock.toLocaleString()} шт. Отгрузка возможна в день оплаты.`
+    : product.leadTime === "Contact"
+      ? `${product.partNumber} доступен под заказ. Свяжитесь с менеджером SibMicro для уточнения сроков и условий поставки.`
+      : `${product.partNumber} временно отсутствует на складе. Срок поставки под заказ: ${product.leadTime}. Можно оформить подписку на уведомление о поступлении.`;
+
+  const moqAnswer = `Минимальный заказ (MOQ) для ${product.partNumber} составляет ${product.moq} шт. При увеличении количества действуют скидки по тарифной сетке — от $${product.priceTiers[0].price.toFixed(product.priceTiers[0].price < 1 ? 4 : 2)} за штуку.`;
+
+  const leadTimeAnswer = product.stock > 0
+    ? `${product.partNumber} есть на складе — отгрузка в течение 1 рабочего дня после оплаты. Доставка по России от 2 до 7 дней в зависимости от региона.`
+    : `Срок поставки ${product.partNumber} под заказ: ${product.leadTime}. Точные сроки и условия уточняйте у менеджера SibMicro.`;
+
+  const faqJsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `Есть ли ${product.partNumber} в наличии?`,
+        acceptedAnswer: { "@type": "Answer", text: stockAnswer },
+      },
+      {
+        "@type": "Question",
+        name: `Какой минимальный заказ (MOQ) для ${product.partNumber}?`,
+        acceptedAnswer: { "@type": "Answer", text: moqAnswer },
+      },
+      {
+        "@type": "Question",
+        name: `Какой срок поставки (lead time) ${product.partNumber}?`,
+        acceptedAnswer: { "@type": "Answer", text: leadTimeAnswer },
+      },
+    ],
+  };
+
   return (
     <Layout>
       <SEO
@@ -215,7 +249,7 @@ const ProductDetail = () => {
         canonical={canonical}
         image={product.image || undefined}
         type="product"
-        jsonLd={[productJsonLd, breadcrumbJsonLd]}
+        jsonLd={[productJsonLd, breadcrumbJsonLd, faqJsonLd]}
       />
       {/* Breadcrumb */}
       <div className="bg-muted/50 border-b border-border">
