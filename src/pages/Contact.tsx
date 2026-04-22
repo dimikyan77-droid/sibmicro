@@ -167,7 +167,7 @@ const Contact = () => {
                   <Phone className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium text-foreground">{t("contact.phone")}</span>
-                    <p className="text-muted-foreground">+7 (495) 123-45-67</p>
+                    <p className="text-muted-foreground">+7 (495) 000-00-00</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
