@@ -69,6 +69,55 @@
     }
     </script>
 
+    <!-- LocalBusiness JSON-LD with geo data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ElectronicsStore",
+      "@id": "https://sibmicro.lovable.app/#localbusiness",
+      "name": "SibMicro",
+      "image": "https://sibmicro.lovable.app/icon-512.png",
+      "logo": "https://sibmicro.lovable.app/icon-512.png",
+      "url": "https://sibmicro.lovable.app/",
+      "telephone": "+7 (495) 000-00-00",
+      "email": "sales@sibmicro.ru",
+      "priceRange": "₽₽",
+      "currenciesAccepted": "RUB, USD, EUR",
+      "paymentAccepted": "Bank transfer, Invoice",
+      "description": "SibMicro — поставщик электронных компонентов: полупроводники, микросхемы, RF-компоненты. Склад в наличии, BOM-загрузка, кросс-референс.",
+      "parentOrganization": { "@id": "https://sibmicro.lovable.app/#organization" },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Пресненская наб., 12",
+        "addressLocality": "Москва",
+        "addressRegion": "Москва",
+        "postalCode": "123112",
+        "addressCountry": "RU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 55.749792,
+        "longitude": 37.539431
+      },
+      "areaServed": [
+        { "@type": "Country", "name": "Russia" },
+        { "@type": "Country", "name": "Kazakhstan" },
+        { "@type": "Country", "name": "Belarus" }
+      ],
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "09:00",
+          "closes": "18:00"
+        }
+      ],
+      "sameAs": [
+        "https://sibmicro.lovable.app/"
+      ]
+    }
+    </script>
+
     <!-- WebSite JSON-LD with SearchAction -->
     <script type="application/ld+json">
     {
