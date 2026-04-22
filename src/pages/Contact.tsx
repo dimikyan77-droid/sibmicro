@@ -68,43 +68,68 @@ const Contact = () => {
       inLanguage: "ru-RU",
       isPartOf: { "@id": "https://sibmicro.lovable.app/#website" },
       about: { "@id": "https://sibmicro.lovable.app/#organization" },
-      mainEntity: {
-        "@type": "Organization",
-        "@id": "https://sibmicro.lovable.app/#organization",
-        name: "SibMicro",
-        url: "https://sibmicro.lovable.app/",
-        email: "sales@sibmicro.ru",
-        telephone: "+7 (495) 123-45-67",
-        address: {
-          "@type": "PostalAddress",
-          streetAddress: "Пресненская наб., 12",
-          addressLocality: "Москва",
-          postalCode: "123112",
-          addressCountry: "RU",
-        },
-        contactPoint: [
-          {
-            "@type": "ContactPoint",
-            telephone: "+7-495-123-45-67",
-            email: "sales@sibmicro.ru",
-            contactType: "sales",
-            areaServed: "RU",
-            availableLanguage: ["Russian", "English"],
-          },
-        ],
-        openingHoursSpecification: [
-          {
-            "@type": "OpeningHoursSpecification",
-            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            opens: "09:00",
-            closes: "18:00",
-          },
-        ],
+      breadcrumb: { "@id": `${canonical}#breadcrumb` },
+      mainEntity: { "@id": "https://sibmicro.lovable.app/#localbusiness" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ElectronicsStore",
+      "@id": "https://sibmicro.lovable.app/#localbusiness",
+      name: "SibMicro",
+      image: "https://sibmicro.lovable.app/icon-512.png",
+      logo: "https://sibmicro.lovable.app/icon-512.png",
+      url: "https://sibmicro.lovable.app/",
+      telephone: "+7 (495) 000-00-00",
+      email: "sales@sibmicro.ru",
+      priceRange: "₽₽",
+      currenciesAccepted: "RUB, USD, EUR",
+      paymentAccepted: "Bank transfer, Invoice",
+      description:
+        "SibMicro — поставщик электронных компонентов: полупроводники, микросхемы, RF-компоненты. Склад в наличии, BOM-загрузка, кросс-референс.",
+      parentOrganization: { "@id": "https://sibmicro.lovable.app/#organization" },
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Пресненская наб., 12",
+        addressLocality: "Москва",
+        addressRegion: "Москва",
+        postalCode: "123112",
+        addressCountry: "RU",
       },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: 55.749792,
+        longitude: 37.539431,
+      },
+      hasMap: "https://yandex.ru/maps/?ll=37.539431%2C55.749792&z=16&pt=37.539431%2C55.749792",
+      areaServed: [
+        { "@type": "Country", name: "Russia" },
+        { "@type": "Country", name: "Kazakhstan" },
+        { "@type": "Country", name: "Belarus" },
+      ],
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          telephone: "+7-495-000-00-00",
+          email: "sales@sibmicro.ru",
+          contactType: "sales",
+          areaServed: ["RU", "KZ", "BY"],
+          availableLanguage: ["Russian", "English"],
+        },
+      ],
+      openingHoursSpecification: [
+        {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          opens: "09:00",
+          closes: "18:00",
+        },
+      ],
+      sameAs: ["https://sibmicro.lovable.app/"],
     },
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
+      "@id": `${canonical}#breadcrumb`,
       itemListElement: [
         { "@type": "ListItem", position: 1, name: t("catalog.home"), item: "https://sibmicro.lovable.app/" },
         { "@type": "ListItem", position: 2, name: t("contact.title"), item: canonical },
@@ -116,7 +141,7 @@ const Contact = () => {
     <Layout>
       <SEO
         title="Контакты SibMicro — адрес, телефон, часы работы"
-        description="Свяжитесь с SibMicro: адрес офиса в Москве, телефон +7 (495) 123-45-67, email sales@sibmicro.ru. Часы работы пн–пт 09:00–18:00."
+        description="Свяжитесь с SibMicro: адрес офиса в Москве (Пресненская наб., 12), телефон +7 (495) 000-00-00, email sales@sibmicro.ru. Часы работы пн–пт 09:00–18:00."
         canonical={canonical}
         jsonLd={contactJsonLd}
       />
@@ -142,7 +167,7 @@ const Contact = () => {
                   <Phone className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <span className="font-medium text-foreground">{t("contact.phone")}</span>
-                    <p className="text-muted-foreground">+7 (495) 123-45-67</p>
+                    <p className="text-muted-foreground">+7 (495) 000-00-00</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
