@@ -141,7 +141,7 @@ const Contact = () => {
     <Layout>
       <SEO
         title="Контакты SibMicro — адрес, телефон, часы работы"
-        description="Свяжитесь с SibMicro: адрес офиса в Москве, телефон +7 (495) 123-45-67, email sales@sibmicro.ru. Часы работы пн–пт 09:00–18:00."
+        description="Свяжитесь с SibMicro: адрес офиса в Москве (Пресненская наб., 12), телефон +7 (495) 000-00-00, email sales@sibmicro.ru. Часы работы пн–пт 09:00–18:00."
         canonical={canonical}
         jsonLd={contactJsonLd}
       />
