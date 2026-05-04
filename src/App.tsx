@@ -74,6 +74,8 @@ const App = () => (
                     <Route path="/inventory" element={<Inventory />} />
                     <Route path="/new-products" element={<NewProducts />} />
                     <Route path="/cross-reference" element={<CrossReference />} />
+                    <Route path="/regions" element={<Regions />} />
+                    <Route path="/regions/:slug" element={<Region />} />
                     <Route path="/admin/orders" element={<AdminOrders />} />
                     <Route path="/admin/products" element={<AdminProducts />} />
                     <Route path="*" element={<NotFound />} />
