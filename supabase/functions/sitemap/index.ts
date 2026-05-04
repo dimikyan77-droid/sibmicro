@@ -18,6 +18,12 @@ const STATIC_ROUTES = [
   { path: "/quote", priority: "0.6", changefreq: "monthly" },
   { path: "/contact", priority: "0.5", changefreq: "monthly" },
   { path: "/resources", priority: "0.5", changefreq: "monthly" },
+  { path: "/regions", priority: "0.7", changefreq: "monthly" },
+  { path: "/regions/moscow", priority: "0.7", changefreq: "monthly" },
+  { path: "/regions/saint-petersburg", priority: "0.7", changefreq: "monthly" },
+  { path: "/regions/novosibirsk", priority: "0.7", changefreq: "monthly" },
+  { path: "/regions/ekaterinburg", priority: "0.7", changefreq: "monthly" },
+  { path: "/regions/kazan", priority: "0.7", changefreq: "monthly" },
 ];
 
 function escapeXml(s: string) {

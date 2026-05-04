@@ -30,6 +30,8 @@ const AdminOrders = lazy(() => import("./pages/AdminOrders"));
 const AdminProducts = lazy(() => import("./pages/AdminProducts"));
 const NewProducts = lazy(() => import("./pages/NewProducts"));
 const CrossReference = lazy(() => import("./pages/CrossReference"));
+const Regions = lazy(() => import("./pages/Regions"));
+const Region = lazy(() => import("./pages/Region"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -72,6 +74,8 @@ const App = () => (
                     <Route path="/inventory" element={<Inventory />} />
                     <Route path="/new-products" element={<NewProducts />} />
                     <Route path="/cross-reference" element={<CrossReference />} />
+                    <Route path="/regions" element={<Regions />} />
+                    <Route path="/regions/:slug" element={<Region />} />
                     <Route path="/admin/orders" element={<AdminOrders />} />
                     <Route path="/admin/products" element={<AdminProducts />} />
                     <Route path="*" element={<NotFound />} />

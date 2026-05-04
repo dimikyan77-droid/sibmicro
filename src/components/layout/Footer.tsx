@@ -27,6 +27,7 @@ const Footer = () => {
             <li><Link to="/bom" className="hover:opacity-100">{t("footer.bom_upload")}</Link></li>
             <li><Link to="/resources" className="hover:opacity-100">{t("footer.tech_resources")}</Link></li>
             <li><Link to="/contact" className="hover:opacity-100">{t("footer.contact_sales")}</Link></li>
+            <li><Link to="/regions" className="hover:opacity-100">Регионы поставок</Link></li>
           </ul>
         </div>
         <div>
